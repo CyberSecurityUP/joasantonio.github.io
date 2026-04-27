@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#0d0f12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Linux Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   LINUX TRAINER — MOBILE-FIRST
+   Design tokens, reset, layout principal
+═══════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  /* cores */
+  --bg:#0d0f12;--bg2:#13161b;--bg3:#1a1e26;--bg4:#222733;--bg5:#2a3040;
+  --border:#252b36;--border2:#3a4555;
+  --green:#3dd68c;--green2:#2ab574;--gdim:rgba(61,214,140,.12);--gdim2:rgba(61,214,140,.22);
+  --blue:#60a5fa;--bdim:rgba(96,165,250,.12);
+  --amber:#fbbf24;--adim:rgba(251,191,36,.12);
+  --red:#f87171;--rdim:rgba(248,113,113,.12);
+  --text:#e8edf2;--text2:#a0a8b4;--text3:#6b7280;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  /* sizing */
+  --r:10px;--r-lg:14px;--r-xl:18px;
+  --tap:44px; /* min toque */
+  /* safe-area */
+  --sa-t:env(safe-area-inset-top,0px);
+  --sa-r:env(safe-area-inset-right,0px);
+  --sa-b:env(safe-area-inset-bottom,0px);
+  --sa-l:env(safe-area-inset-left,0px);
+  /* alturas chrome */
+  --hdr-h:52px;
+  --bottom-h:60px;
+}
+html,body{
+  height:100%;
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+  overscroll-behavior:none;
+}
+body{overflow:hidden;position:fixed;width:100%}
+button,input,select,textarea{font-family:inherit;color:inherit;font-size:inherit}
+button{-webkit-appearance:none;appearance:none;background:none;border:none;cursor:pointer;touch-action:manipulation}
+input{-webkit-appearance:none;appearance:none;border-radius:0}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT BASE
+═══════════════════════════════════════════════════════ */
+.app{
+  display:flex;flex-direction:column;
+  height:100vh;height:100svh;height:100dvh;
+  padding-left:var(--sa-l);padding-right:var(--sa-r);
+}
+
+/* HEADER FIXO */
+.hdr{
+  flex-shrink:0;
+  height:calc(var(--hdr-h) + var(--sa-t));
+  padding-top:var(--sa-t);
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding-left:8px;padding-right:12px;gap:6px;
+  z-index:30;position:relative;
+}
+.hdr-btn{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text2);
+}
+.hdr-btn:active{background:var(--bg3);color:var(--text)}
+.ham-icon{width:18px;height:14px;display:flex;flex-direction:column;justify-content:space-between}
+.ham-icon span{display:block;height:2px;background:currentColor;border-radius:1px;transition:all .25s}
+.ham-icon span:nth-child(1){width:18px}
+.ham-icon span:nth-child(2){width:14px}
+.ham-icon span:nth-child(3){width:18px}
+.logo{
+  font-family:var(--mono);font-size:14px;font-weight:700;
+  color:var(--green);display:flex;align-items:center;gap:6px;
+  flex:1;min-width:0;letter-spacing:-.02em;
+}
+.logo .p{color:var(--text3)}
+.logo .n{color:var(--text);font-weight:600}
+
+/* stats compactos no header */
+.hdr-stats{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.stat{
+  display:flex;align-items:center;gap:3px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:99px;padding:4px 9px;
+  font-size:11px;font-family:var(--mono);
+  min-height:28px;
+}
+.stat .v{color:var(--green);font-weight:600;font-size:12px}
+.stat.fire .v{color:var(--amber)}
+.stat .ic{font-size:11px;line-height:1}
+
+/* ═══════════════════════════════════════════════════════
+   ÁREA PRINCIPAL (rolável)
+═══════════════════════════════════════════════════════ */
+.main{
+  flex:1;min-height:0;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.view{
+  display:none;flex-direction:column;
+  flex:1;min-height:0;overflow:hidden;
+}
+.view.active{display:flex}
+
+/* ═══════════════════════════════════════════════════════
+   DRAWER (sidebar mobile fullscreen)
+═══════════════════════════════════════════════════════ */
+.drawer{
+  position:fixed;
+  top:0;left:0;bottom:0;
+  width:min(320px,86vw);
+  background:var(--bg2);border-right:1px solid var(--border);
+  z-index:60;
+  transform:translateX(-100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  padding-top:var(--sa-t);padding-bottom:var(--sa-b);padding-left:var(--sa-l);
+  box-shadow:6px 0 24px rgba(0,0,0,.5);
+}
+.drawer.open{transform:translateX(0)}
+.drawer-hdr{
+  flex-shrink:0;padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.drawer-hdr h3{
+  font-size:11px;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.1em;flex:1;
+}
+.drawer-close{
+  width:36px;height:36px;border-radius:8px;
+  color:var(--text2);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+}
+.drawer-close:active{background:var(--bg3);color:var(--text)}
+.drawer-prog{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.pbar-track{background:var(--bg3);border-radius:99px;height:4px;margin-bottom:6px;overflow:hidden}
+.pbar-fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:99px;transition:width .5s}
+.pbar-txt{font-size:11px;color:var(--text3);font-family:var(--mono)}
+
+.drawer-list{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding:8px 8px 16px;
+}
+.mod-group{margin-bottom:6px}
+.mod-lbl{
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:10px 10px 6px;
+}
+.cmd-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:11px 10px;border-radius:10px;
+  text-align:left;color:var(--text2);
+  min-height:var(--tap);
+  transition:background .12s;
+}
+.cmd-btn:active{background:var(--bg3)}
+.cmd-btn.active{background:var(--gdim);color:var(--green)}
+.cmd-btn.active .cmd-ic{background:var(--gdim2);color:var(--green);border-color:rgba(61,214,140,.3)}
+.cmd-ic{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--text3);flex-shrink:0;
+}
+.cmd-meta{flex:1;min-width:0}
+.cmd-name{
+  font-family:var(--mono);font-size:13px;font-weight:600;
+  color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.cmd-btn.active .cmd-name{color:var(--green)}
+.cmd-prog{font-size:11px;color:var(--text3);margin-top:1px}
+.dot-row{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--bg5);flex-shrink:0}
+.dot.d{background:var(--green2)}
+
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);z-index:50;
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+}
+.overlay.show{display:block;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ═══════════════════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════════════════ */
+.empty-st{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:14px;padding:24px;text-align:center;
+}
+.empty-st .icon{
+  font-size:52px;
+  filter:drop-shadow(0 4px 16px rgba(61,214,140,.3));
+}
+.empty-st h3{font-size:18px;color:var(--text);font-weight:600}
+.empty-st p{font-size:14px;color:var(--text3);max-width:280px}
+.empty-cta{
+  margin-top:8px;
+  padding:13px 22px;border-radius:12px;
+  background:var(--green2);color:#061510;font-weight:600;font-size:14px;
+  display:flex;align-items:center;gap:8px;
+  min-height:var(--tap);
+}
+.empty-cta:active{background:var(--green);transform:scale(.97)}
+
+/* ═══════════════════════════════════════════════════════
+   EXERCÍCIO (single column mobile)
+═══════════════════════════════════════════════════════ */
+.ex-scroll{
+  flex:1;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:12px;
+  padding-bottom:calc(var(--bottom-h) + var(--sa-b) + 12px);
+  display:flex;flex-direction:column;gap:12px;
+}
+.ex-scroll > *{flex-shrink:0}
+.ex-scroll::-webkit-scrollbar{width:0}
+
+/* ── CARD BASE ─────────────────────────────── */
+.card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+}
+.card-hdr{
+  padding:11px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);
+}
+.card-hdr .ic{font-size:14px;flex-shrink:0}
+.card-hdr .ttl{
+  font-size:11px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.08em;
+  flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.card-hdr .extra{margin-left:auto;display:flex;gap:6px;align-items:center;flex-shrink:0}
+.card-body{padding:14px}
+.card-body.tight{padding:11px 14px}
+
+/* ── TASK CARD ─────────────────────────────── */
+.task-num{
+  font-family:var(--mono);font-size:10px;
+  color:var(--text2);background:var(--bg4);
+  border:1px solid var(--border);border-radius:6px;
+  padding:3px 8px;font-weight:600;
+}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.tag{
+  font-size:10px;padding:3px 9px;border-radius:99px;
+  font-weight:600;font-family:var(--mono);white-space:nowrap;
+  letter-spacing:.02em;
+}
+.tag-i{background:var(--gdim);color:var(--green);border:1px solid rgba(61,214,140,.25)}
+.tag-m{background:var(--bdim);color:var(--blue);border:1px solid rgba(96,165,250,.25)}
+.tag-v{background:var(--adim);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+
+.task-lbl{
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;
+}
+.task-obj{
+  font-size:15px;color:var(--text);line-height:1.55;
+  font-weight:500;
+}
+.task-why{
+  font-size:13px;color:var(--text2);line-height:1.55;
+  margin-top:11px;padding-top:11px;
+  border-top:1px solid var(--border);
+}
+.task-why strong{color:var(--text);font-weight:600}
+
+/* ── CONTEXT CARD ─────────────────────────── */
+.ctx-item{margin-bottom:11px}
+.ctx-item:last-child{margin-bottom:0}
+.ctx-name{
+  font-family:var(--mono);font-size:12px;
+  color:var(--blue);font-weight:600;margin-bottom:3px;
+}
+.ctx-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:6px}
+.ctx-snippet{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;
+  font-family:var(--mono);font-size:12px;color:var(--text2);
+  white-space:pre;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;line-height:1.6;
+}
+.ctx-snippet::-webkit-scrollbar{height:3px}
+.ctx-snippet::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── VARIATIONS (pills) ─────────────────────── */
+.var-pills{
+  display:flex;gap:6px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:2px;margin:-2px;
+  scroll-snap-type:x proximity;
+}
+.var-pills::-webkit-scrollbar{display:none}
+.vpill{
+  padding:8px 14px;border-radius:99px;
+  border:1px solid var(--border);background:var(--bg3);
+  color:var(--text2);font-size:12px;font-family:var(--sans);
+  font-weight:500;white-space:nowrap;flex-shrink:0;
+  scroll-snap-align:start;min-height:32px;
+  transition:all .15s;
+}
+.vpill:active{transform:scale(.95)}
+.vpill.active{
+  background:var(--gdim);border-color:rgba(61,214,140,.4);
+  color:var(--green);font-weight:600;
+}
+.vpill.solved{border-color:var(--green2);color:var(--green2)}
+.vpill.solved.active{background:var(--gdim2)}
+
+/* ── TERMINAL ───────────────────────────────── */
+.term{
+  background:#080a0d;border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,.4);
+}
+.term-bar{
+  background:var(--bg3);border-bottom:1px solid var(--border);
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+}
+.tdots{display:flex;gap:5px}
+.tdot{width:10px;height:10px;border-radius:50%}
+.tdot-r{background:#ff5f57}.tdot-y{background:#febc2e}.tdot-g{background:#28c840}
+.ttitle{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  margin-left:4px;
+}
+.term-body{
+  padding:12px;
+  min-height:140px;max-height:280px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  font-family:var(--mono);font-size:13px;line-height:1.55;
+  cursor:text;word-break:break-word;overflow-wrap:anywhere;
+}
+.term-body::-webkit-scrollbar{width:3px}
+.term-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.t-hist{margin-bottom:3px}
+.t-prompt{display:flex;align-items:center;flex-wrap:wrap}
+.ps1{display:inline-flex;align-items:center;white-space:nowrap;flex-shrink:0;font-size:13px}
+.ps1-u{color:var(--green)}
+.ps1-a,.ps1-c{color:var(--text3)}
+.ps1-h{color:var(--blue)}
+.ps1-p{color:var(--amber)}
+.ps1-d{color:var(--text2);margin-right:6px}
+.t-input{
+  background:none;border:none;outline:none;color:var(--text);
+  font-family:var(--mono);
+  /* 16px previne zoom iOS ao focar */
+  font-size:16px;
+  flex:1;min-width:0;caret-color:var(--green);
+  padding:0;
+}
+.t-out{margin:4px 0;white-space:pre-wrap;font-family:var(--mono);font-size:12px;line-height:1.5}
+.ok{color:var(--green)}.er{color:var(--red)}
+
+/* ── BARRA DE TECLAS ESPECIAIS (acima do teclado virtual) ── */
+.keybar{
+  display:flex;gap:5px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:6px 2px;margin:-2px;
+}
+.keybar::-webkit-scrollbar{display:none}
+.kkey{
+  flex-shrink:0;min-width:38px;height:36px;
+  padding:0 11px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text2);font-family:var(--mono);font-size:13px;
+  font-weight:500;display:flex;align-items:center;justify-content:center;
+}
+.kkey:active{background:var(--bg4);color:var(--text);transform:scale(.92)}
+.kkey.special{color:var(--blue);font-size:11px;font-weight:600;letter-spacing:.04em}
+
+/* ── FEEDBACK ──────────────────────────────── */
+.fb{
+  border-radius:var(--r);padding:12px 14px;
+  border:1px solid transparent;display:none;
+  animation:slideUp .25s ease;
+}
+.fb.show{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fb.suc{background:var(--gdim);border-color:rgba(61,214,140,.3)}
+.fb.err{background:var(--rdim);border-color:rgba(248,113,113,.3)}
+.fb.hin{background:var(--adim);border-color:rgba(251,191,36,.3)}
+.fb-ttl{font-weight:700;font-size:14px;margin-bottom:4px}
+.suc .fb-ttl{color:var(--green)}
+.err .fb-ttl{color:var(--red)}
+.hin .fb-ttl{color:var(--amber)}
+.fb-body{font-size:13px;color:var(--text2);line-height:1.55}
+.fb-code{
+  font-family:var(--mono);font-size:12px;background:rgba(0,0,0,.35);
+  border-radius:6px;padding:8px 10px;margin-top:8px;color:var(--green);
+  white-space:pre-wrap;display:none;
+}
+
+/* ── ANSWERS BOX ───────────────────────────── */
+.ans-box{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:11px 14px;display:none;
+}
+.ans-box h4{
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;
+}
+.ans-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ans-chip{
+  font-family:var(--mono);font-size:13px;
+  background:var(--gdim);border:1px solid rgba(61,214,140,.3);
+  border-radius:6px;padding:6px 11px;color:var(--green);font-weight:500;
+}
+
+/* ── ACTION BUTTONS GRID ──────────────────── */
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.actions .btn-check{grid-column:1 / -1}
+.btn{
+  padding:0 14px;height:46px;border-radius:11px;
+  font-family:var(--sans);font-size:14px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid transparent;
+  -webkit-user-select:none;user-select:none;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.96)}
+.btn-p{background:var(--green2);color:#061510;border-color:var(--green2)}
+.btn-p:active{background:var(--green)}
+.btn-g{background:var(--bg3);color:var(--text);border-color:var(--border)}
+.btn-g:active{background:var(--bg4)}
+.btn-icon{font-size:15px}
+
+/* ── EXPLAIN CARD (acordeon) ──────────────── */
+.exp-card{transition:all .25s}
+.exp-toggle{
+  width:100%;padding:11px 14px;
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);
+  color:var(--text);text-align:left;
+}
+.exp-toggle .ic{font-size:14px}
+.exp-toggle .ttl{
+  font-size:11px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.exp-toggle .cmd{
+  font-family:var(--mono);font-size:13px;font-weight:700;
+  color:var(--green);margin-left:auto;
+}
+.exp-toggle .arr{
+  color:var(--text3);font-size:11px;margin-left:6px;
+  transition:transform .25s;
+}
+.exp-card.open .exp-toggle{border-bottom:1px solid var(--border)}
+.exp-card.open .exp-toggle .arr{transform:rotate(180deg)}
+.exp-content{
+  max-height:0;overflow:hidden;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1);
+}
+.exp-card.open .exp-content{max-height:1500px}
+.exp-inner{padding:14px}
+.exp-summary{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:14px}
+.exp-summary b{color:var(--green);font-weight:600}
+.flag-list{display:flex;flex-direction:column;gap:6px}
+.flag-row{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;
+}
+.flag-key{
+  font-family:var(--mono);font-size:13px;color:var(--green);
+  font-weight:600;margin-bottom:3px;
+  word-break:break-all;
+}
+.flag-ex{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  margin-top:4px;padding-top:6px;
+  border-top:1px solid var(--border);
+  word-break:break-all;
+}
+.flag-desc{font-size:13px;color:var(--text2);line-height:1.5}
+
+/* ═══════════════════════════════════════════════════════
+   CHEATSHEET (Referência)
+═══════════════════════════════════════════════════════ */
+.cs-scroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px;
+  padding-bottom:calc(var(--bottom-h) + var(--sa-b) + 14px);
+}
+.cs-scroll::-webkit-scrollbar{width:0}
+.cs-intro{margin-bottom:18px;padding:0 2px}
+.cs-intro h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
+.cs-intro p{font-size:13px;color:var(--text3)}
+.cs-sec{margin-bottom:22px}
+.cs-sec-hdr{
+  font-size:12px;font-weight:700;color:var(--text);
+  margin-bottom:10px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.cs-cmd-nm{font-family:var(--mono);color:var(--green);font-size:14px;font-weight:700}
+.cs-cmd-desc{color:var(--text3);font-weight:400;font-size:12px}
+.cs-grid{display:flex;flex-direction:column;gap:7px}
+.cs-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:11px 13px;
+}
+.cs-flag{
+  font-family:var(--mono);font-size:13px;color:var(--green);
+  font-weight:600;margin-bottom:4px;word-break:break-all;
+}
+.cs-desc{font-size:13px;color:var(--text2);line-height:1.5}
+.cs-ex{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  margin-top:6px;padding-top:6px;border-top:1px solid var(--border);
+  word-break:break-all;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESSO
+═══════════════════════════════════════════════════════ */
+.prog-scroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px;
+  padding-bottom:calc(var(--bottom-h) + var(--sa-b) + 14px);
+}
+.prog-scroll::-webkit-scrollbar{width:0}
+.prog-intro{margin-bottom:16px;padding:0 2px}
+.prog-intro h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
+.prog-intro p{font-size:13px;color:var(--text3)}
+
+.prog-summary{
+  background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);
+  border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:14px;margin-bottom:14px;
+  display:flex;align-items:center;gap:14px;
+}
+.prog-summary-num{
+  font-family:var(--mono);font-size:32px;font-weight:700;
+  color:var(--green);line-height:1;letter-spacing:-.02em;
+}
+.prog-summary-info{flex:1;min-width:0}
+.prog-summary-info .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:5px}
+.prog-summary-info .bar{background:var(--bg);border-radius:99px;height:6px;overflow:hidden}
+.prog-summary-info .fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:99px;transition:width .6s}
+
+.prog-grid{display:flex;flex-direction:column;gap:9px}
+.prog-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:13px;
+  transition:all .15s;
+}
+.prog-card:active{background:var(--bg3);transform:scale(.99)}
+.prog-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:6px;gap:8px;
+}
+.prog-nm{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-sub{font-size:12px;color:var(--text3);margin-bottom:9px}
+.prog-bar{background:var(--bg);border-radius:99px;height:4px;margin-bottom:5px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:99px;transition:width .5s}
+.prog-txt{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.prog-dots{display:flex;gap:3px;margin-top:8px;flex-wrap:wrap}
+.prog-dot{width:6px;height:6px;border-radius:50%;background:var(--bg5)}
+.prog-dot.d{background:var(--green2)}
+
+/* ═══════════════════════════════════════════════════════
+   BOTTOM NAVIGATION (mobile native pattern)
+═══════════════════════════════════════════════════════ */
+.bottom-nav{
+  flex-shrink:0;
+  height:calc(var(--bottom-h) + var(--sa-b));
+  padding-bottom:var(--sa-b);
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  display:flex;
+  z-index:25;
+}
+.tab-btn{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;color:var(--text3);
+  font-family:var(--sans);font-size:11px;font-weight:500;
+  height:100%;padding:6px 4px;
+  position:relative;
+}
+.tab-btn:active{background:var(--bg3)}
+.tab-btn.active{color:var(--green)}
+.tab-btn.active::before{
+  content:"";position:absolute;top:0;left:50%;
+  transform:translateX(-50%);
+  width:32px;height:3px;
+  background:var(--green);border-radius:0 0 3px 3px;
+}
+.tab-ic{font-size:20px;line-height:1;transition:transform .2s}
+.tab-btn:active .tab-ic{transform:scale(.9)}
+.tab-lbl{font-size:10px;letter-spacing:.02em}
+
+/* ═══════════════════════════════════════════════════════
+   ANIMAÇÕES
+═══════════════════════════════════════════════════════ */
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}
+  60%{transform:translateX(-3px)}
+  80%{transform:translateX(3px)}
+}
+@keyframes fall{
+  0%{transform:translateY(-30px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+.shake{animation:shake .35s ease}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+
+/* ═══════════════════════════════════════════════════════
+   TABLET / DESKTOP (responsivo, mas otimizado para mobile)
+═══════════════════════════════════════════════════════ */
+@media (min-width:768px){
+  .hdr{padding-left:16px;padding-right:16px}
+  .ex-scroll{padding:18px;max-width:760px;margin:0 auto;width:100%;gap:14px}
+  .cs-scroll,.prog-scroll{padding:20px;max-width:840px;margin:0 auto;width:100%}
+  .actions{grid-template-columns:repeat(4,1fr);gap:10px}
+  .actions .btn-check{grid-column:span 2}
+  .term-body{max-height:340px}
+  .cs-grid{display:grid;grid-template-columns:repeat(2,1fr)}
+  .prog-grid{display:grid;grid-template-columns:repeat(2,1fr)}
+}
+@media (min-width:1024px){
+  .cs-grid{grid-template-columns:repeat(3,1fr)}
+  .prog-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* preferências do sistema */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+  }
+}
+
+/* landscape em telas baixas: terminal menor */
+@media (max-height:480px) and (orientation:landscape){
+  :root{--hdr-h:44px;--bottom-h:50px}
+  .term-body{max-height:160px;min-height:90px}
+  .empty-st .icon{font-size:36px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="hdr">
+    <button class="hdr-btn" onclick="toggleDrawer()" aria-label="Abrir menu">
+      <div class="ham-icon"><span></span><span></span><span></span></div>
+    </button>
+    <div class="logo">
+      <span class="p">$</span>
+      <span class="n">linux</span>
+      <span style="color:var(--text3)">trainer</span>
+    </div>
+    <div class="hdr-stats">
+      <div class="stat" title="Corretos">
+        <span class="ic">✓</span><span class="v" id="sc">0</span>
+      </div>
+      <div class="stat fire" title="Sequência">
+        <span class="ic">🔥</span><span class="v" id="ss">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ OVERLAY DO DRAWER ═══ -->
+  <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+  <!-- ═══ DRAWER (sidebar mobile) ═══ -->
+  <aside class="drawer" id="drawer">
+    <div class="drawer-hdr">
+      <h3>Comandos Linux</h3>
+      <button class="drawer-close" onclick="closeDrawer()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="drawer-prog">
+      <div class="pbar-track"><div class="pbar-fill" id="mpf" style="width:0%"></div></div>
+      <div class="pbar-txt" id="mpt">0 de 0 variações</div>
+    </div>
+    <div class="drawer-list" id="ml"></div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+
+    <!-- ═══ VIEW: PRATICAR ═══ -->
+    <section class="view active" id="view-exercise">
+
+      <!-- Empty state (quando nenhum comando selecionado) -->
+      <div class="empty-st" id="est">
+        <div class="icon">⚡</div>
+        <h3>Vamos praticar?</h3>
+        <p>Escolha um comando Linux para começar a praticar com exercícios reais</p>
+        <button class="empty-cta" onclick="openDrawer()">
+          <span>📚</span><span>Escolher comando</span>
+        </button>
+      </div>
+
+      <!-- Conteúdo do exercício (single-column mobile) -->
+      <div class="ex-scroll" id="ex-content" style="display:none">
+
+        <!-- Card: Tarefa -->
+        <div class="card" id="task-card">
+          <div class="card-hdr">
+            <span class="ic">🎯</span>
+            <span class="ttl">Tarefa</span>
+            <div class="extra">
+              <span class="task-num" id="task-num">1/1</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="tags" id="task-tags"></div>
+            <div class="task-lbl">O que fazer</div>
+            <div class="task-obj" id="task-obj"></div>
+            <div class="task-why" id="task-why"></div>
+          </div>
+        </div>
+
+        <!-- Card: Variações -->
+        <div class="card">
+          <div class="card-hdr">
+            <span class="ic">🔄</span>
+            <span class="ttl">Variações</span>
+          </div>
+          <div class="card-body tight">
+            <div class="var-pills" id="vp"></div>
+          </div>
+        </div>
+
+        <!-- Card: Contexto/Ambiente -->
+        <div class="card" id="ctx-card" style="display:none">
+          <div class="card-hdr">
+            <span class="ic">📁</span>
+            <span class="ttl">Ambiente</span>
+          </div>
+          <div class="card-body" id="ctx-body"></div>
+        </div>
+
+        <!-- Terminal -->
+        <div class="term" id="tw">
+          <div class="term-bar">
+            <div class="tdots">
+              <div class="tdot tdot-r"></div>
+              <div class="tdot tdot-y"></div>
+              <div class="tdot tdot-g"></div>
+            </div>
+            <div class="ttitle" id="ttl">bash — user@linux:~</div>
+          </div>
+          <div class="term-body" id="tb" onclick="focusInput()">
+            <div id="th"></div>
+            <div class="t-prompt">
+              <div class="ps1">
+                <span class="ps1-u">user</span><span class="ps1-a">@</span><span class="ps1-h">linux</span><span class="ps1-c">:</span><span class="ps1-p" id="pp">~</span><span class="ps1-d">$&nbsp;</span>
+              </div>
+              <input class="t-input" id="ti" type="text"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                placeholder="digite o comando..."/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de teclas especiais (atalhos para mobile) -->
+        <div class="keybar">
+          <button class="kkey special" onclick="kInsert(' | ')">|</button>
+          <button class="kkey special" onclick="kInsert(' > ')">&gt;</button>
+          <button class="kkey special" onclick="kInsert(' >> ')">&gt;&gt;</button>
+          <button class="kkey" onclick="kInsert('-')">-</button>
+          <button class="kkey" onclick="kInsert('/')">/</button>
+          <button class="kkey" onclick="kInsert('~')">~</button>
+          <button class="kkey" onclick="kInsert('.')">.</button>
+          <button class="kkey" onclick="kInsert('*')">*</button>
+          <button class="kkey special" onclick="kHistory(1)">↑</button>
+          <button class="kkey special" onclick="kHistory(-1)">↓</button>
+          <button class="kkey special" onclick="kTab()">↹</button>
+        </div>
+
+        <!-- Feedback inline -->
+        <div class="fb" id="fp">
+          <div class="fb-ttl" id="ft"></div>
+          <div class="fb-body" id="fb"></div>
+          <div class="fb-code" id="fc"></div>
+        </div>
+
+        <!-- Ações -->
+        <div class="actions">
+          <button class="btn btn-p btn-check" onclick="checkAnswer()">
+            <span class="btn-icon">✓</span><span>Verificar</span>
+          </button>
+          <button class="btn btn-g" onclick="showHint()">
+            <span class="btn-icon">💡</span><span>Dica</span>
+          </button>
+          <button class="btn btn-g" onclick="revealAnswer()">
+            <span class="btn-icon">👁</span><span>Resposta</span>
+          </button>
+          <button class="btn btn-g" onclick="resetTerm()">
+            <span class="btn-icon">⌫</span><span>Limpar</span>
+          </button>
+          <button class="btn btn-g" onclick="nextVar()">
+            <span class="btn-icon">→</span><span>Próxima</span>
+          </button>
+        </div>
+
+        <!-- Caixa de respostas aceitas -->
+        <div class="ans-box" id="ab">
+          <h4>Respostas aceitas</h4>
+          <div class="ans-chips" id="ac"></div>
+        </div>
+
+        <!-- Card: Como funciona (acordeon) -->
+        <div class="card exp-card" id="exp-card">
+          <button class="exp-toggle" onclick="toggleExp()">
+            <span class="ic">📖</span>
+            <span class="ttl">Como funciona</span>
+            <span class="cmd" id="exp-cmd"></span>
+            <span class="arr">▼</span>
+          </button>
+          <div class="exp-content">
+            <div class="exp-inner">
+              <div class="exp-summary" id="exp-summary"></div>
+              <div class="flag-list" id="flag-list"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ VIEW: REFERÊNCIA ═══ -->
+    <section class="view" id="view-cheatsheet">
+      <div class="cs-scroll">
+        <div class="cs-intro">
+          <h2>Referência rápida</h2>
+          <p>Todas as flags e formas de uso com exemplos</p>
+        </div>
+        <div id="cs-body"></div>
+      </div>
+    </section>
+
+    <!-- ═══ VIEW: PROGRESSO ═══ -->
+    <section class="view" id="view-progress">
+      <div class="prog-scroll">
+        <div class="prog-intro">
+          <h2>Seu progresso</h2>
+          <p>Toque num card para praticar aquele comando</p>
+        </div>
+        <div class="prog-summary">
+          <div class="prog-summary-num" id="psn">0%</div>
+          <div class="prog-summary-info">
+            <div class="lbl" id="psl">0 de 0 variações resolvidas</div>
+            <div class="bar"><div class="fill" id="psf" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="prog-grid" id="pg"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ BOTTOM NAV ═══ -->
+  <nav class="bottom-nav">
+    <button class="tab-btn active" onclick="switchView('exercise')" id="nav-exercise">
+      <span class="tab-ic">⌨️</span>
+      <span class="tab-lbl">Praticar</span>
+    </button>
+    <button class="tab-btn" onclick="switchView('cheatsheet')" id="nav-cheatsheet">
+      <span class="tab-ic">📖</span>
+      <span class="tab-lbl">Referência</span>
+    </button>
+    <button class="tab-btn" onclick="switchView('progress')" id="nav-progress">
+      <span class="tab-ic">📊</span>
+      <span class="tab-lbl">Progresso</span>
+    </button>
+  </nav>
+
+</div>
+
+<div class="confetti-wrap" id="cw"></div>
+
+<script>
+const CMDS=[{"id":"ls","name":"ls","desc":"Listar arquivos e pastas","level":"iniciante","path":"~","exp":{"summary":"O <b>ls</b> mostra o que existe em uma pasta. Sem flags ele lista apenas os nomes. Com flags você adiciona detalhes como tamanho, data e permissões.","flags":[{"flag":"ls","desc":"Lista apenas os nomes dos arquivos e pastas","example":"ls"},{"flag":"-l  (long)","desc":"Formato longo: mostra permissões, dono, tamanho em bytes e data de modificação","example":"ls -l"},{"flag":"-a  (all)","desc":"Mostra todos, incluindo arquivos ocultos (nomes que começam com ponto)","example":"ls -a"},{"flag":"-h  (human)","desc":"Tamanhos legíveis: 4.0K, 2.5M, 1.2G em vez de números em bytes. Usar com -l","example":"ls -lh"},{"flag":"-la ou -al","desc":"Combinação: formato longo + arquivos ocultos. As flags podem ser agrupadas","example":"ls -la"},{"flag":"-lt","desc":"Formato longo ordenado por data: o mais recente aparece primeiro","example":"ls -lt"},{"flag":"ls /caminho","desc":"Lista o conteúdo de qualquer pasta sem precisar entrar nela","example":"ls /etc"}]},"exs":[{"title":"ls — listar arquivos","vars":[{"badge":"1. básico","title":"Só os nomes","objective":"Liste os arquivos e pastas da pasta atual. Sem nenhuma flag — apenas os nomes.","why":"É o comando que você digita para 'ver o que tem aqui'. Como abrir uma pasta no gerenciador de arquivos.","hint":"Só duas letras. Nenhuma flag necessária.","context":[{"name":"Pasta atual (~)","desc":"Contém estes itens:","snippet":"Documentos/   Downloads/   notas.txt   script.sh   imagem.png"}],"answers":["ls"],"sim":"Documentos  Downloads  notas.txt  script.sh  imagem.png","explanation":"Sem flags, ls mostra só os nomes dos itens visíveis da pasta atual, em ordem alfabética — em colunas no terminal, ou um por linha quando mandado para um pipe. Não inclui arquivos ocultos (os que começam com ponto, como .bashrc) nem informa tamanho, tipo, dono ou data. É o comando certo para uma olhada rápida: \"o que tem aqui?\". Para ver ocultos use -a; para detalhes use -l."},{"badge":"2. formato longo","title":"Detalhes de cada arquivo","objective":"Liste com formato longo (-l) para ver permissões, dono, tamanho em bytes e data de cada arquivo.","why":"Quando você precisa saber QUEM pode acessar o arquivo, QUANDO foi modificado e qual o TAMANHO exato.","hint":"Use a flag -l (letra L minúscula).","context":[{"name":"Pasta atual (~)","desc":"Mesmos arquivos — mas agora você quer ver os detalhes de cada um.","snippet":"notas.txt   script.sh   Documentos/   imagem.png"}],"answers":["ls -l"],"sim":"-rw-r--r-- 1 user user    82 Jan  3 09:15 notas.txt\n-rwxr-xr-x 1 user user   512 Jan  2 14:30 script.sh\ndrwxr-xr-x 2 user user  4096 Jan  1 10:00 Documentos\n-rw-r--r-- 1 user user 48302 Jan  1 08:00 imagem.png","explanation":"O formato longo (-l) exibe sete colunas: permissões (10 caracteres), número de links, dono, grupo, tamanho em bytes, data da última modificação e nome. O primeiro caractere das permissões indica o tipo (- arquivo, d pasta, l link); os nove seguintes são três blocos rwx para dono/grupo/outros. É a visão usada para investigar permissões e descobrir quem pode fazer o quê em cada arquivo."},{"badge":"3. arquivos ocultos","title":"Ver os ocultos também","objective":"Liste todos os arquivos incluindo os ocultos. Arquivos ocultos no Linux começam com ponto (ex: .bashrc).","why":"Arquivos de configuração do sistema e do shell ficam ocultos por padrão. Você precisa de -a para vê-los.","hint":"Use -a (all = todos).","context":[{"name":"Pasta atual (~)","desc":"Existem arquivos ocultos aqui que ls normal não mostra:","snippet":".bashrc   .profile   .ssh/   notas.txt   Documentos/"}],"answers":["ls -a"],"sim":".  ..  .bashrc  .profile  .ssh  Documentos  Downloads  notas.txt","explanation":"O -a inclui tudo que começa com ponto — uma convenção do Unix para marcar arquivos de configuração como \"ocultos\", não uma proteção real de segurança. Os itens . e .. não são arquivos: são entradas que todo diretório possui apontando para si mesmo e para o diretório pai. Se quiser ver ocultos mas sem o barulho do . e .., use -A (maiúsculo)."},{"badge":"4. longo + ocultos","title":"Detalhes de todos (incluindo ocultos)","objective":"Liste com detalhes (-l) E mostrando os arquivos ocultos (-a) ao mesmo tempo. Combine as duas flags.","why":"É o comando mais completo para inspecionar uma pasta — você vê tudo com todos os detalhes.","hint":"Combine -l e -a. Pode ser -la, -al ou -l -a. Qualquer ordem funciona.","context":[{"name":"Pasta atual (~)","desc":"Você quer ver todos os arquivos (incluindo .bashrc, .profile) com permissões e datas."}],"answers":["ls -la","ls -al","ls -l -a","ls -a -l"],"sim":"drwxr-xr-x 6 user user  4096 Jan  3 09:15 .\ndrwxr-xr-x 3 root root  4096 Jan  1 00:00 ..\n-rw-r--r-- 1 user user  3526 Jan  1 09:00 .bashrc\n-rw-r--r-- 1 user user   220 Jan  1 09:00 .profile\ndrwx------ 2 user user  4096 Jan  1 09:00 .ssh\ndrwxr-xr-x 2 user user  4096 Jan  1 10:00 Documentos\n-rw-r--r-- 1 user user    82 Jan  3 09:15 notas.txt","explanation":"Flags de letra única podem ser agrupadas: -la equivale a -l -a ou -a -l, a ordem das letras não importa. Essa combinação (ver tudo com detalhes) é tão frequente que muitas distros já trazem o alias ll='ls -la' pronto — confira digitando alias no terminal. Para criar o seu, adicione a linha em ~/.bashrc e recarregue com source ~/.bashrc."},{"badge":"5. tamanho legível","title":"Tamanhos em KB e MB","objective":"Liste com formato longo (-l) mas com tamanhos em KB/MB/GB em vez de bytes brutos. Use -h junto com -l.","why":"82 bytes é fácil, mas 1048576 bytes você não sabe de cabeça que é 1MB. O -h converte automaticamente.","hint":"Use -lh (l + h juntos). O -h sozinho não funciona, precisa do -l.","context":[{"name":"Pasta atual","desc":"Tem arquivos de vários tamanhos:","snippet":"notas.txt (82 bytes)   video.mp4 (52428800 bytes)   foto.jpg (2097152 bytes)"}],"answers":["ls -lh","ls -lh .","ls -lha"],"sim":"-rw-r--r-- 1 user user   82 Jan  3 notas.txt\n-rw-r--r-- 1 user user 2.0M Jan  2 foto.jpg\n-rw-r--r-- 1 user user  50M Jan  1 video.mp4","explanation":"O -h só faz efeito visível quando há uma coluna de tamanho — por isso é sempre combinado com -l (ou -s). Ele arredonda para K (1024 bytes), M, G, T usando potências de 1024; para potências de 1000 (padrão SI), use --si em vez de -h. O número exato some no arredondamento, então use -h para leitura rápida e -l puro quando precisar do byte exato."},{"badge":"6. outra pasta","title":"Listar sem entrar","objective":"Liste o conteúdo da pasta /etc sem precisar navegar até lá com cd.","why":"Você pode listar qualquer pasta passando o caminho como argumento. Útil para ver várias pastas sem mudar de lugar.","hint":"ls aceita um caminho como argumento. Tente ls /etc","context":[{"name":"/etc","desc":"Pasta de configurações do sistema. Você está em ~ mas quer ver o que tem lá."}],"answers":["ls /etc","ls -l /etc","ls -la /etc"],"sim":"apt  bash.bashrc  cron.d  fstab  hostname  hosts  network  passwd  ssh  syslog.conf","explanation":"Passar um caminho como argumento lista aquele diretório sem precisar fazer cd — ótimo para dar uma espiada e continuar trabalhando onde está. Você pode passar vários caminhos de uma vez (ls /etc /var/log) e o ls mostra cada um com um cabeçalho. Todas as flags continuam valendo juntas: ls -lh /etc lista /etc em formato longo com tamanhos legíveis."}]}]},{"id":"pwd_cd","name":"pwd / cd","desc":"Localização e navegação","level":"iniciante","path":"~","exp":{"summary":"<b>pwd</b> responde: 'onde estou agora?'. <b>cd</b> responde: 'como chego lá?'. São os dois comandos de navegação fundamentais do Linux.","flags":[{"flag":"pwd","desc":"Print Working Directory — mostra o caminho completo da pasta atual","example":"pwd  → /home/user"},{"flag":"cd nome","desc":"Entra na pasta 'nome' (relativo à pasta atual)","example":"cd Documentos"},{"flag":"cd ..","desc":"Sobe um nível — vai para a pasta pai","example":"cd ..  (de /home/user → /home)"},{"flag":"cd ~","desc":"Vai para sua pasta home, de onde quer que esteja","example":"cd ~"},{"flag":"cd -","desc":"Volta para a pasta onde você estava antes. Como Alt+Tab das pastas","example":"cd -  → /var/log"},{"flag":"cd /caminho","desc":"Vai direto para qualquer pasta usando caminho absoluto (começa com /)","example":"cd /var/log"},{"flag":"cd ../..","desc":"Sobe dois níveis de uma vez. Cada .. é um nível","example":"cd ../.."}]},"exs":[{"title":"pwd e cd","vars":[{"badge":"1. onde estou?","title":"Ver pasta atual","objective":"Você acabou de abrir o terminal. Qual comando mostra em qual pasta você está agora?","why":"Antes de fazer qualquer coisa no terminal, você precisa saber de onde está operando. pwd é sempre o primeiro passo.","hint":"pwd = Print Working Directory. Só isso, sem argumentos.","context":[{"name":"Situação","desc":"Você abriu o terminal e não sabe em qual pasta está. Precisa verificar antes de continuar."}],"answers":["pwd"],"sim":"/home/user","explanation":"pwd (print working directory) responde \"em que pasta eu estou?\" imprimindo sempre o caminho absoluto, começando da raiz /. É muito útil em scripts quando você precisa guardar o diretório atual em uma variável: DIR=$(pwd). Cada shell aberto tem seu próprio \"diretório atual\" independente — abrir um novo terminal começa de novo no home."},{"badge":"2. entrar em pasta","title":"Navegar para uma pasta","objective":"Entre na pasta chamada Documentos que existe na pasta atual.","why":"cd (change directory) é como clicar duas vezes em uma pasta. É o comando de navegação mais usado no Linux.","hint":"cd seguido do nome da pasta. Sem / no final é necessário.","context":[{"name":"Pasta atual (~/user)","desc":"Contém estas pastas:","snippet":"Documentos/   Downloads/   Imagens/   notas.txt"}],"answers":["cd Documentos","cd Documentos/"],"sim":"","explanation":"Sem a barra inicial, \"Documentos\" é um caminho relativo: o shell procura essa pasta a partir de onde você está agora. Se estivesse em /tmp, o mesmo comando tentaria /tmp/Documentos e falharia com \"No such file or directory\". A barra no final é opcional para diretórios — cd Documentos e cd Documentos/ fazem a mesma coisa; confirme onde chegou com pwd."},{"badge":"3. voltar um nível","title":"Subir para a pasta pai","objective":"Você está em /home/user/Documentos. Volte para /home/user (a pasta que contém Documentos).","why":".. representa sempre 'a pasta acima'. É o atalho para subir na hierarquia de pastas.","hint":"cd seguido de dois pontos: cd ..","context":[{"name":"Você está em","desc":"/home/user/Documentos","snippet":"Conteúdo: relatorios/   contratos/   lista.txt"},{"name":"Quer ir para","desc":"/home/user (um nível acima)"}],"answers":["cd .."],"sim":"","explanation":"Todo diretório guarda duas entradas automáticas: . (ele mesmo) e .. (o pai). Por isso cd .. funciona em qualquer pasta — não é mágica do shell, é uma entrada real do sistema de arquivos (você vê com ls -a). Caso especial: no diretório raiz /, o .. aponta para o próprio /, então cd .. ali não muda nada."},{"badge":"4. ir para o home","title":"Voltar para o home","objective":"Você está perdido em /var/log/journal. Volte para sua pasta home com um único comando rápido.","why":"~ é um atalho que sempre representa sua pasta home (/home/seu_usuario). Muito mais rápido que digitar o caminho completo.","hint":"cd ~ ou simplesmente cd (sem nada depois) — ambos vão para o home.","context":[{"name":"Você está em","desc":"/var/log/journal (longe do home)"},{"name":"Seu home é","desc":"/home/user"}],"answers":["cd ~","cd","cd $HOME"],"sim":"","explanation":"O til (~) é expandido pelo shell para o valor da variável $HOME antes do comando rodar — por isso cd ~, cd sozinho e cd $HOME têm o mesmo efeito. O ~ também funciona dentro de caminhos: ~/Documentos vira /home/user/Documentos, e ~outro vai para o home de outro usuário do sistema. Se $HOME não estiver definida, o shell consulta /etc/passwd para descobrir qual é o seu home."},{"badge":"5. pasta anterior","title":"Voltar para onde estava","objective":"Você estava em /var/log, foi para /home/user para pegar um arquivo, e agora quer voltar ao /var/log rápido.","why":"cd - memoriza a última pasta e volta para ela. Como um botão 'voltar'. Economiza muito tempo.","hint":"cd - (traço/hífen). O Linux guarda sua última localização.","context":[{"name":"Histórico de navegação","desc":"Você foi: /var/log → /home/user","snippet":"Agora quer voltar para /var/log sem digitar o caminho completo"}],"answers":["cd -"],"sim":"/var/log","explanation":"O shell guarda o último diretório na variável $OLDPWD, e o traço (-) é o atalho que usa esse valor. Repetindo cd - você alterna entre dois diretórios — ótimo quando precisa ir e voltar entre dois lugares (ex.: um projeto e /var/log). Só o último é lembrado; para manter um histórico maior com empilhamento, use pushd e popd."},{"badge":"6. caminho absoluto","title":"Ir direto para qualquer pasta","objective":"Vá direto para /etc/ssh usando o caminho completo, sem importar onde você está agora.","why":"Caminhos absolutos (começam com /) funcionam de qualquer lugar. Você não precisa saber onde está para usá-los.","hint":"Use o caminho completo começando com /. Ex: cd /etc/ssh","context":[{"name":"Você está em","desc":"/home/user/Documentos/projetos/src"},{"name":"Quer ir para","desc":"/etc/ssh (pasta de configuração do SSH)"}],"answers":["cd /etc/ssh","cd /etc/ssh/"],"sim":"","explanation":"Caminhos absolutos (começam com /) descrevem a localização exata desde a raiz e funcionam igual em qualquer situação — use-os em scripts e cron jobs para evitar surpresas quando o diretório atual mudar. Caminhos relativos (sem / inicial) são interpretados a partir do diretório atual, por isso são mais curtos no dia a dia mas quebram se o script rodar de outro lugar. Regra prática: interativo pode ser relativo, script geralmente deve ser absoluto."},{"badge":"7. subir dois níveis","title":"Pular dois níveis acima","objective":"Você está em /home/user/projetos/src. Suba dois níveis (para /home/user) com um único comando.","why":"Cada .. sobe um nível. Você pode encadear quantos precisar separados por /.","hint":"Dois pontos separados por barra: ../..  (cada .. é um nível)","context":[{"name":"Você está em","desc":"/home/user/projetos/src"},{"name":"Quer chegar em","desc":"/home/user (dois níveis acima)","snippet":"/home/user/projetos/src\n          ↑ um nível → /home/user/projetos\n          ↑ dois níveis → /home/user"}],"answers":["cd ../.."],"sim":"","explanation":"A barra separa passos de caminho: ../.. é lido como \"sobe um, depois sobe mais um\". Você pode misturar com nomes: ../outra-pasta sobe e entra em outra-pasta que está no mesmo nível. Não há limite prático — ../../../.. sobe quatro níveis; se passar da raiz, o shell simplesmente para em / (..  de / é o próprio /)."}]}]},{"id":"mkdir_touch","name":"mkdir / touch","desc":"Criar pastas e arquivos","level":"iniciante","path":"~","exp":{"summary":"<b>mkdir</b> cria pastas (make directory). <b>touch</b> cria arquivos vazios ou atualiza a data de modificação de um arquivo existente.","flags":[{"flag":"mkdir nome","desc":"Cria uma pasta chamada 'nome'","example":"mkdir projetos"},{"flag":"mkdir -p a/b/c","desc":"Cria toda a estrutura de pastas de uma vez, sem erro se já existir (-p = parents)","example":"mkdir -p app/src/components"},{"flag":"mkdir a b c","desc":"Cria várias pastas de uma vez separando os nomes por espaço","example":"mkdir src docs tests"},{"flag":"touch arquivo.txt","desc":"Cria um arquivo vazio. Se o arquivo já existe, apenas atualiza sua data","example":"touch index.html"},{"flag":"touch a b c","desc":"Cria vários arquivos vazios de uma vez","example":"touch index.html style.css app.js"}]},"exs":[{"title":"mkdir e touch","vars":[{"badge":"1. criar pasta","title":"Uma pasta nova","objective":"Crie uma pasta chamada projetos na pasta atual.","why":"mkdir (make directory) é o comando para criar pastas no Linux. Equivale a 'Nova pasta' no gerenciador de arquivos.","hint":"mkdir seguido do nome. Sem espaço no nome (use _ ou - se precisar).","context":[{"name":"Pasta atual (~)","desc":"Está vazia. Você quer criar a estrutura de trabalho:","snippet":"Criar: projetos/"}],"answers":["mkdir projetos"],"sim":"","explanation":"mkdir cria o diretório com as permissões padrão do seu usuário, definidas pela umask (normalmente resulta em 755). Se uma pasta com esse nome já existir, o comando falha com \"File exists\" — use mkdir -p para suprimir esse erro. Para confirmar que deu certo, rode ls e veja projetos aparecendo na listagem (algumas ferramentas adicionam / ao final para marcar diretórios)."},{"badge":"2. várias pastas","title":"Várias de uma vez","objective":"Crie três pastas de uma vez: src, docs e tests. Tudo em um único comando.","why":"mkdir aceita vários nomes. Mais rápido que criar uma por uma.","hint":"Separe os nomes por espaço depois do mkdir.","context":[{"name":"Objetivo","desc":"Criar esta estrutura para um novo projeto:","snippet":"Criar de uma vez: src/   docs/   tests/"}],"answers":["mkdir src docs tests"],"sim":"","explanation":"mkdir aceita quantos nomes quiser separados por espaço e cria todos em sequência na pasta atual. Se um deles falhar (já existe, sem permissão), o comando segue adiante criando os outros e sai com status diferente de 0 no final — útil de saber em scripts. Para que nomes já existentes não provoquem erro, adicione -p."},{"badge":"3. estrutura aninhada","title":"Pastas dentro de pastas","objective":"Crie a estrutura app/src/components com um único comando. Se você não usar a flag certa, vai dar erro.","why":"Sem -p o mkdir falha se a pasta pai não existe. Com -p ele cria tudo que for necessário.","hint":"Use mkdir -p para criar a estrutura completa. O -p cria os pais automaticamente.","context":[{"name":"Problema sem -p","desc":"mkdir app/src/components falharia porque app/ e app/src/ não existem ainda","snippet":"mkdir app/src/components\n→ mkdir: cannot create directory 'app/src/components': No such file or directory\n\nmkdir -p app/src/components\n→ Cria tudo de uma vez ✓"}],"answers":["mkdir -p app/src/components"],"sim":"","explanation":"A flag -p (parents) faz o mkdir criar todos os diretórios intermediários que ainda não existem, seguindo a ordem do pai para o filho. Como bônus, -p torna o comando idempotente: rodar duas vezes não dá erro, o que é perfeito para scripts de setup. Sem -p, mkdir a/b/c falha imediatamente se a/ ou a/b/ não existirem antes."},{"badge":"4. arquivo vazio","title":"Criar arquivo vazio","objective":"Crie um arquivo vazio chamado index.html. O arquivo deve existir mas sem conteúdo ainda.","why":"touch cria arquivos vazios como 'placeholder'. Muito usado em scripts para garantir que um arquivo existe.","hint":"touch seguido do nome do arquivo com a extensão.","context":[{"name":"Pasta atual","desc":"Você está começando um projeto web e precisa criar os arquivos antes de editá-los:","snippet":"Criar: index.html (vazio, para editar depois)"}],"answers":["touch index.html"],"sim":"","explanation":"O propósito original do touch é \"tocar\" o arquivo — atualizar seus timestamps (atime e mtime) para o instante atual. Se o arquivo não existir, ele é criado vazio (0 bytes) como efeito colateral; se já existir, o conteúdo é preservado intacto, só as datas mudam. Use -d para definir uma data específica: touch -d '2020-01-01' arquivo — útil para testar scripts que dependem de data."},{"badge":"5. vários arquivos","title":"Vários arquivos de uma vez","objective":"Crie três arquivos de uma vez: index.html, style.css e app.js.","why":"Assim como mkdir, touch aceita vários nomes. Muito comum ao iniciar um projeto.","hint":"touch seguido dos três nomes separados por espaço.","context":[{"name":"Início de projeto web","desc":"Você precisa criar a estrutura base de arquivos:","snippet":"Criar: index.html   style.css   app.js"}],"answers":["touch index.html style.css app.js"],"sim":"","explanation":"Assim como mkdir, o touch aceita vários argumentos e cria todos em uma só chamada — forma rápida de preparar a estrutura de um projeto antes de começar a editar. Rode ls para confirmar os três; depois abra cada um no editor para preencher o conteúdo. Se algum já existir, ele não é zerado — só ganha data nova."},{"badge":"6. criar + confirmar","title":"Criar e verificar","objective":"Crie a pasta config e logo em seguida liste o conteúdo para confirmar que ela foi criada. Tudo em um comando só.","why":"O operador && executa o segundo comando APENAS se o primeiro funcionou. É a forma segura de encadear comandos.","hint":"Use && para encadear: mkdir config && ls","context":[{"name":"Diferença entre ; e &&","desc":"","snippet":"mkdir config && ls   → ls só roda se mkdir funcionou\nmkdir config ; ls    → ls roda sempre, mesmo com erro"}],"answers":["mkdir config && ls","mkdir config; ls","mkdir config ; ls"],"sim":"config/  Documentos/  Downloads/  notas.txt","explanation":"O && só executa o comando da direita se o da esquerda terminou com sucesso (exit code 0). Compare com ; (executa sempre, em sequência, sem olhar resultado) e com || (executa só se o anterior falhou — padrão de fallback: comando || echo 'falhou'). Encadear com && evita rodar passos seguintes sobre um estado inválido, como compilar depois de um make install que quebrou."}]}]},{"id":"cat_less","name":"cat / head / tail","desc":"Ver conteúdo de arquivos","level":"iniciante","path":"~","exp":{"summary":"<b>cat</b> despeja o arquivo inteiro na tela. <b>head</b> mostra o começo. <b>tail</b> mostra o final. <b>less</b> deixa você navegar com as setas.","flags":[{"flag":"cat arquivo","desc":"Mostra o conteúdo inteiro do arquivo na tela de uma vez","example":"cat /etc/hostname"},{"flag":"cat -n arquivo","desc":"Igual ao cat, mas numera cada linha — útil para referenciar erros","example":"cat -n script.sh"},{"flag":"head arquivo","desc":"Mostra as primeiras 10 linhas (padrão)","example":"head /etc/passwd"},{"flag":"head -n 5 arquivo","desc":"Mostra as primeiras N linhas (você define quantas)","example":"head -n 3 arquivo.txt"},{"flag":"tail arquivo","desc":"Mostra as últimas 10 linhas (padrão)","example":"tail /var/log/syslog"},{"flag":"tail -n 5 arquivo","desc":"Mostra as últimas N linhas","example":"tail -n 20 error.log"},{"flag":"tail -f arquivo","desc":"Fica monitorando: novas linhas aparecem em tempo real. Ctrl+C para sair","example":"tail -f /var/log/syslog"},{"flag":"less arquivo","desc":"Abre para navegar com setas. / para buscar, q para sair","example":"less /etc/passwd"}]},"exs":[{"title":"cat, head, tail","vars":[{"badge":"1. ver arquivo inteiro","title":"Conteúdo completo","objective":"Veja o conteúdo completo do arquivo /etc/hostname.","why":"cat (concatenate) é o jeito mais rápido de ler um arquivo pequeno no terminal, sem abrir editor.","hint":"cat seguido do caminho do arquivo.","context":[{"name":"/etc/hostname","desc":"Arquivo de texto simples que contém o nome da máquina. Poucas linhas, ideal para cat.","snippet":"(arquivo pequeno — perfeito para cat)"}],"answers":["cat /etc/hostname"],"sim":"linux-machine","explanation":"O nome cat vem de \"concatenate\": passe vários arquivos (cat a.txt b.txt) e ele imprime um depois do outro — perfeito para juntar partes. Para arquivos grandes, prefira less, que permite rolar, pesquisar com / e sair com q. Evite cat em arquivos binários: bytes de controle podem embaralhar o terminal; se isso acontecer, digite reset para restaurar."},{"badge":"2. com número de linha","title":"Linhas numeradas","objective":"Veja o /etc/hosts com o número de cada linha à esquerda.","why":"Quando alguém diz 'o erro está na linha 42' você precisa ver os números. cat -n faz isso.","hint":"Use cat -n seguido do arquivo.","context":[{"name":"/etc/hosts","desc":"Mapeia nomes de host para IPs. Você quer ver com números para referenciar linhas:","snippet":"127.0.0.1   localhost\n127.0.1.1   linux-machine\n::1         ip6-localhost"}],"answers":["cat -n /etc/hosts"],"sim":"     1\t127.0.0.1   localhost\n     2\t127.0.1.1   linux-machine\n     3\t::1         ip6-localhost\n     4\t# The following lines are for IPv6\n     5\tff02::1     ip6-allnodes","explanation":"O -n numera todas as linhas, inclusive as vazias; para pular as vazias e numerar só as com conteúdo, use -b. Os números saem alinhados à direita seguidos por um tab, o que facilita cortar depois com cut ou awk. Muitos editores também mostram números de linha — mas em pipe, log ou script, cat -n é a forma universal e sem dependências."},{"badge":"3. primeiras linhas","title":"Só o começo do arquivo","objective":"O /etc/passwd tem dezenas de linhas. Mostre apenas as primeiras 10 para ter uma ideia do formato.","why":"head é ideal para arquivos grandes quando você só quer entender o formato ou ver o cabeçalho.","hint":"head sem opção mostra 10 linhas por padrão. Ou use -n 10 para ser explícito.","context":[{"name":"/etc/passwd","desc":"Lista de usuários do sistema. Formato: usuario:x:UID:GID:nome:/home:/shell","snippet":"(arquivo com 40+ linhas — head mostra só o começo)"}],"answers":["head /etc/passwd","head -n 10 /etc/passwd","head -10 /etc/passwd"],"sim":"root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\nsync:x:4:65534:sync:/bin:/bin/sync\ngames:x:5:60:games:/usr/games:/usr/sbin/nologin\nman:x:6:12:man:/var/cache/man:/usr/sbin/nologin\nlp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin\nmail:x:8:8:mail:/var/mail:/usr/sbin/nologin\nnews:x:9:9:news:/var/spool/news:/usr/sbin/nologin","explanation":"Sem -n, o head pega as primeiras 10 linhas (default histórico). Com -n N você escolhe quantas; um truque útil é -n -N (com menos), que imprime tudo EXCETO as últimas N linhas — ótimo para remover rodapés. Também existe head -c N para limitar por bytes em vez de linhas, prático com arquivos binários ou logs muito longos."},{"badge":"4. N linhas específicas","title":"Exatamente 3 linhas","objective":"Mostre apenas as primeiras 3 linhas do /etc/passwd.","why":"Às vezes você quer menos que 10 linhas. -n deixa você controlar exatamente quantas.","hint":"Use head -n 3 ou head -3 (ambos funcionam).","context":[{"name":"/etc/passwd","desc":"Você só quer ver as 3 primeiras entradas para entender o formato do arquivo."}],"answers":["head -n 3 /etc/passwd","head -3 /etc/passwd"],"sim":"root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin","explanation":"As duas formas existem por razões históricas: head -3 é a sintaxe antiga ainda aceita pela maioria das implementações, e head -n 3 é a sintaxe POSIX, mais portável e recomendada em scripts. A mesma dupla vale para tail (tail -3 vs tail -n 3). Em alguns macOS/BSD mais estritos, só -n funciona — então use -n se quiser que seu script rode em qualquer lugar."},{"badge":"5. últimas linhas","title":"Final do arquivo — logs","objective":"Os logs mais recentes ficam no FINAL do arquivo. Veja as últimas 10 linhas do /var/log/syslog.","why":"Em logs, as entradas mais novas ficam no final. tail mostra o que aconteceu mais recentemente.","hint":"tail sem opção mostra as últimas 10 linhas.","context":[{"name":"/var/log/syslog","desc":"Log do sistema. Entradas mais recentes ficam no final do arquivo.","snippet":"(arquivo com milhares de linhas — tail pega só o fim)"}],"answers":["tail /var/log/syslog","tail -n 10 /var/log/syslog"],"sim":"Jan  3 10:28:01 linux CRON[1234]: (root) CMD (command -v)\nJan  3 10:29:00 linux systemd[1]: Starting Cleanup of Temporary Directories\nJan  3 10:29:00 linux systemd[1]: Started Cleanup of Temporary Directories\nJan  3 10:30:01 linux kernel: eth0: renamed from veth3f2a1b\nJan  3 10:30:05 linux sshd[5678]: Accepted password for user from 192.168.1.5","explanation":"Assim como head, o tail mostra 10 linhas por padrão — só que do fim. Logs são arquivos append-only (só crescem pelo final), então as últimas linhas são sempre os eventos mais recentes. Variação menos conhecida: tail -n +N imprime a partir da linha N até o final (inverte a lógica do -n N), útil para pular cabeçalhos de CSV."},{"badge":"6. monitorar ao vivo","title":"Logs em tempo real","objective":"Fique monitorando o /var/log/syslog ao vivo. Novas linhas devem aparecer na tela conforme chegam.","why":"Quando algo falha, você abre o log em outra aba com tail -f e reproduz o erro para ver o que aparece.","hint":"Use tail -f (follow). Pressione Ctrl+C para parar.","context":[{"name":"Cenário real","desc":"Você está depurando um problema. Em uma aba roda o sistema, na outra você monitora:","snippet":"$ tail -f /var/log/syslog\n(novas linhas aparecem automaticamente)\n(Ctrl+C para sair)"}],"answers":["tail -f /var/log/syslog","tail --follow /var/log/syslog"],"sim":"Jan  3 10:31:00 linux sshd[1234]: Accepted publickey for user\nJan  3 10:31:01 linux systemd[1]: Started Session 42 of user user.\n[aguardando novas entradas... Ctrl+C para sair]","explanation":"O tail -f segue o arquivo pelo descritor aberto: imprime cada nova linha conforme o arquivo cresce, até você dar Ctrl+C para sair. Se o log for rotacionado (renomeado e recriado, como faz o logrotate), use -F (maiúsculo) para o tail detectar e reabrir o arquivo novo. Sem o -F, depois da rotação você fica olhando um arquivo que não recebe mais escritas."}]}]},{"id":"cp_mv_rm","name":"cp / mv / rm","desc":"Copiar, mover e remover","level":"iniciante","path":"~","exp":{"summary":"<b>cp</b> copia (origem → destino). <b>mv</b> move ou renomeia. <b>rm</b> apaga para sempre — <b>não há lixeira no terminal!</b>","flags":[{"flag":"cp origem destino","desc":"Copia um arquivo. O original fica intacto","example":"cp config.txt config.bak"},{"flag":"cp -r pasta/ dest/","desc":"Copia uma pasta inteira com todo o conteúdo (-r = recursive)","example":"cp -r src/ backup/"},{"flag":"mv origem destino","desc":"Move OU renomeia. Se destino é uma pasta, move. Se é um nome, renomeia","example":"mv rascunho.txt final.txt"},{"flag":"rm arquivo","desc":"Remove PERMANENTEMENTE. Não vai para lixeira","example":"rm lixo.txt"},{"flag":"rm -r pasta/","desc":"Remove uma pasta e tudo dentro dela recursivamente","example":"rm -r temp/"},{"flag":"rm -i arquivo","desc":"Pede confirmação antes de cada remoção (i = interactive). Mais seguro","example":"rm -i importante.txt"},{"flag":"rm -f arquivo","desc":"Força a remoção sem pedir confirmação, mesmo se protegido (f = force). Cuidado!","example":"rm -f arquivo"}]},"exs":[{"title":"cp, mv, rm","vars":[{"badge":"1. copiar arquivo","title":"Fazer um backup","objective":"Copie o arquivo config.txt e salve a cópia como config.bak (uma cópia de backup).","why":"cp cria uma cópia independente. Modificar o destino não afeta a origem. Muito usado para backups.","hint":"cp origem destino. O arquivo original fica intacto.","context":[{"name":"Pasta atual","desc":"Contém:","snippet":"config.txt  (arquivo de configuração que você quer fazer backup)"},{"name":"Objetivo","desc":"Criar config.bak como cópia de config.txt"}],"answers":["cp config.txt config.bak"],"sim":"","explanation":"A sintaxe é cp ORIGEM DESTINO. Após a cópia, os dois arquivos são totalmente independentes: editar um não afeta o outro. Se o destino já existir, o cp sobrescreve sem avisar — use cp -i para pedir confirmação, ou cp -n para nunca sobrescrever. Para preservar dono, permissões e datas originais, use cp -p (preserve)."},{"badge":"2. copiar pasta","title":"Copiar pasta inteira","objective":"Copie toda a pasta src/ (com todos os arquivos dentro) para uma nova pasta chamada src_backup/.","why":"Para copiar pastas você precisa de -r (recursive). Sem -r o cp falha com erro.","hint":"cp -r (com r de recursive) para pastas. Tente cp -r src/ src_backup/","context":[{"name":"src/","desc":"Pasta com arquivos:","snippet":"src/\n  app.py\n  utils.py\n  config.py"},{"name":"Objetivo","desc":"Criar src_backup/ com todos os mesmos arquivos"}],"answers":["cp -r src/ src_backup/","cp -r src src_backup"],"sim":"","explanation":"O -r (ou -R) percorre toda a árvore copiando pastas e arquivos. Sem -r, o cp recusa-se a copiar diretórios e dá o erro \"is a directory (not copied)\". Uma variante poderosa é cp -a (archive): equivale a -dR --preserve=all, mantendo links simbólicos, dono, grupo, permissões e datas — é o modo ideal para backups que precisam ser fiéis ao original."},{"badge":"3. renomear arquivo","title":"Mudar o nome","objective":"Renomeie o arquivo rascunho.txt para final.txt.","why":"mv serve para MOVER e para RENOMEAR — é o mesmo comando. No Linux, renomear = mover para o mesmo lugar com nome diferente.","hint":"mv origem destino. Se o destino for um nome (não uma pasta), ele renomeia.","context":[{"name":"Situação","desc":"Você terminou de escrever o documento e quer mudar o nome:","snippet":"rascunho.txt  →  final.txt"}],"answers":["mv rascunho.txt final.txt"],"sim":"","explanation":"Renomear e mover são o mesmo comando no Unix. Dentro do mesmo sistema de arquivos, mv apenas atualiza o nome na tabela do diretório — operação atômica e instantânea, mesmo com arquivos de gigabytes. Entre sistemas de arquivos diferentes (ex.: disco interno para pendrive), ele copia e depois remove o original, então o tempo passa a depender do tamanho do arquivo."},{"badge":"4. mover para pasta","title":"Mover arquivo","objective":"Mova o arquivo relatorio.pdf para dentro da pasta Documentos/.","why":"mv com uma pasta como destino MOVE o arquivo para dentro dela. O arquivo some da origem e aparece no destino.","hint":"mv arquivo pasta/. Se o destino termina em / é uma pasta.","context":[{"name":"Pasta atual","desc":"Contém:","snippet":"relatorio.pdf   notas.txt   Documentos/   Downloads/"},{"name":"Objetivo","desc":"Mover relatorio.pdf para dentro de Documentos/"}],"answers":["mv relatorio.pdf Documentos/","mv relatorio.pdf Documentos"],"sim":"","explanation":"Quando o destino é uma pasta existente, o mv coloca o arquivo dentro dela mantendo o nome original. Atenção à pegadinha: se Documentos/ não existisse, o mv teria RENOMEADO o arquivo para \"Documentos\" (sem extensão!) na pasta atual — a barra no fim deixa a intenção explícita e evita esse erro. Para mover várias coisas de uma vez, passe todas antes do destino: mv a.txt b.txt c.txt destino/."},{"badge":"5. remover arquivo","title":"Apagar para sempre","objective":"Remova o arquivo lixo.txt. Atenção: no Linux não há lixeira — o arquivo some definitivamente.","why":"rm apaga o arquivo permanentemente. Não tem Ctrl+Z, não tem lixeira. Pense antes de executar.","hint":"rm seguido do nome do arquivo.","context":[{"name":"AVISO","desc":"rm apaga para sempre. Não há como recuperar com um comando simples depois.","snippet":"rm lixo.txt\n# O arquivo é removido permanentemente\n# Não vai para nenhuma lixeira"}],"answers":["rm lixo.txt"],"sim":"","explanation":"O rm faz unlink: o sistema marca o espaço como livre, mas não há lixeira — não dá para restaurar pelo terminal (forense avançado sim, mas não conte com isso). Se o arquivo estiver aberto por algum processo, o conteúdo continua acessível para ele até fechar. Como proteção, use rm -i (confirma cada um) ou rm -I (confirma uma vez só quando forem mais de 3)."},{"badge":"6. remover com confirmação","title":"Remoção segura","objective":"Remova o arquivo importante.txt mas use a flag que pede confirmação antes de deletar.","why":"rm -i pergunta 'tem certeza?' para cada arquivo. Bom hábito quando você não tem 100% de certeza.","hint":"Use rm -i (interactive). Ele vai perguntar, responda 'y' para confirmar.","context":[{"name":"Boa prática","desc":"Antes de rm em arquivos críticos, use -i:","snippet":"$ rm -i importante.txt\nrm: remove regular file 'importante.txt'? y\n(só apaga após você confirmar com 'y')"}],"answers":["rm -i importante.txt"],"sim":"rm: remove regular file 'importante.txt'? y","explanation":"O -i (interactive) faz o rm perguntar antes de cada arquivo — qualquer resposta que não comece com y/Y cancela aquele item. Para apagar muitos arquivos sem enlouquecer com perguntas, use -I (maiúsculo): pergunta uma vez só, quando forem mais de 3 ou quando for recursivo. Muitos administradores adicionam alias rm='rm -i' no ~/.bashrc como rede de segurança."},{"badge":"7. remover pasta","title":"Apagar pasta inteira","objective":"Remova a pasta temp/ e tudo que está dentro dela (arquivos e subpastas).","why":"rm sem -r não apaga pastas. Com -r ele apaga tudo recursivamente.","hint":"rm -r para pastas. rm -rf força sem pedir confirmação (cuidado com rm -rf /).","context":[{"name":"temp/","desc":"Pasta com arquivos temporários que você quer apagar:","snippet":"temp/\n  cache.tmp\n  sessao.dat\n  logs/\n    debug.log"}],"answers":["rm -r temp/","rm -r temp","rm -rf temp/","rm -rf temp"],"sim":"","explanation":"O -r (recursive) apaga a pasta e tudo dentro; -f (force) ignora arquivos inexistentes e suprime perguntas. rm -rf é o comando mais perigoso do Unix: NUNCA rode rm -rf / (apaga o sistema), e tome cuidado com variáveis vazias — rm -rf $DIR/ vira rm -rf / se $DIR estiver vazia. Sempre confira o caminho ANTES de apertar Enter, e em scripts use set -u para abortar em variável não definida."}]}]},{"id":"grep","name":"grep","desc":"Buscar texto em arquivos","level":"intermediário","path":"~","exp":{"summary":"<b>grep</b> filtra linhas de um arquivo que contenham um texto. É como Ctrl+F do editor de texto, mas no terminal — e muito mais poderoso.","flags":[{"flag":"grep texto arquivo","desc":"Mostra as linhas que contêm 'texto'","example":"grep root /etc/passwd"},{"flag":"-i","desc":"Ignora maiúsculas/minúsculas (case insensitive): 'Error' = 'error' = 'ERROR'","example":"grep -i error log.txt"},{"flag":"-n","desc":"Mostra o número de cada linha encontrada","example":"grep -n bash /etc/passwd"},{"flag":"-v","desc":"Inverte: mostra as linhas que NÃO têm o texto","example":"grep -v nologin /etc/passwd"},{"flag":"-c","desc":"Conta quantas linhas têm o texto (não mostra as linhas)","example":"grep -c error log.txt"},{"flag":"-r","desc":"Busca em todos os arquivos de uma pasta recursivamente","example":"grep -r TODO ."},{"flag":"-w","desc":"Palavra inteira: 'log' não casa com 'syslog' ou 'logger'","example":"grep -w log arquivo"},{"flag":"cmd | grep texto","desc":"Filtra a saída de outro comando. Muito usado com ps, ls, history","example":"ps aux | grep nginx"}]},"exs":[{"title":"grep — buscar texto","vars":[{"badge":"1. busca simples","title":"Encontrar uma palavra","objective":"Encontre as linhas que contêm a palavra root no arquivo /etc/passwd.","why":"grep é o filtro mais usado no Linux. Em vez de ler um arquivo inteiro, você extrai só o que interessa.","hint":"grep palavra arquivo — nessa ordem.","context":[{"name":"/etc/passwd","desc":"Arquivo com todos os usuários do sistema. Formato de cada linha:","snippet":"usuario:senha:UID:GID:comentario:/home:/shell\n\nExemplos:\nroot:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nuser:x:1000:1000:User:/home/user:/bin/bash"}],"answers":["grep root /etc/passwd"],"sim":"root:x:0:0:root:/root:/bin/bash","explanation":"O nome grep vem do editor ed: g/re/p significava \"global, regular expression, print\". Ele lê o arquivo linha a linha e imprime cada uma que casa com o padrão. Por padrão o padrão é interpretado como regex básica (BRE); use -E para regex estendida (+, ?, | sem escape), -F para texto literal (mais rápido quando não precisa de regex) ou -P para PCRE (com lookaheads)."},{"badge":"2. sem maiúsculas","title":"Busca case insensitive","objective":"Busque a palavra 'error' em /var/log/syslog. O arquivo tem ERROR, Error e error — você quer encontrar todos.","why":"Sem -i, 'error' não casaria com 'ERROR'. Com -i, maiúsculas e minúsculas são tratadas como iguais.","hint":"grep -i (i de insensitive). Coloque o texto entre aspas se tiver espaços.","context":[{"name":"/var/log/syslog","desc":"Log do sistema com entradas de vários programas. Erros podem aparecer escritos de formas diferentes:","snippet":"Jan  3 10:05 linux kernel: ERROR: disk space critical\nJan  3 10:15 linux app: error: connection refused  \nJan  3 10:22 linux nginx: Error: timeout exceeded"}],"answers":["grep -i error /var/log/syslog"],"sim":"Jan  3 10:05 linux kernel: ERROR: disk space critical\nJan  3 10:15 linux app: error: connection refused\nJan  3 10:22 linux nginx: Error: timeout exceeded","explanation":"O -i (ignore case) faz a comparação desconsiderar maiúsculas e minúsculas — \"Error\", \"ERROR\" e \"eRrOr\" casam todos com o padrão \"error\". Por padrão o grep é case-sensitive, então \"error\" não acharia \"Error\". Em logs onde a mesma palavra aparece em estilos diferentes (debug, INFO, Warning), -i evita que você perca ocorrências por causa de caixa."},{"badge":"3. número da linha","title":"Saber em qual linha está","objective":"Busque 'bash' no /etc/passwd e mostre o número de cada linha encontrada.","why":"Quando alguém diz 'o problema está na linha X', ou quando você vai editar o arquivo no vim, o número de linha é essencial.","hint":"grep -n (n de number).","context":[{"name":"/etc/passwd","desc":"Você quer saber exatamente em qual linha de número está cada usuário com bash:","snippet":"root:x:0:0:root:/root:/bin/bash   ← em qual linha?\n...(muitas linhas)...\nuser:x:1000:1000:User:/home/user:/bin/bash  ← e esta?"}],"answers":["grep -n bash /etc/passwd"],"sim":"1:root:x:0:0:root:/root:/bin/bash\n1000:user:x:1000:1000:User:/home/user:/bin/bash","explanation":"O -n adiciona o número da linha antes de cada resultado, separado por dois-pontos. Isso é essencial quando você precisa editar o arquivo depois — a maioria dos editores aceita \"abrir na linha X\" (vim +42 arquivo, code -g arquivo:42). Combine com -H para forçar o nome do arquivo antes do número, ou com -C 3 para incluir 3 linhas de contexto antes e depois de cada match."},{"badge":"4. linhas sem o texto","title":"Inverter o filtro","objective":"Mostre as linhas do /etc/passwd que NÃO contêm 'nologin'. Você quer ver apenas os usuários que têm um shell real.","why":"-v inverte: em vez de mostrar o que TEM o texto, mostra o que NÃO tem. Muito útil para excluir resultados.","hint":"grep -v (v de inVert ou neGatiVe).","context":[{"name":"/etc/passwd","desc":"A maioria dos usuários do sistema usa /usr/sbin/nologin (não podem logar). Você quer ver os que podem logar de verdade:","snippet":"root:x:0:0:root:/root:/bin/bash          ← MOSTRAR (não tem nologin)\ndaemon:x:1:1:daemon:/usr/sbin/nologin    ← ESCONDER (tem nologin)\nuser:x:1000:1000:User:/home/user:/bin/bash ← MOSTRAR"}],"answers":["grep -v nologin /etc/passwd"],"sim":"root:x:0:0:root:/root:/bin/bash\nsync:x:4:65534:sync:/bin:/bin/sync\nuser:x:1000:1000:User:/home/user:/bin/bash","explanation":"O -v (invert) inverte o sentido da busca: mostra as linhas que NÃO casam com o padrão. É ótimo para limpar saídas removendo ruído — o clássico ps aux | grep python | grep -v grep tira a linha do próprio grep dos resultados. Você pode encadear vários grep -v para remover múltiplos padrões em sequência."},{"badge":"5. contar ocorrências","title":"Só o número","objective":"Conte quantas linhas do /etc/passwd contêm 'nologin'. Mostre apenas o número, sem as linhas.","why":"-c retorna só o count. Útil em scripts para tomar decisões: 'se o número de erros for maior que 0...'","hint":"grep -c (c de count). O resultado é um número só.","context":[{"name":"Pergunta","desc":"Quantos usuários do sistema usam nologin?","snippet":"(você não quer ver as linhas — só o número total)"}],"answers":["grep -c nologin /etc/passwd"],"sim":"28","explanation":"O -c retorna apenas o número de linhas que casaram — e não o número de ocorrências totais, uma distinção importante: se a mesma linha tiver a palavra três vezes, -c conta 1. Para contar ocorrências reais, use grep -o padrão arquivo | wc -l (o -o imprime uma por linha cada trecho casado). Em vários arquivos, -c mostra arquivo:contagem para cada um."},{"badge":"6. busca em pastas","title":"Buscar em vários arquivos","objective":"Busque a palavra TODO em todos os arquivos da pasta atual e subpastas.","why":"-r (recursive) percorre todos os arquivos de uma pasta. Fundamental para buscar em projetos com vários arquivos.","hint":"grep -r texto . (o ponto representa a pasta atual)","context":[{"name":"Projeto Python","desc":"Vários arquivos espalhados com comentários TODO:","snippet":"./app.py          ← tem TODOs?\n./utils.py        ← tem TODOs?\n./models/user.py  ← tem TODOs?\n./tests/test.py   ← tem TODOs?"}],"answers":["grep -r TODO .","grep -rn TODO ."],"sim":"./app.py:45: # TODO: refatorar esta função\n./utils.py:12: # TODO: adicionar validação de entrada\n./models/user.py:8: # TODO: implementar cache","explanation":"O -r (recursive) faz o grep descer toda a árvore a partir do caminho informado (aqui, o . = pasta atual). Por padrão -r não segue links simbólicos — se precisar segui-los, use -R. Em projetos grandes combine com --include='*.py' para limitar os tipos de arquivo, ou com --exclude-dir=node_modules para pular pastas pesadas e acelerar muito a busca."},{"badge":"7. palavra exata","title":"Match exato de palavra","objective":"Busque exatamente a palavra 'log' no arquivo /etc/syslog.conf. Não deve aparecer 'syslog' nem 'logger', só 'log' isolado.","why":"-w (word) só casa se o texto for uma palavra inteira. Sem -w, 'log' casaria também dentro de 'syslog', 'logger', 'catalog'.","hint":"grep -w (w de word boundary).","context":[{"name":"Problema sem -w","desc":"","snippet":"grep log arquivo\n→ encontra: log, syslog, logger, catalog (qualquer que tenha 'log')\n\ngrep -w log arquivo  \n→ encontra: só onde 'log' é uma palavra isolada"}],"answers":["grep -w log /etc/syslog.conf"],"sim":"log\t/var/log/messages","explanation":"O -w (word) exige que o padrão esteja cercado por limites de palavra — início/fim de linha ou caracteres não-alfanuméricos. Assim \"log\" não casa em \"syslog\", \"logrotate\" ou \"dialog\". É especialmente útil quando seu termo de busca é curto ou é substring comum de outras palavras (como \"log\", \"id\", \"var\")."},{"badge":"8. grep com pipe","title":"Filtrar saída de outro comando","objective":"Liste todos os processos rodando e filtre para ver apenas os que têm 'python' no nome ou nos argumentos.","why":"Pipe + grep é um dos padrões mais usados do Linux. Em vez de ler a saída gigante do ps, você filtra o que importa.","hint":"Use o pipe | entre ps aux e grep python.","context":[{"name":"ps aux","desc":"Lista todos os processos. A saída pode ter centenas de linhas:","snippet":"USER   PID %CPU %MEM COMMAND\nroot     1  0.0  0.1 /sbin/init\nroot   234  0.0  0.0 sshd\nuser  1234  1.5  2.8 python3 app.py    ← você quer ver esse\nroot   512  0.0  0.2 cron\nuser  5678  0.0  0.1 python3 monitor.py ← e esse"}],"answers":["ps aux | grep python","ps -ef | grep python"],"sim":"user  1234  1.5  2.8 python3 app.py\nuser  5678  0.0  0.1 python3 monitor.py\nuser  9999  0.0  0.0 grep --color python","explanation":"O ps lista todos os processos e o grep filtra os que contêm \"python\". O próprio grep aparece no resultado porque ele já é um processo no momento em que o ps captura a lista — é o paradoxo clássico desse padrão. Truque para sumir com essa linha: grep [p]ython — os colchetes casam com a letra p, mas o texto do comando guardado pelo kernel é \"[p]ython\", que o próprio grep não encontra."}]}]},{"id":"find","name":"find","desc":"Encontrar arquivos no sistema","level":"intermediário","path":"~","exp":{"summary":"<b>find</b> procura arquivos e pastas usando critérios como nome, tipo, tamanho e data. Mais poderoso que ls -r porque aceita filtros e pode executar ações nos resultados.","flags":[{"flag":"find . -name arquivo","desc":"Procura pelo nome exato (. = pasta atual e subpastas)","example":"find . -name README.md"},{"flag":"-name '*.log'","desc":"Glob: qualquer arquivo que termine em .log. Use aspas para evitar expansão","example":"find /var -name '*.log'"},{"flag":"-type f","desc":"Filtra apenas arquivos regulares (não pastas, não links)","example":"find . -type f"},{"flag":"-type d","desc":"Filtra apenas diretórios","example":"find . -type d"},{"flag":"-mtime -1","desc":"Modificados há menos de 1 dia. -7 = última semana. +30 = mais de 30 dias atrás","example":"find /tmp -mtime -1"},{"flag":"-size +10M","desc":"Maiores que 10MB. Use k(KB), M(MB), G(GB). + = maior, - = menor","example":"find / -size +100M"},{"flag":"2>/dev/null","desc":"Redireciona erros para /dev/null (descarta). Evita 'Permission denied' na tela","example":"find / -name x 2>/dev/null"},{"flag":"-exec cmd {} \\;","desc":"Executa um comando em cada resultado. {} é substituído pelo arquivo encontrado","example":"find . -name '*.py' -exec ls -l {} \\;"}]},"exs":[{"title":"find — encontrar arquivos","vars":[{"badge":"1. nome exato","title":"Buscar arquivo específico","objective":"Encontre todos os arquivos chamados exatamente README.md na pasta atual e suas subpastas.","why":"find busca recursivamente por padrão. Você não precisa de -r como no grep — ele já desce nas subpastas.","hint":"find . -name README.md (o ponto é 'aqui, a pasta atual')","context":[{"name":"Estrutura do projeto","desc":"Vários arquivos README.md espalhados:","snippet":"./README.md\n./docs/README.md\n./api/README.md\n./frontend/README.md"}],"answers":["find . -name README.md"],"sim":"./README.md\n./docs/README.md\n./api/README.md\n./frontend/README.md","explanation":"A sintaxe do find é: caminho + expressão. O primeiro argumento é por onde começar a busca, e o resto são testes ou ações. -name casa o nome exato e é sensível a maiúsculas; para ignorar caixa use -iname. Sempre explicite o ponto inicial (find . em vez de só find) — alguns finds antigos reclamam sem ele, e o código fica mais legível."},{"badge":"2. por extensão","title":"Todos de uma extensão","objective":"Encontre todos os arquivos .txt dentro de /home.","why":"Globs com * permitem buscar por extensão. Use aspas para evitar que o shell expanda o * antes do find.","hint":"Use aspas no padrão: -name '*.txt' (aspas simples ou duplas)","context":[{"name":"Por que aspas?","desc":"","snippet":"find /home -name *.txt    → shell expande * primeiro (pode falhar)\nfind /home -name '*.txt'  → find recebe o padrão literal (correto)"}],"answers":["find /home -name '*.txt'","find /home -name \"*.txt\""],"sim":"/home/user/notas.txt\n/home/user/Documentos/lista.txt\n/home/user/Documentos/tarefas.txt\n/home/user/Downloads/instrucoes.txt","explanation":"O padrão usa sintaxe de glob (igual à do shell): * casa qualquer sequência, ? casa um único caractere, [abc] casa um caractere de uma lista. É FUNDAMENTAL colocar o padrão entre aspas — sem elas, o shell expande o * ANTES de chamar o find, mandando como argumento a lista de arquivos .txt do diretório atual em vez do padrão literal."},{"badge":"3. só arquivos","title":"Excluir pastas do resultado","objective":"Encontre apenas arquivos .conf em /etc. Pastas com o nome .conf não devem aparecer.","why":"-type f filtra só arquivos regulares. Sem ele, find poderia retornar pastas com o mesmo nome.","hint":"Combine -type f com -name: find /etc -type f -name '*.conf'","context":[{"name":"Problema sem -type f","desc":"","snippet":"find /etc -name '*.conf'\n→ pode retornar arquivos E pastas chamadas .conf\n\nfind /etc -type f -name '*.conf'\n→ retorna APENAS arquivos (sem pastas)"}],"answers":["find /etc -type f -name '*.conf'","find /etc -type f -name \"*.conf\""],"sim":"/etc/apt/apt.conf\n/etc/logrotate.conf\n/etc/rsyslog.conf\n/etc/syslog.conf\n/etc/ssh/sshd_config","explanation":"O -type filtra pelo tipo da entrada: f = arquivo regular, d = diretório, l = link simbólico, b = dispositivo de bloco, c = dispositivo de caractere, p = pipe nomeado, s = socket. Testes podem ser encadeados: find . -type f -name '*.log' -mtime +30 encontra arquivos .log mais antigos que 30 dias. A ordem dos testes é avaliada da esquerda para a direita."},{"badge":"4. só pastas","title":"Listar diretórios","objective":"Liste apenas as pastas (não arquivos) dentro de /var/log.","why":"Às vezes você quer a estrutura de diretórios sem os arquivos. -type d faz isso.","hint":"Use -type d (directory) em vez de -type f.","context":[{"name":"/var/log","desc":"Mistura de arquivos e pastas:","snippet":"/var/log/syslog        ← arquivo\n/var/log/auth.log      ← arquivo\n/var/log/apt/          ← pasta ← você quer essas\n/var/log/journal/      ← pasta ← e essas\n/var/log/nginx/        ← pasta ← e essas"}],"answers":["find /var/log -type d"],"sim":"/var/log\n/var/log/apt\n/var/log/journal\n/var/log/nginx\n/var/log/unattended-upgrades","explanation":"Com -type d o find lista só diretórios e inclui o próprio ponto de partida (por isso /var/log aparece na primeira linha do resultado). Para limitar a profundidade, use -maxdepth N: -maxdepth 1 mostra só filhos diretos, o equivalente mais poderoso do ls -d */. Combine com -empty para achar pastas vazias, ótimo para faxina de disco."},{"badge":"5. modificados hoje","title":"Arquivos recentes","objective":"Encontre arquivos em /tmp modificados nas últimas 24 horas.","why":"-mtime -1 significa 'modificado há menos de 1 dia'. Útil para encontrar o que mudou recentemente.","hint":"find /tmp -mtime -1 (menos que 1 dia = últimas 24h)","context":[{"name":"Como -mtime funciona","desc":"","snippet":"-mtime -1  → menos de 1 dia atrás (últimas 24h)\n-mtime -7  → menos de 7 dias (última semana)\n-mtime +30 → mais de 30 dias atrás (antigos)"}],"answers":["find /tmp -mtime -1","find /tmp -mtime -1 -type f"],"sim":"/tmp/tmpfile_abc123\n/tmp/cache_sessao\n/tmp/apt-fetch-0001","explanation":"O -mtime conta a idade da modificação em blocos de 24 horas, a partir de agora. Sinais: -N significa \"menos de N dias\" (recente), +N \"mais de N dias\" (antigo), e N sem sinal casa exatamente o dia N (entre N e N+1). Parentes úteis: -atime (último acesso), -ctime (última mudança de metadado) e as versões -mmin/-amin/-cmin que contam em minutos em vez de dias."},{"badge":"6. por tamanho","title":"Arquivos grandes","objective":"Encontre arquivos maiores que 100MB em /var para identificar o que está ocupando espaço.","why":"Disco cheio é comum em servidores. find -size +100M ajuda a identificar os culpados rapidamente.","hint":"find /var -size +100M (o + significa 'maior que')","context":[{"name":"Unidades de tamanho","desc":"","snippet":"-size +100M  → maior que 100 megabytes\n-size +1G    → maior que 1 gigabyte\n-size +500k  → maior que 500 kilobytes\n-size -10M   → menor que 10 megabytes"}],"answers":["find /var -size +100M","find /var -size +100M -type f"],"sim":"/var/log/journal/abc123/system.journal\n/var/lib/mysql/ibdata1\n/var/cache/apt/archives/chrome_amd64.deb","explanation":"Unidades aceitas pelo -size: c = bytes, k = kibibytes (1024), M = mebibytes, G = gibibytes. Os sinais funcionam igual ao -mtime: +N significa maior que, -N menor que, N sem sinal casa exatamente. Uma técnica comum de sysadmin: find / -type f -size +1G 2>/dev/null localiza os arquivos gigantes que estão enchendo o disco."},{"badge":"7. ignorar erros","title":"Busca sem erros de permissão","objective":"Busque arquivos chamados 'config' em todo o sistema (/). Erros de 'Permission denied' devem ser descartados.","why":"Sem 2>/dev/null, a tela fica poluída com centenas de 'Permission denied'. Descartamos o stderr mas mantemos os resultados.","hint":"Adicione 2>/dev/null ao final do comando.","context":[{"name":"O problema","desc":"","snippet":"find / -name config\n→ /etc/network/config\n→ find: /root: Permission denied    ← poluição\n→ find: /proc/tty: Permission denied ← poluição\n\nfind / -name config 2>/dev/null\n→ /etc/network/config               ← só resultados"}],"answers":["find / -name config 2>/dev/null"],"sim":"/etc/network/config\n/usr/lib/python3/dist-packages/config\n/home/user/.config","explanation":"Ao buscar em / sem ser root, você bate em várias pastas protegidas e recebe dezenas de mensagens \"Permission denied\" misturadas nos resultados verdadeiros. O 2>/dev/null manda o canal 2 (stderr, onde os erros saem) para o arquivo especial /dev/null, que descarta tudo que recebe. O canal 1 (stdout), com os arquivos encontrados, continua aparecendo normalmente na tela."}]}]},{"id":"chmod","name":"chmod / chown","desc":"Permissões e dono de arquivos","level":"intermediário","path":"~","exp":{"summary":"<b>chmod</b> define quem pode ler (r), escrever (w) ou executar (x) um arquivo. <b>chown</b> define o dono. Permissões são fundamentais para segurança no Linux.","flags":[{"flag":"chmod +x arquivo","desc":"Adiciona execução para todos (dono, grupo, outros)","example":"chmod +x script.sh"},{"flag":"chmod u+x arquivo","desc":"Adiciona execução só para o dono (u=user). g=group, o=others, a=all","example":"chmod u+x script.sh"},{"flag":"chmod 644 arquivo","desc":"rw-r--r--: dono lê+escreve, grupo e outros só leem. Padrão para arquivos","example":"chmod 644 config.txt"},{"flag":"chmod 755 arquivo","desc":"rwxr-xr-x: dono tudo, grupo e outros leem+executam. Padrão para scripts/pastas","example":"chmod 755 script.sh"},{"flag":"chmod 600 arquivo","desc":"rw-------: só o dono acessa. Para arquivos privados como chaves SSH","example":"chmod 600 ~/.ssh/id_rsa"},{"flag":"chmod -R 755 pasta/","desc":"Aplica recursivamente em toda a pasta e arquivos dentro","example":"chmod -R 755 public/"},{"flag":"chown user arquivo","desc":"Muda o dono do arquivo para 'user'","example":"chown deploy app.py"},{"flag":"chown user:grupo arquivo","desc":"Muda dono e grupo ao mesmo tempo","example":"chown www-data:www-data index.html"}]},"exs":[{"title":"chmod e chown","vars":[{"badge":"1. dar execução","title":"Tornar script executável","objective":"Você criou o arquivo deploy.sh mas ele não é executável ainda. Dê permissão de execução para todos.","why":"No Linux, arquivos de texto não são executáveis por padrão. Você precisa de chmod +x antes de rodar ./script.sh.","hint":"chmod +x arquivo (+ adiciona, x é execute).","context":[{"name":"Situação","desc":"","snippet":"$ ./deploy.sh\nbash: ./deploy.sh: Permission denied  ← sem permissão\n\n$ chmod +x deploy.sh\n$ ./deploy.sh\nDeploying...  ← funciona!"}],"answers":["chmod +x deploy.sh","chmod a+x deploy.sh"],"sim":"","explanation":"A notação simbólica tem três partes: quem (u=user/dono, g=group, o=others, a=all), operador (+ adiciona, - remove, = define exatamente) e permissão (r, w, x). Sem o \"quem\" explícito, chmod +x usa o default a (todos). A notação simbólica é incremental: só mexe no que você pediu, deixando as outras permissões como estavam — por isso costuma ser mais segura em scripts do que a octal."},{"badge":"2. só para o dono","title":"Execução restrita","objective":"Dê permissão de execução em backup.sh APENAS para o dono do arquivo. Outros não devem poder executar.","why":"u+x adiciona execução só para o usuário dono. Mais seguro que +x quando o script não deve ser executado por outros.","hint":"u de user (dono), + adiciona, x execução: chmod u+x","context":[{"name":"Letras de permissão","desc":"","snippet":"u = user (dono do arquivo)\ng = group (grupo do arquivo)\no = others (todos os outros)\na = all (todos acima juntos)\n\n+ adiciona    - remove    = define exato"}],"answers":["chmod u+x backup.sh"],"sim":"","explanation":"Combinar alvo (u/g/o/a) e operador (+/-/=) permite ajustes cirúrgicos nas permissões. Exemplos práticos: u+x dá execução só ao dono; go-w tira escrita de grupo e outros; a=r deixa só leitura para todo mundo (zera qualquer outra permissão). Como a simbólica é aditiva por padrão, é ideal quando você quer modificar sem sobrescrever tudo que já estava configurado."},{"badge":"3. permissão 644","title":"Arquivo de configuração","objective":"Defina config.conf com permissão 644 (rw-r--r--): dono pode ler e escrever, outros só leem.","why":"644 é a permissão padrão para arquivos de configuração e texto. Protege contra edição acidental por outros usuários.","hint":"Os números: r=4, w=2, x=1. Some para cada grupo: dono=6(rw), grupo=4(r), outros=4(r).","context":[{"name":"Como calcular octal","desc":"","snippet":"r=4  w=2  x=1\n\nPermissão 644:\nDono:   6 = 4+2 = r+w = rw-\nGrupo:  4 = 4   = r   = r--\nOutros: 4 = 4   = r   = r--\nResultado: rw-r--r--"}],"answers":["chmod 644 config.conf"],"sim":"","explanation":"Cada dígito octal é a soma dos bits: r=4, w=2, x=1. Assim 6=4+2 (rw), 4=r, 5=4+1 (rx), 7=4+2+1 (rwx). Então 644 vira rw- r-- r--, o padrão para arquivos de dados (dono edita, todo mundo lê). A umask padrão do sistema (geralmente 022) já cria novos arquivos em 644, então raramente você precisa aplicar isso à mão."},{"badge":"4. permissão 755","title":"Script público","objective":"Defina install.sh com permissão 755 (rwxr-xr-x): dono faz tudo, outros podem ler e executar.","why":"755 é a permissão padrão para scripts e pastas. Qualquer um pode rodar o script mas só o dono pode modificá-lo.","hint":"755: dono=7(rwx), grupo=5(r-x), outros=5(r-x). 7=4+2+1=rwx, 5=4+1=r-x.","context":[{"name":"Permissão 755","desc":"","snippet":"r=4  w=2  x=1\n\nPermissão 755:\nDono:   7 = 4+2+1 = r+w+x = rwx\nGrupo:  5 = 4+1   = r+x   = r-x\nOutros: 5 = 4+1   = r+x   = r-x\nResultado: rwxr-xr-x"}],"answers":["chmod 755 install.sh"],"sim":"","explanation":"755 vira rwx r-x r-x, o padrão clássico de diretórios e scripts executáveis. Em diretórios, o bit x tem um significado especial: permite \"entrar/atravessar\" a pasta — sem ele, mesmo com r você não consegue listar o conteúdo de verdade. Por isso pastas sem x para outros são praticamente inacessíveis a eles, mesmo que o r esteja lá."},{"badge":"5. arquivo privado","title":"Chave SSH privada","objective":"Defina chave.pem com permissão 600 (rw-------): APENAS o dono pode acessar. Outros não veem nada.","why":"Chaves SSH com permissão errada são rejeitadas. O ssh exige que a chave privada seja acessível só pelo dono.","hint":"600: dono=6(rw), grupo=0(---), outros=0(---). Zero significa nenhuma permissão.","context":[{"name":"SSH e permissões","desc":"","snippet":"$ ssh -i chave.pem user@server\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nWARNING: UNPROTECTED PRIVATE KEY FILE!\nPermissions 0644 are too open.\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n$ chmod 600 chave.pem\n$ ssh -i chave.pem user@server\nuser@server:~$  ← agora funciona"}],"answers":["chmod 600 chave.pem"],"sim":"","explanation":"600 vira rw- --- ---, permissão só para o dono. O cliente SSH se recusa a usar chaves privadas com permissões mais abertas — é uma proteção para que a chave não vaze para outros usuários da mesma máquina. A mesma lógica vale para a pasta ~/.ssh (geralmente 700) e para arquivos que guardam senhas ou tokens em aplicações."},{"badge":"6. recursivo","title":"Permissão em pasta inteira","objective":"Aplique permissão 755 em toda a pasta public/ e em todos os arquivos e subpastas dentro dela.","why":"chmod -R aplica recursivamente. Sem -R, só a pasta em si receberia a permissão, não o conteúdo.","hint":"chmod -R 755 pasta/ (-R = Recursive, R maiúsculo).","context":[{"name":"Cenário","desc":"Servidor web precisa que o dono de public/ e todo conteúdo tenha permissão 755:","snippet":"public/\n  index.html  ← precisa de 755\n  style.css   ← precisa de 755\n  images/     ← precisa de 755\n    logo.png  ← precisa de 755"}],"answers":["chmod -R 755 public/","chmod -R 755 public"],"sim":"","explanation":"O -R aplica a mesma permissão a tudo dentro recursivamente, o que pode ser ruim: arquivos normalmente devem ser 644 e pastas 755 — dar 755 em arquivos os deixa com x desnecessário e potencialmente inseguro. Para permissões diferentes por tipo, combine com find: find public -type d -exec chmod 755 {} + ajusta só as pastas, e find public -type f -exec chmod 644 {} + só os arquivos."},{"badge":"7. mudar o dono","title":"Transferir propriedade","objective":"Mude o dono do arquivo app.py para o usuário chamado deploy.","why":"Em servidores, você cria arquivos como root mas precisa que outro usuário seja o dono para executar o serviço.","hint":"chown usuario arquivo (sem sudo pode falhar — mas tente).","context":[{"name":"Situação","desc":"Você fez upload de app.py como root. O serviço roda como usuário 'deploy'. Precisa mudar o dono:","snippet":"$ ls -l app.py\n-rw-r--r-- 1 root root 2048 app.py  ← dono: root\n\n$ chown deploy app.py\n\n$ ls -l app.py\n-rw-r--r-- 1 deploy deploy 2048 app.py  ← dono: deploy"}],"answers":["chown deploy app.py"],"sim":"","explanation":"Apenas root pode mudar o dono de arquivos — regra de segurança para que você não \"presenteie\" um arquivo seu a outro usuário, estragando cotas e rastreio de responsabilidade. Na prática quase sempre é sudo chown. Com -R você muda recursivamente; com --reference=outro-arquivo você copia o dono e o grupo de outro arquivo, útil para alinhar um novo arquivo com os já existentes."},{"badge":"8. dono e grupo","title":"Dono e grupo juntos","objective":"Mude o dono E o grupo de index.html para www-data (usuário padrão do servidor web nginx/apache).","why":"Servidores web rodam como www-data. Para o nginx servir os arquivos corretamente, ele precisa ser o dono.","hint":"chown usuario:grupo arquivo — dois pontos separam usuário de grupo.","context":[{"name":"Servidor web","desc":"Nginx roda como www-data. Para servir index.html, o arquivo precisa pertencer a www-data:","snippet":"$ ls -l index.html\n-rw-r--r-- 1 user user 1024 index.html\n\n$ chown www-data:www-data index.html\n\n$ ls -l index.html\n-rw-r--r-- 1 www-data www-data 1024 index.html"}],"answers":["chown www-data:www-data index.html"],"sim":"","explanation":"A sintaxe usuário:grupo ajusta os dois de uma vez. Variantes: só www-data muda apenas o usuário mantendo o grupo; :www-data (com os dois-pontos iniciais) muda só o grupo mantendo o usuário; www-data: muda o usuário e força o grupo para o grupo primário dele. www-data é o usuário não-privilegiado que nginx e Apache usam no Ubuntu/Debian — arquivos servidos costumam ficar com esse dono para limitar o que o servidor pode tocar."}]}]},{"id":"pipes","name":"Pipes e Redirecionamento","desc":"Conectar comandos e controlar saída","level":"intermediário","path":"~","exp":{"summary":"O <b>pipe (|)</b> conecta comandos: a saída de um vira a entrada do próximo. O <b>redirecionamento</b> controla onde a saída vai: arquivo, lixo ou junto com os erros.","flags":[{"flag":"cmd1 | cmd2","desc":"Pipe: a saída de cmd1 é a entrada de cmd2","example":"ps aux | grep nginx"},{"flag":"cmd > arquivo","desc":"Salva a saída em arquivo (APAGA o conteúdo anterior)","example":"ls > lista.txt"},{"flag":"cmd >> arquivo","desc":"ADICIONA a saída no final do arquivo (não apaga)","example":"date >> log.txt"},{"flag":"cmd 2>/dev/null","desc":"Descarta erros (stderr). /dev/null é o 'lixo' do Linux","example":"find / -name x 2>/dev/null"},{"flag":"cmd > arq 2>&1","desc":"Salva tudo (saída + erros) no mesmo arquivo","example":"make > build.log 2>&1"},{"flag":"cmd | tee arquivo","desc":"Mostra na tela E salva no arquivo ao mesmo tempo","example":"ls | tee lista.txt"},{"flag":"cmd | wc -l","desc":"Conta as linhas da saída do comando anterior","example":"ls /etc | wc -l"}]},"exs":[{"title":"Pipes e redirecionamento","vars":[{"badge":"1. pipe simples","title":"Filtrar saída de comando","objective":"Liste os processos rodando e filtre para ver apenas os que têm 'ssh' no nome ou argumentos.","why":"ps aux retorna centenas de linhas. O pipe | passa isso para o grep filtrar. É o padrão mais comum do Linux.","hint":"ps aux | grep ssh — o pipe conecta a saída do ps com a entrada do grep.","context":[{"name":"Sem pipe","desc":"ps aux mostraria TODOS os processos (pode ser 200+ linhas). Você quer só os do ssh:","snippet":"ps aux | grep ssh\n↑ ps gera    ↑ grep filtra"}],"answers":["ps aux | grep ssh","ps -ef | grep ssh"],"sim":"root  1234  0.0 sshd: /usr/sbin/sshd [listener]\nroot  1235  0.0 sshd: user@pts/0\nuser  9876  0.0 grep --color=auto ssh","explanation":"O | conecta o stdout do primeiro comando ao stdin do segundo — ambos rodam em paralelo, em processos separados, com a saída viajando por um buffer do kernel. Você pode encadear quantos comandos quiser: a | b | c | d. É a filosofia Unix na prática: cada programa faz uma coisa bem feita, e os pipes combinam as peças para formar fluxos poderosos."},{"badge":"2. contar linhas","title":"Contar com wc -l","objective":"Conte quantos arquivos e pastas existem dentro de /etc.","why":"ls lista os itens, wc -l conta as linhas. Cada linha = um item. É como contar o resultado de qualquer comando.","hint":"ls /etc | wc -l (wc = word count, -l = lines)","context":[{"name":"wc -l","desc":"wc conta palavras, linhas e bytes. -l específica que você quer só a contagem de linhas:","snippet":"ls /etc | wc -l\n↑ ls lista  ↑ wc conta cada linha"}],"answers":["ls /etc | wc -l"],"sim":"187","explanation":"Quando o ls detecta que a saída é um pipe (e não um terminal), ele muda automaticamente para o formato \"um nome por linha\" — por isso a combinação funciona. O wc -l conta quebras de linha. O wc também tem -w (palavras), -c (bytes) e -m (caracteres). Observação: wc -l pode contar uma a menos se a última linha não terminar com \\n."},{"badge":"3. salvar em arquivo","title":"Redirecionar saída","objective":"Salve a lista de processos em execução no arquivo processos.txt.","why":"'>' redireciona a saída para um arquivo em vez de mostrar na tela. Útil para guardar resultados para analisar depois.","hint":"Use > após o comando: ps aux > processos.txt","context":[{"name":"O que > faz","desc":"","snippet":"ps aux           → mostra na tela\nps aux > arq.txt → salva no arquivo (nada aparece na tela)\n\nATENÇÃO: > apaga o que tinha antes no arquivo!"}],"answers":["ps aux > processos.txt"],"sim":"","explanation":"O > cria o arquivo se ainda não existir e TRUNCA (zera) se já existir — cuidado para não apagar um arquivo importante sem querer. Apenas o stdout (canal 1) é redirecionado; erros continuam aparecendo na tela. Para se proteger de sobrescrever, ative set -o noclobber no shell: o > passa a falhar se o destino já existir, e você usa >| (com pipe) quando quiser realmente forçar."},{"badge":"4. adicionar sem apagar","title":"Append ao arquivo","objective":"Adicione a data e hora atual no final do arquivo log.txt sem apagar o que já está lá.","why":">> adiciona ao final (append). > sobrescreve. Em logs você sempre quer >> para não perder o histórico.","hint":"Use >> (dois sinais de maior) em vez de >.","context":[{"name":"Diferença entre > e >>","desc":"","snippet":"echo 'linha1' > arquivo.txt   → arquivo tem: linha1\necho 'linha2' > arquivo.txt   → arquivo tem: linha2 (apagou!)\n\necho 'linha1' > arquivo.txt   → arquivo tem: linha1\necho 'linha2' >> arquivo.txt  → arquivo tem: linha1 e linha2"}],"answers":["date >> log.txt"],"sim":"","explanation":"O >> é seguro para acumular dados: cada execução acrescenta ao final sem tocar no conteúdo anterior. Se o arquivo ainda não existe, ele é criado, igual ao >. É a forma ideal de escrever logs em scripts: echo \"[$(date)] evento X\" >> app.log. Já o > sozinho dentro de um loop apagaria o arquivo a cada iteração."},{"badge":"5. descartar erros","title":"Esconder Permission denied","objective":"Busque arquivos chamados 'hosts' em todo o sistema (/). Mensagens de 'Permission denied' devem sumir da tela.","why":"find no / tenta entrar em pastas protegidas e gera spam de erros. 2>/dev/null descarta só os erros, mantendo os resultados.","hint":"Adicione 2>/dev/null ao final do comando find.","context":[{"name":"Canais de saída","desc":"","snippet":"Saída normal (stdout) = canal 1\nErros (stderr)        = canal 2\n\n2>/dev/null redireciona o canal 2 (erros)\npara /dev/null (o lixo do Linux)"}],"answers":["find / -name hosts 2>/dev/null"],"sim":"/etc/hosts\n/etc/avahi/hosts","explanation":"Cada processo tem três canais numerados: 0 (stdin), 1 (stdout), 2 (stderr). A sintaxe N> redireciona o canal N; então 2>/dev/null joga todos os erros no \"buraco negro\" /dev/null, que descarta tudo que recebe. Os canais são independentes, por isso o stdout (canal 1, seus resultados úteis) continua fluindo normalmente para a tela."},{"badge":"6. salvar tudo","title":"Stdout + stderr juntos","objective":"Execute 'ls /root' e salve TANTO a saída normal QUANTO possíveis erros no arquivo resultado.txt.","why":"Às vezes você quer guardar tudo: o que funcionou e os erros. 2>&1 redireciona os erros para o mesmo lugar do stdout.","hint":"cmd > arquivo 2>&1 (primeiro redireciona stdout, depois junta stderr com stdout)","context":[{"name":"O que 2>&1 significa","desc":"","snippet":"ls /root > resultado.txt 2>&1\n         ↑             ↑\n      stdout          stderr vai para\n      vai para        o mesmo lugar\n      resultado.txt   que o stdout"}],"answers":["ls /root > resultado.txt 2>&1"],"sim":"","explanation":"A notação 2>&1 significa: \"duplique o canal 2 para onde o canal 1 está apontando AGORA\". A ordem importa muito: > resultado.txt 2>&1 junta os dois no arquivo (correto), mas 2>&1 > resultado.txt manda stderr para a tela (o stdout só vira arquivo depois de o stderr ter sido redirecionado). Atalho moderno do bash: &> arquivo faz as duas coisas em um só token."},{"badge":"7. ver e salvar","title":"tee: tela e arquivo","objective":"Liste /etc e ao mesmo tempo salve a lista no arquivo lista.txt — você quer VER e GUARDAR ao mesmo tempo.","why":"Com > você vê ou salva, nunca os dois. tee resolve: mostra na tela E grava no arquivo simultaneamente.","hint":"Use tee no final do pipe: ls /etc | tee lista.txt","context":[{"name":"O problema sem tee","desc":"","snippet":"ls /etc > lista.txt   → salva mas não mostra na tela\nls /etc               → mostra mas não salva\nls /etc | tee lista.txt → mostra E salva (os dois!)"}],"answers":["ls /etc | tee lista.txt"],"sim":"apt\nbash.bashrc\ncron.d\nfstab\nhostname\nhosts\nnetwork\npasswd\nssh","explanation":"O nome tee vem do encanamento: um T que bifurca o fluxo. Ele lê do stdin e escreve simultaneamente no arquivo e no stdout, o que permite continuar o pipeline depois dele: comando | tee log.txt | grep erro. Com -a (append), ele acrescenta no lugar de sobrescrever — truque indispensável com sudo: comando | sudo tee -a /etc/arquivo (o sudo vale para o tee, não para o comando)."},{"badge":"8. pipeline 3 comandos","title":"Encadear múltiplos","objective":"Mostre os 5 processos que mais estão usando memória RAM. Use ps aux, sort e head.","why":"Você pode encadear quantos pipes quiser. Cada comando transforma a saída do anterior.","hint":"ps aux | sort pela coluna de memória (4ª coluna, -nrk 4) | head para pegar os 5 primeiros.","context":[{"name":"Pipeline de 3 etapas","desc":"","snippet":"ps aux                → lista todos os processos\n  | sort -nrk 4       → ordena pela 4ª coluna (%MEM) decrescente\n  | head -6           → pega as 6 primeiras linhas (1 header + 5 processos)"}],"answers":["ps aux | sort -nrk 4 | head -6","ps aux --sort=-%mem | head -6"],"sim":"USER   PID %CPU %MEM COMMAND\nuser  2001  1.2  8.5 /usr/lib/firefox\nuser  3421  0.8  6.2 /usr/bin/code\nuser  1234  1.5  5.1 python3 app.py\nroot   512  0.1  2.8 /usr/bin/dockerd\nuser  4567  0.3  2.1 /usr/bin/node","explanation":"Pipeline lido da esquerda para a direita: ps aux lista os processos; sort -n ordena numericamente (sem -n, \"10\" viria antes de \"2\" por comparação textual); -r inverte (maior primeiro); -k 4 escolhe a coluna 4 (%MEM); e head -6 mantém só as 6 primeiras linhas, já contando com o cabeçalho. É o padrão \"top N\" do Unix: gerar dados → ordenar → cortar, uma receita aplicável a dezenas de análises."}]}]},{"id":"tar","name":"tar","desc":"Compactar e extrair arquivos","level":"intermediário","path":"~","exp":{"summary":"<b>tar</b> empacota e comprime arquivos. Regra de ouro: <b>c</b>=criar, <b>x</b>=extrair, <b>t</b>=listar. Sempre com <b>z</b> (gzip) e <b>f</b> (nome do arquivo).","flags":[{"flag":"tar -czf arq.tar.gz pasta/","desc":"Cria (c) um tar comprimido com gzip (z). f especifica o nome","example":"tar -czf backup.tar.gz /home/user/"},{"flag":"tar -xzf arq.tar.gz","desc":"Extrai (x) o tar comprimido com gzip","example":"tar -xzf backup.tar.gz"},{"flag":"tar -tzf arq.tar.gz","desc":"Lista (t) o conteúdo sem extrair nada","example":"tar -tzf backup.tar.gz"},{"flag":"-v (verbose)","desc":"Mostra cada arquivo enquanto processa (mais lento mas visível)","example":"tar -czvf arq.tar.gz pasta/"},{"flag":"-C /pasta","desc":"Extrai dentro de uma pasta específica (não na pasta atual)","example":"tar -xzf arq.tar.gz -C /tmp/"},{"flag":"--exclude='*.log'","desc":"Exclui arquivos que casam com o padrão durante a criação","example":"tar -czf proj.tar.gz . --exclude='*.log'"}]},"exs":[{"title":"tar — compactar e extrair","vars":[{"badge":"1. compactar pasta","title":"Criar arquivo .tar.gz","objective":"Compacte a pasta projetos/ e salve como projetos.tar.gz.","why":"tar.gz é o formato padrão no Linux para distribuir e fazer backup de pastas com seus arquivos.","hint":"tar -czf NOME_DO_ARQUIVO PASTA_A_COMPACTAR. O arquivo vem antes da pasta.","context":[{"name":"Ordem dos argumentos","desc":"","snippet":"tar  -czf  projetos.tar.gz  projetos/\n         ↑  nome do arquivo  ↑ o que compactar\nc = criar\nz = comprimir com gzip\nf = arquivo (o nome vem logo depois)"}],"answers":["tar -czf projetos.tar.gz projetos/","tar -czf projetos.tar.gz projetos","tar czf projetos.tar.gz projetos/"],"sim":"","explanation":"As três flags formam a tríade clássica para criar um arquivo compactado: c (create) inicia a criação, z (gzip) comprime com gzip, f (file) avisa que o próximo argumento é o nome do arquivo de saída. A ordem \"modo primeiro, depois o que compactar\" importa — o .tar.gz vem antes do alvo. Para outros compressores, troque -z por -j (bzip2, arquivos menores porém mais lento) ou -J (xz, ainda menor)."},{"badge":"2. compactar verbose","title":"Ver o que está sendo compactado","objective":"Compacte docs/ como docs.tar.gz e mostre cada arquivo sendo adicionado durante a compressão.","why":"-v (verbose) mostra o que está acontecendo. Para pastas grandes, fica menos ansioso ver o progresso.","hint":"Adicione v às flags: -czvf (c=criar, z=gzip, v=verbose, f=arquivo).","context":[{"name":"Com verbose","desc":"","snippet":"tar -czvf docs.tar.gz docs/\ndocs/\ndocs/readme.md\ndocs/manual.pdf\ndocs/imagens/\ndocs/imagens/logo.png"}],"answers":["tar -czvf docs.tar.gz docs/","tar czvf docs.tar.gz docs/"],"sim":"docs/\ndocs/readme.md\ndocs/manual.pdf\ndocs/imagens/\ndocs/imagens/logo.png","explanation":"O -v (verbose) lista no stderr cada arquivo conforme ele é adicionado ao tar. Em operações grandes é a forma mais simples de confirmar que o comando não travou. Para um feedback mais leve em pipelines, use pv entre o tar e o arquivo (tar cf - pasta | pv > saida.tar), que mostra velocidade e ETA sem inundar a tela com nomes."},{"badge":"3. listar conteúdo","title":"Ver sem extrair","objective":"Veja o que tem dentro de backup.tar.gz SEM extrair nada.","why":"Antes de extrair, sempre bom verificar o conteúdo. -t lista sem modificar nada.","hint":"Troque o c por t: -tzf (t=listar, z=gzip, f=arquivo).","context":[{"name":"Por que listar antes?","desc":"","snippet":"Você recebeu backup.tar.gz de alguém.\nAntes de extrair, verifique o que tem:\n\ntar -tzf backup.tar.gz\n→ backup/\n→ backup/config.txt\n→ backup/banco.sql\n\nNenhum arquivo foi extraído ainda."}],"answers":["tar -tzf backup.tar.gz","tar tzf backup.tar.gz","tar -tf backup.tar.gz"],"sim":"backup/\nbackup/config.txt\nbackup/banco.sql\nbackup/logs/\nbackup/logs/app.log","explanation":"O -t (list) lê o índice do tar e imprime os caminhos internos sem extrair — como um \"dry run\". Use SEMPRE antes de extrair um tar baixado, para conferir que os caminhos internos não começam com / (absolutos) ou com ../, que poderiam escrever arquivos fora da pasta atual. A partir do GNU tar 1.14, a flag --one-top-level também força a extração para dentro de uma única pasta segura."},{"badge":"4. extrair aqui","title":"Extrair na pasta atual","objective":"Extraia o arquivo release.tar.gz na pasta onde você está.","why":"Por padrão, tar extrai na pasta atual. É o uso mais comum: baixar um .tar.gz e extrair para usar.","hint":"Troque o c por x: -xzf (x=extrair, z=gzip, f=arquivo).","context":[{"name":"Processo","desc":"","snippet":"$ ls\nrelease.tar.gz\n\n$ tar -xzf release.tar.gz\n\n$ ls\nrelease/      ← pasta foi criada\nrelease.tar.gz"}],"answers":["tar -xzf release.tar.gz","tar xzf release.tar.gz"],"sim":"release/\nrelease/bin/\nrelease/bin/app\nrelease/config.conf\nrelease/README.md","explanation":"Tríade para extrair: x (extract) + z (gzip) + f (file). O tar moderno do GNU reconhece o formato automaticamente, então -xf geralmente basta (sem precisar do z/j/J) — mas passar explicitamente não atrapalha e é mais compatível com implementações antigas. O conteúdo é extraído com os caminhos internos relativos ao diretório atual; para mudar o destino use -C (ver próximo exercício)."},{"badge":"5. extrair em pasta","title":"Extrair em outro lugar","objective":"Extraia backup.tar.gz dentro da pasta /tmp/ em vez de aqui.","why":"-C (Change directory) define onde extrair. Evita bagunçar a pasta atual quando o tar não tem uma pasta raiz.","hint":"Adicione -C /tmp/ ao final: tar -xzf arquivo.tar.gz -C /tmp/","context":[{"name":"Com -C","desc":"","snippet":"tar -xzf backup.tar.gz\n→ extrai na pasta atual (~/)\n\ntar -xzf backup.tar.gz -C /tmp/\n→ extrai dentro de /tmp/\n\nA pasta /tmp/ precisa existir antes."}],"answers":["tar -xzf backup.tar.gz -C /tmp/","tar -xzf backup.tar.gz -C /tmp"],"sim":"","explanation":"O -C (change directory) faz o tar entrar no destino antes de começar a operação — por isso a pasta precisa existir previamente (crie com mkdir -p se necessário). Também funciona na criação: tar -czf saida.tar.gz -C /dados arquivos/ empacota a pasta arquivos/ SEM incluir o prefixo /dados no caminho interno, deixando o arquivo portável para ser extraído em outra máquina."},{"badge":"6. excluir arquivos","title":"Compactar sem certos arquivos","objective":"Compacte a pasta atual em projeto.tar.gz mas exclua todos os arquivos .log.","why":"Logs podem ocupar muito espaço. --exclude permite filtrar o que não deve entrar no arquivo compactado.","hint":"Adicione --exclude='*.log' ao comando: tar -czf projeto.tar.gz . --exclude='*.log'","context":[{"name":"Situação","desc":"Pasta atual tem código e logs. Você só quer o código:","snippet":"./app.py        ← incluir\n./utils.py      ← incluir\n./debug.log     ← EXCLUIR\n./error.log     ← EXCLUIR\n./config/       ← incluir"}],"answers":["tar -czf projeto.tar.gz . --exclude='*.log'","tar -czf projeto.tar.gz . --exclude=\"*.log\"","tar -czf projeto.tar.gz --exclude='*.log' ."],"sim":"","explanation":"O --exclude aceita padrões glob (*, ?, []) e pode ser repetido para descartar várias coisas: --exclude='*.log' --exclude='node_modules'. Deve aparecer antes do caminho a compactar para o tar aplicar o filtro durante a travessia dos arquivos. Em projetos com muitos padrões, salve todos em um arquivo (um por linha) e use --exclude-from=ignorar.txt — mais limpo e versionável."}]}]},{"id":"ps_kill","name":"ps / kill / top","desc":"Monitorar e encerrar processos","level":"intermediário","path":"~","exp":{"summary":"<b>ps</b> lista os processos em execução. <b>kill</b> envia sinais para eles (não só para matar). <b>top</b> monitora em tempo real. Todo processo tem um PID (número único).","flags":[{"flag":"ps aux","desc":"Lista TODOS os processos: a=all users, u=user-format, x=sem terminal","example":"ps aux"},{"flag":"ps aux | grep nome","desc":"Filtra para ver processos de um programa específico","example":"ps aux | grep nginx"},{"flag":"kill PID","desc":"Envia SIGTERM (15): pede encerramento gentil. O processo pode salvar dados","example":"kill 1234"},{"flag":"kill -9 PID","desc":"Envia SIGKILL: força encerramento imediato. O processo não pode se recusar","example":"kill -9 1234"},{"flag":"kill -HUP PID","desc":"SIGHUP: recarrega configurações sem reiniciar. Usado com nginx, sshd","example":"kill -HUP 1234"},{"flag":"pkill nome","desc":"Encerra todos os processos com aquele nome (sem precisar do PID)","example":"pkill firefox"},{"flag":"top","desc":"Monitor interativo: atualiza a cada 2 segundos. q=sair, k=matar processo","example":"top"}]},"exs":[{"title":"ps e kill — processos","vars":[{"badge":"1. listar processos","title":"Ver o que está rodando","objective":"Liste todos os processos em execução no sistema com seus detalhes (PID, uso de CPU e memória).","why":"ps aux é o snapshot de tudo que roda no sistema. Fundamental para ver o que está consumindo recursos.","hint":"ps aux — três letras juntas sem hífen (ou com: ps -ef funciona também).","context":[{"name":"Colunas do ps aux","desc":"","snippet":"USER   PID  %CPU  %MEM  COMMAND\n  ↑     ↑     ↑     ↑       ↑\ndono  número  uso   uso  nome do processo\n       único  CPU   RAM"}],"answers":["ps aux","ps -ef"],"sim":"USER   PID %CPU %MEM COMMAND\nroot     1  0.0  0.1 /sbin/init\nroot   234  0.0  0.0 /usr/sbin/sshd\nuser  1234  1.5  2.8 python3 app.py\nuser  2001  0.8  8.5 /usr/lib/firefox\nroot   512  0.0  0.2 /usr/sbin/cron","explanation":"Existem dois estilos históricos: ps aux (BSD, sem traço) e ps -ef (SysV, com traço); os dois listam todos os processos com colunas ligeiramente diferentes. Colunas importantes: PID (usado com kill e pkill), USER (dono), %CPU e %MEM (consumo atual), COMMAND (linha de comando). Diferente do top, o ps é um snapshot instantâneo — rode de novo para ver os valores atualizados."},{"badge":"2. encontrar processo","title":"Achar PID de um programa","objective":"Liste os processos e filtre para ver apenas os relacionados ao nginx. Você quer ver o PID.","why":"ps aux | grep nome é o jeito padrão de encontrar o PID de um processo específico para poder controlá-lo.","hint":"ps aux | grep nginx — o grep filtra a saída do ps.","context":[{"name":"Por que precisa do PID?","desc":"","snippet":"Para kill e kill -HUP você precisa do PID.\nO PID é o número na 2ª coluna:\n\nroot  1234  0.0 nginx: master process  ← PID = 1234\nnginx 1235  0.0 nginx: worker process  ← PID = 1235"}],"answers":["ps aux | grep nginx","ps -ef | grep nginx"],"sim":"root  1234  0.0  0.1 nginx: master process /usr/sbin/nginx\nnginx 1235  0.0  0.1 nginx: worker process\nnginx 1236  0.0  0.1 nginx: worker process","explanation":"Encadear ps com grep é o padrão do dia a dia para \"achar PID de um programa\". Identificado o master (geralmente o PID menor, com \"master process\" no comando), você escolhe a ação: kill -HUP para recarregar configs sem derrubar, kill (SIGTERM) para encerrar limpo, kill -9 para forçar. Alternativa mais direta: pgrep nginx devolve só os PIDs, sem precisar do grep nem filtrar o cabeçalho."},{"badge":"3. encerrar com gentileza","title":"SIGTERM — encerramento gracioso","objective":"Peça para o processo com PID 1234 encerrar. Use o sinal padrão que permite ao processo salvar dados.","why":"kill sem especificar sinal manda SIGTERM (15). O processo recebe o sinal e pode fechar conexões, salvar estado, etc.","hint":"kill seguido do PID. Sem -9, sem nada — apenas kill PID.","context":[{"name":"Diferença de sinais","desc":"","snippet":"kill 1234         → SIGTERM: 'por favor feche'\n                   O processo pode ignorar ou demorar\n\nkill -9 1234      → SIGKILL: 'feche agora!'\n                   O kernel força, sem exceção"}],"answers":["kill 1234","kill -15 1234","kill -SIGTERM 1234"],"sim":"","explanation":"SIGTERM (sinal 15, default do kill) é um pedido educado: \"por favor, termine quando puder\". O processo recebe o sinal e pode rodar seu próprio handler para fechar arquivos, gravar estado, desconectar clientes e só então sair. É o sinal padrão que o systemd usa ao parar um serviço. Se o processo ignorar ou travar, aí você escala para SIGKILL."},{"badge":"4. forçar encerramento","title":"SIGKILL — forçar fechar","objective":"O processo PID 5678 está travado e não responde ao kill normal. Force o encerramento imediato.","why":"SIGKILL (-9) é irrecusável — o kernel encerra o processo na hora. Use quando o processo ignora SIGTERM.","hint":"kill -9 PID (o -9 é o número do sinal SIGKILL).","context":[{"name":"Quando usar -9?","desc":"","snippet":"1. Tente primeiro: kill 5678\n2. Espere alguns segundos\n3. Se ainda estiver rodando: kill -9 5678\n\nO -9 não pode ser ignorado pelo processo."}],"answers":["kill -9 5678","kill -SIGKILL 5678"],"sim":"","explanation":"SIGKILL (sinal 9) não chega a ser entregue ao processo — o próprio kernel remove ele da memória. Diferente do SIGTERM, não pode ser capturado nem ignorado, então é garantido encerrar qualquer processo. O preço: arquivos sem flush, locks presos, banco de dados possivelmente corrompido. Regra prática: SIGTERM primeiro, espere alguns segundos; só então use SIGKILL, quando o processo já mostrou que não vai sair por conta própria."},{"badge":"5. encerrar por nome","title":"pkill sem precisar do PID","objective":"Encerre todos os processos chamados 'firefox' de uma vez, sem precisar descobrir o PID antes.","why":"pkill busca pelo nome e envia o sinal automaticamente. Mais rápido que ps aux | grep | kill.","hint":"pkill nome — encerra todos os processos com aquele nome.","context":[{"name":"pkill vs kill","desc":"","snippet":"Método longo:\n$ ps aux | grep firefox\nuser 2001 firefox\n$ kill 2001\n\nMétodo curto:\n$ pkill firefox   ← faz tudo de uma vez"}],"answers":["pkill firefox","killall firefox"],"sim":"","explanation":"pkill e killall buscam processos pelo nome do executável e enviam o sinal (default SIGTERM). Diferença sutil: pkill casa por padrão (pkill fire já acha firefox), enquanto killall exige o nome exato. Flags comuns dos dois: -9 para enviar SIGKILL, -u usuário para limitar aos processos de alguém específico, e -HUP para pedir reload a todos os instances ao mesmo tempo."},{"badge":"6. recarregar configuração","title":"SIGHUP — reload sem reiniciar","objective":"O nginx (PID 1234) tem a configuração atualizada. Mande-o recarregar as configs sem reiniciar o serviço.","why":"SIGHUP faz servidores como nginx, sshd e apache recarregarem as configurações sem parar e reiniciar (sem downtime).","hint":"kill -HUP PID ou kill -1 PID (HUP é o sinal número 1).","context":[{"name":"Por que não reiniciar?","desc":"","snippet":"Reiniciar nginx:\n$ systemctl restart nginx  ← para e volta (downtime!)\n\nRecarregar configs (sem parar):\n$ kill -HUP 1234  ← nginx relê o arquivo e aplica\n                    sem interromper conexões ativas"}],"answers":["kill -HUP 1234","kill -1 1234","kill -SIGHUP 1234"],"sim":"","explanation":"Historicamente, SIGHUP (sinal 1) avisava a um shell que sua linha de terminal caiu (\"hang up\"), e o default era encerrar o processo. Serviços de longa duração (nginx, sshd, rsyslogd) reaproveitaram o sinal para significar \"recarregue as configurações\" — muito mais barato que reiniciar o serviço. Sempre consulte o man page do serviço para confirmar qual é o comportamento dele com SIGHUP."},{"badge":"7. monitor ao vivo","title":"top — ver em tempo real","objective":"Abra o monitor interativo de processos que atualiza em tempo real, mostrando CPU e memória.","why":"top mostra os processos mais pesados no topo e atualiza a cada 2 segundos. Útil para identificar o que está sobrecarregando o sistema.","hint":"Só digitr top. Dentro do top: q=sair, k=matar processo, M=ordenar por memória.","context":[{"name":"Atalhos dentro do top","desc":"","snippet":"q → sair do top\nk → kill (pede o PID)\nM → ordenar por uso de memória\nP → ordenar por uso de CPU\n1 → mostrar cada núcleo de CPU separado"}],"answers":["top","htop"],"sim":"top - 10:30:01 up 1:22, 1 user, load: 0.52\nTasks: 142 total, 1 running, 141 sleeping\n%Cpu: 3.1 us, 1.2 sy, 95.2 id\nMem: 3931M total, 1234M free, 1200M used\n\n  PID USER  %CPU %MEM COMMAND\n 2001 user   8.5  8.5 firefox\n 1234 user   5.1  2.8 python3 app.py\n  512 root   2.1  0.2 dockerd","explanation":"O top atualiza a tela a cada poucos segundos e responde a teclas: q sai, k mata um PID, P ordena por CPU, M por memória, h abre o menu de ajuda. O htop (instalável via apt/brew install htop) traz cores, visualização em árvore (F5) e suporte a mouse, mas consome um pouco mais de CPU. Para logar periodicamente sem modo interativo, use top -b -n 1 (batch, uma iteração) — pode gravar em arquivo."}]}]},{"id":"ssh_scp","name":"ssh / scp","desc":"Acesso remoto e cópia de arquivos","level":"intermediário","path":"~","exp":{"summary":"<b>ssh</b> abre um terminal seguro em outro servidor. <b>scp</b> copia arquivos entre máquinas usando SSH. Ambos usam criptografia.","flags":[{"flag":"ssh usuario@ip","desc":"Conecta ao servidor. Pedirá senha (ou usa chave automaticamente)","example":"ssh admin@192.168.1.100"},{"flag":"ssh -p 2222 usuario@ip","desc":"Conecta usando porta diferente da padrão (padrão é 22)","example":"ssh -p 2222 deploy@servidor.com"},{"flag":"ssh -i chave.pem usuario@ip","desc":"Conecta usando uma chave privada em vez de senha","example":"ssh -i ~/.ssh/prod.pem ubuntu@servidor.com"},{"flag":"scp arquivo usuario@ip:/pasta/","desc":"Envia um arquivo para o servidor. Origem → Destino","example":"scp backup.tar.gz admin@192.168.1.1:/backups/"},{"flag":"scp usuario@ip:/pasta/arquivo .","desc":"Baixa um arquivo do servidor para a pasta atual (. = aqui)","example":"scp admin@192.168.1.1:/var/log/app.log ."},{"flag":"scp -r pasta/ usuario@ip:/destino/","desc":"Envia uma pasta inteira (-r = recursivo)","example":"scp -r configs/ deploy@servidor.com:/etc/app/"},{"flag":"rsync -avz src/ usuario@ip:/dest/","desc":"Sincroniza: só envia o que mudou. Mais eficiente que scp para pastas grandes","example":"rsync -avz www/ admin@servidor.com:/var/www/"}]},"exs":[{"title":"ssh e scp — acesso remoto","vars":[{"badge":"1. conectar via SSH","title":"Abrir terminal remoto","objective":"Conecte via SSH ao servidor 192.168.1.100 usando o usuário admin.","why":"ssh abre um terminal seguro no servidor remoto. Tudo que você digitar lá é executado no servidor, não na sua máquina.","hint":"ssh usuario@ip — sempre esse formato.","context":[{"name":"O que acontece","desc":"","snippet":"$ ssh admin@192.168.1.100\nadmin@192.168.1.100's password: (digita senha)\nLast login: Mon Jan  1 09:00:00 2024\nadmin@servidor:~$   ← agora você está no servidor!"},{"name":"Depois de conectar","desc":"Tudo que digitar será executado no servidor remoto, não na sua máquina local."}],"answers":["ssh admin@192.168.1.100"],"sim":"admin@192.168.1.100's password:\nLast login: Mon Jan  1 09:00:00 2024 from 192.168.1.5\nadmin@servidor:~$","explanation":"A sintaxe é ssh usuário@host; sem informar usuário, ssh usa o seu local. A porta default é 22. Na primeira conexão, o ssh mostra o fingerprint do host e pede confirmação — só responda \"yes\" se tiver confirmado por outro meio que é o servidor certo (o fingerprint fica salvo em ~/.ssh/known_hosts). Com o prompt mudado, todos os comandos a seguir rodam no servidor remoto, até você dar exit ou Ctrl+D."},{"badge":"2. porta diferente","title":"SSH em porta alternativa","objective":"Conecte ao servidor 10.0.0.5 como usuário deploy, mas o SSH está configurado na porta 2222.","why":"Por segurança, muitos servidores mudam o SSH da porta padrão 22 para outra porta. Você precisa especificar com -p.","hint":"ssh -p PORTA usuario@ip. O -p vem antes do usuario@ip.","context":[{"name":"Por que mudar a porta?","desc":"Bots na internet ficam tentando logar na porta 22. Mudar para 2222 reduz as tentativas de invasão.","snippet":"ssh deploy@10.0.0.5        → tenta porta 22 (padrão)\nssh -p 2222 deploy@10.0.0.5 → usa porta 2222"}],"answers":["ssh -p 2222 deploy@10.0.0.5"],"sim":"deploy@servidor:~$","explanation":"Muitos servidores mudam a porta padrão do SSH (de 22 para 2222, 22222, etc.) para reduzir a quantidade de tentativas automáticas de login. Sem o -p, a tentativa vai para a 22 e falha imediatamente com \"Connection refused\". Para não ter que lembrar da porta toda vez, cadastre o host em ~/.ssh/config com \"Port 2222\" — depois basta ssh nomedohost e o cliente já sabe a porta, usuário e chave."},{"badge":"3. com chave privada","title":"Autenticação por chave","objective":"Conecte ao servidor prod.empresa.com como ubuntu usando a chave privada localizada em ~/.ssh/prod.pem.","why":"Chaves SSH são mais seguras que senhas. Servidores cloud (AWS, Google Cloud) usam chaves por padrão.","hint":"ssh -i CAMINHO_DA_CHAVE usuario@servidor. O -i especifica o arquivo de identidade.","context":[{"name":"Chave vs senha","desc":"","snippet":"Com senha:   ssh ubuntu@prod.empresa.com\n             → pede senha\n\nCom chave:   ssh -i ~/.ssh/prod.pem ubuntu@prod.empresa.com\n             → autentica automaticamente via chave\n             → sem digitar senha"},{"name":"Atenção","desc":"A chave .pem precisa ter permissão 600, senão o SSH recusa:","snippet":"chmod 600 ~/.ssh/prod.pem"}],"answers":["ssh -i ~/.ssh/prod.pem ubuntu@prod.empresa.com"],"sim":"ubuntu@prod:~$","explanation":"O -i aponta qual chave privada usar nesta conexão. A chave PRIVADA fica no seu computador e precisa ter permissão 600 (sem isso o ssh recusa); a chave PÚBLICA correspondente (terminação .pub) fica em ~/.ssh/authorized_keys no servidor. A mesma flag -i vale para scp; no rsync você passa -e 'ssh -i caminho'. Para automatizar, cadastre em ~/.ssh/config: IdentityFile ~/.ssh/prod.pem."},{"badge":"4. enviar arquivo","title":"Copiar arquivo para servidor","objective":"Envie o arquivo local backup.tar.gz para a pasta /backups/ no servidor 192.168.1.100.","why":"scp usa SSH para copiar com segurança. scp arquivo usuario@ip:pasta — origem local, destino remoto.","hint":"scp arquivo usuario@ip:/pasta/ — os dois pontos separam o ip do caminho remoto.","context":[{"name":"Formato do scp","desc":"","snippet":"scp  ORIGEM  DESTINO\n     ↓       ↓\n\nEnviar (local → remoto):\nscp backup.tar.gz admin@192.168.1.100:/backups/\n    ↑ arquivo local         ↑ pasta no servidor\n\nOs dois pontos : separam IP do caminho remoto."}],"answers":["scp backup.tar.gz admin@192.168.1.100:/backups/"],"sim":"backup.tar.gz    100% 15MB  25.3MB/s  00:00","explanation":"O scp usa SSH por baixo dos panos, então autenticação e segurança são as mesmas do ssh. Sintaxe: scp ORIGEM DESTINO, e qualquer lado pode ser remoto (usuário@host:/caminho). Atenção: o destino /backups/ precisa existir no servidor — o scp não cria pastas. Desde 2020, o OpenSSH marcou o scp como legado por limitações no protocolo e recomenda sftp ou rsync para scripts novos."},{"badge":"5. baixar arquivo","title":"Copiar arquivo do servidor","objective":"Baixe o arquivo /var/log/app.log do servidor 192.168.1.100 para a pasta onde você está agora.","why":"Mesmo comando scp, mas invertido: agora a origem é remota e o destino é local. O ponto (.) significa 'aqui'.","hint":"scp usuario@ip:/caminho/arquivo . (o ponto no final = pasta atual)","context":[{"name":"Origem e destino invertidos","desc":"","snippet":"Enviar:  scp arquivo.local  admin@ip:/remoto/\nBaixar:  scp admin@ip:/remoto/arquivo  .  ← ponto = aqui\n                                            ↑ pasta atual"}],"answers":["scp admin@192.168.1.100:/var/log/app.log .","scp admin@192.168.1.100:/var/log/app.log ./"],"sim":"app.log    100% 2.3MB  18.7MB/s  00:00","explanation":"Invertendo a ordem dos argumentos, o scp baixa em vez de subir: a origem ganha o formato host:caminho e o destino é local. O . no final indica a pasta atual, mas você também pode escrever ./novo-nome para renomear durante a cópia. Para arquivos grandes ou redes instáveis, prefira rsync com --partial — scp não retoma transferência, se cair você recomeça do zero."},{"badge":"6. enviar pasta","title":"Copiar pasta inteira","objective":"Envie toda a pasta configs/ para /etc/app/ no servidor 10.0.0.5.","why":"scp -r copia pastas recursivamente (como cp -r). Sem -r, scp falha ao tentar copiar uma pasta.","hint":"scp -r pasta/ usuario@ip:/destino/ (r maiúsculo ou minúsculo — ambos funcionam)","context":[{"name":"configs/","desc":"Pasta local com arquivos de configuração:","snippet":"configs/\n  app.conf\n  database.conf\n  redis.conf\n\nVocê quer tudo em /etc/app/ no servidor."}],"answers":["scp -r configs/ deploy@10.0.0.5:/etc/app/"],"sim":"configs/app.conf       100% 1024  30.0KB/s  00:00\nconfigs/database.conf  100%  512  15.0KB/s  00:00\nconfigs/redis.conf     100%  256  12.0KB/s  00:00","explanation":"Sem -r o scp se recusa a copiar diretórios, igual ao cp. O progresso aparece arquivo por arquivo, o que polui a tela quando você manda milhares de arquivos pequenos. Para sincronizações recorrentes ou pastas grandes, rsync -avz é mais inteligente: transfere só o que mudou desde a última vez e já preserva permissões e timestamps automaticamente."},{"badge":"7. sincronizar","title":"rsync — só o que mudou","objective":"Sincronize a pasta local www/ com /var/www/ no servidor 192.168.1.100. Apenas arquivos modificados devem ser enviados.","why":"scp sempre copia tudo. rsync compara e envia só o que mudou — muito mais rápido para pastas grandes.","hint":"rsync -avz pasta/ usuario@ip:/destino/ (-a=archive, -v=verbose, -z=comprime)","context":[{"name":"scp vs rsync","desc":"","snippet":"scp -r www/ admin@ip:/var/www/\n→ copia TODOS os arquivos sempre\n→ 100MB toda vez\n\nrsync -avz www/ admin@ip:/var/www/\n→ compara e envia só o que mudou\n→ se só 2 arquivos mudaram: envia só eles"}],"answers":["rsync -avz www/ admin@192.168.1.100:/var/www/"],"sim":"sending incremental file list\nwww/index.html\nwww/style.css\n\nsent 45,678 bytes  received 892 bytes  12,345.78 bytes/sec\ntotal size is 2,456,789  speedup is 53.56","explanation":"As três flags juntas formam a receita padrão: -a (archive) equivale a -rlptgoD — recursivo, preservando links, permissões, timestamps, dono e grupo; -v (verbose) mostra o que está sendo feito; -z comprime os dados no transporte, útil em rede lenta. O grande truque do rsync é o algoritmo delta: ele só envia os pedaços que mudaram desde a última sincronização (o \"speedup\" no fim mostra o ganho). Para ensaiar sem copiar nada, rode antes com --dry-run."}]}]}];
+
+const ST={cmd:null,varIdx:0,solved:{},correct:0,attempts:0,streak:0,hist:[],hpos:-1};
+
+/* ═══════════════════════════════════════════════════════
+   STATE & UTILS
+═══════════════════════════════════════════════════════ */
+CMDS.forEach(function(c){ST.solved[c.id]=[];});
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function totalVars(cmd){return cmd.exs.reduce(function(s,e){return s+e.vars.length;},0);}
+function getVar(){
+  if(!ST.cmd)return null;
+  var vi=0;
+  for(var ei=0;ei<ST.cmd.exs.length;ei++){
+    var ex=ST.cmd.exs[ei];
+    for(var v=0;v<ex.vars.length;v++){
+      if(vi===ST.varIdx)return{ex:ex,v:ex.vars[v]};
+      vi++;
+    }
+  }
+  return null;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DRAWER (sidebar mobile)
+═══════════════════════════════════════════════════════ */
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+function toggleDrawer(){
+  var sb=document.getElementById('drawer');
+  if(sb.classList.contains('open'))closeDrawer();else openDrawer();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIDEBAR LIST (lista de comandos)
+═══════════════════════════════════════════════════════ */
+function buildSidebar(){
+  var ml=document.getElementById('ml');
+  var ini=CMDS.filter(function(c){return c.level==='iniciante';});
+  var inter=CMDS.filter(function(c){return c.level==='intermediário';});
+  var out='<div class="mod-group"><div class="mod-lbl">Iniciante</div>';
+  ini.forEach(function(c){out+=renderCmdBtn(c);});
+  out+='</div><div class="mod-group"><div class="mod-lbl">Intermediário</div>';
+  inter.forEach(function(c){out+=renderCmdBtn(c);});
+  out+='</div>';
+  ml.innerHTML=out;
+}
+function renderCmdBtn(cmd){
+  var tv=totalVars(cmd);
+  var sv=(ST.solved[cmd.id]||[]).length;
+  var dots='';
+  for(var i=0;i<tv;i++){
+    dots+='<div class="dot'+((ST.solved[cmd.id]||[]).indexOf(i)>=0?' d':'')+'"></div>';
+  }
+  var act=(ST.cmd&&ST.cmd.id===cmd.id)?' active':'';
+  var ic=cmd.name.replace(/\s/g,'').substring(0,2);
+  return '<button class="cmd-btn'+act+'" onclick="selCmd(\''+cmd.id+'\')">'
+    +'<div class="cmd-ic">'+esc(ic)+'</div>'
+    +'<div class="cmd-meta">'
+    +'<div class="cmd-name">'+esc(cmd.name)+'</div>'
+    +'<div class="cmd-prog">'+sv+'/'+tv+' variações</div>'
+    +'<div class="dot-row">'+dots+'</div>'
+    +'</div></button>';
+}
+function updateSidebar(){buildSidebar();updateMP();}
+function updateMP(){
+  var t=0,s=0;
+  CMDS.forEach(function(c){t+=totalVars(c);s+=(ST.solved[c.id]||[]).length;});
+  var pct=t>0?Math.round(s/t*100):0;
+  document.getElementById('mpf').style.width=pct+'%';
+  document.getElementById('mpt').textContent=s+' de '+t+' variações';
+}
+
+/* ═══════════════════════════════════════════════════════
+   SELECT COMMAND
+═══════════════════════════════════════════════════════ */
+function selCmd(id){
+  var cmd=null;
+  for(var i=0;i<CMDS.length;i++){if(CMDS[i].id===id){cmd=CMDS[i];break;}}
+  if(!cmd)return;
+  ST.cmd=cmd;ST.varIdx=0;
+  closeDrawer();
+  showExercise();
+  renderExplanation(cmd);
+  renderEx();
+  updateSidebar();
+  switchView('exercise');
+  // scroll up the exercise panel
+  setTimeout(function(){
+    var sc=document.getElementById('ex-content');
+    if(sc)sc.scrollTop=0;
+  },50);
+}
+
+function showExercise(){
+  document.getElementById('est').style.display='none';
+  document.getElementById('ex-content').style.display='flex';
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXPLANATION CARD
+═══════════════════════════════════════════════════════ */
+function renderExplanation(cmd){
+  document.getElementById('exp-cmd').textContent=cmd.name;
+  document.getElementById('exp-summary').innerHTML=cmd.exp.summary;
+  var fl=document.getElementById('flag-list');
+  var h='';
+  cmd.exp.flags.forEach(function(f){
+    h+='<div class="flag-row">'
+      +'<div class="flag-key">'+esc(f.flag)+'</div>'
+      +'<div class="flag-desc">'+esc(f.desc)+'</div>'
+      +(f.example?'<div class="flag-ex">ex: '+esc(f.example)+'</div>':'')
+      +'</div>';
+  });
+  fl.innerHTML=h;
+  // Por padrão começa fechado; abrir só na primeira seleção é overkill — deixa o user decidir
+  document.getElementById('exp-card').classList.remove('open');
+}
+function toggleExp(){
+  document.getElementById('exp-card').classList.toggle('open');
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER EXERCISE
+═══════════════════════════════════════════════════════ */
+function renderEx(){
+  var cmd=ST.cmd;if(!cmd)return;
+  var tv=totalVars(cmd);
+  var data=getVar();if(!data)return;
+  var v=data.v;
+
+  // task
+  document.getElementById('task-num').textContent=(ST.varIdx+1)+'/'+tv;
+  var li=cmd.level==='iniciante';
+  document.getElementById('task-tags').innerHTML=
+    '<span class="tag '+(li?'tag-i':'tag-m')+'">'+esc(cmd.level)+'</span>'
+    +'<span class="tag tag-v">'+esc(v.badge)+'</span>';
+  document.getElementById('task-obj').textContent=v.objective;
+  document.getElementById('task-why').innerHTML='<strong>Por que importa:</strong> '+esc(v.why);
+
+  // context
+  var ctxCard=document.getElementById('ctx-card');
+  var ctxBody=document.getElementById('ctx-body');
+  if(v.context&&v.context.length>0){
+    var ch='';
+    v.context.forEach(function(c){
+      ch+='<div class="ctx-item">'
+        +'<div class="ctx-name">'+esc(c.name)+'</div>'
+        +(c.desc?'<div class="ctx-desc">'+esc(c.desc)+'</div>':'')
+        +(c.snippet?'<div class="ctx-snippet">'+esc(c.snippet)+'</div>':'')
+        +'</div>';
+    });
+    ctxBody.innerHTML=ch;
+    ctxCard.style.display='block';
+  }else{
+    ctxCard.style.display='none';
+  }
+
+  // variation pills
+  var vp=document.getElementById('vp');vp.innerHTML='';
+  var vi=0;
+  cmd.exs.forEach(function(e){
+    e.vars.forEach(function(vr){
+      var sv=(ST.solved[cmd.id]||[]).indexOf(vi)>=0;
+      var act=vi===ST.varIdx;
+      var pill=document.createElement('button');
+      pill.className='vpill'+(act?' active':'')+(sv?' solved':'');
+      pill.textContent=(sv?'✓ ':'')+vr.badge;
+      (function(ci){pill.onclick=function(){ST.varIdx=ci;renderEx();scrollToTerminal();};})(vi);
+      vp.appendChild(pill);vi++;
+    });
+  });
+
+  // scroll active pill into view
+  setTimeout(function(){
+    var act=vp.querySelector('.vpill.active');
+    if(act)act.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  },50);
+
+  // terminal header
+  document.getElementById('ttl').textContent='bash — user@linux:'+cmd.path;
+  document.getElementById('pp').textContent=cmd.path;
+  resetTerm();hideFB();
+  document.getElementById('ab').style.display='none';
+}
+
+function scrollToTerminal(){
+  var tw=document.getElementById('tw');
+  if(!tw)return;
+  var sc=document.getElementById('ex-content');
+  if(!sc)return;
+  // smooth scroll relative to container
+  var top=tw.offsetTop-12;
+  sc.scrollTo({top:top,behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════════════════════
+   TERMINAL
+═══════════════════════════════════════════════════════ */
+function focusInput(){
+  var ti=document.getElementById('ti');
+  if(ti)ti.focus();
+}
+function resetTerm(){
+  document.getElementById('th').innerHTML='';
+  document.getElementById('ti').value='';
+  ST.hist=[];ST.hpos=-1;hideFB();
+}
+function addHist(cmd,out,cls){
+  var th=document.getElementById('th');
+  var path=ST.cmd?ST.cmd.path:'~';
+  var e='<div class="t-hist">'
+    +'<span class="ps1">'
+    +'<span class="ps1-u">user</span><span class="ps1-a">@</span>'
+    +'<span class="ps1-h">linux</span><span class="ps1-c">:</span>'
+    +'<span class="ps1-p">'+esc(path)+'</span><span class="ps1-d">$&nbsp;</span>'
+    +'</span>'+esc(cmd)+'</div>';
+  if(out)e+='<div class="t-out '+cls+'">'+esc(out)+'</div>';
+  th.innerHTML+=e;
+  var tb=document.getElementById('tb');
+  tb.scrollTop=tb.scrollHeight;
+}
+
+/* ═══════════════════════════════════════════════════════
+   KEYBAR HELPERS (para teclado mobile)
+═══════════════════════════════════════════════════════ */
+function kInsert(s){
+  var ti=document.getElementById('ti');
+  var start=ti.selectionStart||ti.value.length;
+  var end=ti.selectionEnd||ti.value.length;
+  ti.value=ti.value.substring(0,start)+s+ti.value.substring(end);
+  ti.focus();
+  var pos=start+s.length;
+  ti.setSelectionRange(pos,pos);
+}
+function kHistory(dir){
+  var ti=document.getElementById('ti');
+  if(dir>0){
+    if(ST.hpos<ST.hist.length-1){ST.hpos++;ti.value=ST.hist[ST.hpos];}
+  }else{
+    if(ST.hpos>0){ST.hpos--;ti.value=ST.hist[ST.hpos];}
+    else if(ST.hpos===0){ST.hpos=-1;ti.value='';}
+  }
+  ti.focus();
+}
+function kTab(){
+  var ti=document.getElementById('ti');
+  var d=getVar();
+  if(d&&ti.value.length>0){
+    var a=d.v.answers[0];
+    if(a.toLowerCase().startsWith(ti.value.toLowerCase())){
+      ti.value=a;
+      ti.focus();
+      ti.setSelectionRange(a.length,a.length);
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHECK ANSWER
+═══════════════════════════════════════════════════════ */
+function checkAnswer(){
+  var ti=document.getElementById('ti');
+  var inp=ti.value.trim();if(!inp)return;
+  ST.hist.unshift(inp);ST.hpos=-1;
+  var data=getVar();if(!data)return;
+  var v=data.v;
+  ST.attempts++;
+  var ni=inp.toLowerCase().replace(/\s+/g,' ').trim();
+  var ok=false;
+  for(var i=0;i<v.answers.length;i++){
+    var na=v.answers[i].toLowerCase().replace(/\s+/g,' ').trim();
+    if(ni===na||ni.startsWith(na+' ')){ok=true;break;}
+  }
+  if(ok){
+    addHist(inp,v.sim||'# Comando executado com sucesso.','ok');
+    ST.correct++;ST.streak++;
+    if((ST.solved[ST.cmd.id]||[]).indexOf(ST.varIdx)<0)ST.solved[ST.cmd.id].push(ST.varIdx);
+    var sm=ST.streak>=5?' 🔥 '+ST.streak+' seguidos!':ST.streak>=3?' 🔥 '+ST.streak+'!':'';
+    showFB('suc','✓ Correto!'+sm,v.explanation||'',null);
+    if(ST.streak===5||ST.streak===10)confetti();
+    updateStats();updateSidebar();
+    // haptic on success (vibrate API)
+    if(navigator.vibrate)navigator.vibrate(40);
+  }else{
+    addHist(inp,'bash: '+inp+': command not found or incorrect','er');
+    ST.streak=0;
+    showFB('err','✗ Incorreto','Releia a tarefa. Use a dica se travar.',null);
+    var tw=document.getElementById('tw');
+    tw.classList.remove('shake');void tw.offsetWidth;tw.classList.add('shake');
+    updateStats();
+    if(navigator.vibrate)navigator.vibrate([50,40,50]);
+  }
+  ti.value='';
+}
+
+function showHint(){
+  var d=getVar();
+  if(d)showFB('hin','💡 Dica',d.v.hint,null);
+}
+function revealAnswer(){
+  var d=getVar();if(!d)return;
+  var chips='';
+  d.v.answers.forEach(function(a){chips+='<div class="ans-chip">'+esc(a)+'</div>';});
+  document.getElementById('ac').innerHTML=chips;
+  document.getElementById('ab').style.display='block';
+  // scroll para mostrar
+  setTimeout(function(){
+    document.getElementById('ab').scrollIntoView({block:'nearest',behavior:'smooth'});
+  },50);
+}
+function nextVar(){
+  var tv=totalVars(ST.cmd);
+  ST.varIdx=ST.varIdx<tv-1?ST.varIdx+1:0;
+  renderEx();
+  scrollToTop();
+}
+function scrollToTop(){
+  var sc=document.getElementById('ex-content');
+  if(sc)sc.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showFB(type,title,body,code){
+  var fp=document.getElementById('fp');
+  fp.className='fb show '+type;
+  document.getElementById('ft').textContent=title;
+  document.getElementById('fb').textContent=body||'';
+  var fc=document.getElementById('fc');
+  if(code){fc.textContent=code;fc.style.display='block';}
+  else fc.style.display='none';
+  // scroll fb into view
+  setTimeout(function(){fp.scrollIntoView({block:'nearest',behavior:'smooth'});},50);
+}
+function hideFB(){document.getElementById('fp').className='fb';}
+
+function updateStats(){
+  document.getElementById('sc').textContent=ST.correct;
+  document.getElementById('ss').textContent=ST.streak;
+}
+
+/* ═══════════════════════════════════════════════════════
+   VIEW SWITCHING (bottom nav)
+═══════════════════════════════════════════════════════ */
+function switchView(v){
+  document.querySelectorAll('.view').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('nav-'+v).classList.add('active');
+  if(v==='cheatsheet')buildCS();
+  if(v==='progress')buildProg();
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHEATSHEET
+═══════════════════════════════════════════════════════ */
+function buildCS(){
+  var body=document.getElementById('cs-body');
+  // sempre rebuild para garantir que reflete estado atual
+  var out='';
+  CMDS.forEach(function(cmd){
+    out+='<div class="cs-sec">'
+      +'<div class="cs-sec-hdr">'
+      +'<span class="cs-cmd-nm">'+esc(cmd.name)+'</span>'
+      +'<span class="cs-cmd-desc">— '+esc(cmd.desc)+'</span>'
+      +'</div>'
+      +'<div class="cs-grid">';
+    cmd.exp.flags.forEach(function(f){
+      out+='<div class="cs-card">'
+        +'<div class="cs-flag">'+esc(f.flag)+'</div>'
+        +'<div class="cs-desc">'+esc(f.desc)+'</div>'
+        +(f.example?'<div class="cs-ex">ex: '+esc(f.example)+'</div>':'')
+        +'</div>';
+    });
+    out+='</div></div>';
+  });
+  body.innerHTML=out;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════════════ */
+function buildProg(){
+  var pg=document.getElementById('pg');
+  var out='';
+
+  // Summary
+  var t=0,s=0;
+  CMDS.forEach(function(c){t+=totalVars(c);s+=(ST.solved[c.id]||[]).length;});
+  var pct=t>0?Math.round(s/t*100):0;
+  document.getElementById('psn').textContent=pct+'%';
+  document.getElementById('psl').textContent=s+' de '+t+' variações resolvidas';
+  document.getElementById('psf').style.width=pct+'%';
+
+  CMDS.forEach(function(cmd){
+    var tv=totalVars(cmd);
+    var sv=(ST.solved[cmd.id]||[]).length;
+    var pct2=tv>0?Math.round(sv/tv*100):0;
+    var li=cmd.level==='iniciante';
+    var dots='';
+    for(var i=0;i<tv;i++){
+      dots+='<div class="prog-dot'+((ST.solved[cmd.id]||[]).indexOf(i)>=0?' d':'')+'"></div>';
+    }
+    out+='<div class="prog-card" onclick="selCmd(\''+cmd.id+'\')">'
+      +'<div class="prog-top"><div class="prog-nm">'+esc(cmd.name)+'</div>'
+      +'<span class="tag '+(li?'tag-i':'tag-m')+'">'+(li?'init':'inter')+'</span></div>'
+      +'<div class="prog-sub">'+esc(cmd.desc)+'</div>'
+      +'<div class="prog-bar"><div class="prog-fill" style="width:'+pct2+'%"></div></div>'
+      +'<div class="prog-txt">'+sv+'/'+tv+' • '+pct2+'%</div>'
+      +'<div class="prog-dots">'+dots+'</div>'
+      +'</div>';
+  });
+  pg.innerHTML=out;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════════════ */
+function confetti(){
+  var cw=document.getElementById('cw');
+  var cols=['#3dd68c','#60a5fa','#fbbf24','#f472b6','#a78bfa'];
+  for(var i=0;i<50;i++){
+    var el=document.createElement('div');
+    var c=cols[Math.floor(Math.random()*cols.length)];
+    var l=Math.random()*100,sz=Math.random()*7+4,dur=Math.random()*2+2,del=Math.random()*.4;
+    el.style.cssText='position:absolute;left:'+l+'%;top:-20px;width:'+sz+'px;height:'+sz+'px;background:'+c
+      +';border-radius:'+(Math.random()>.5?'50%':'2px')
+      +';animation:fall '+dur+'s '+del+'s ease-in forwards';
+    cw.appendChild(el);
+    (function(e,t){setTimeout(function(){e.remove();},t*1000);})(el,dur+del+.5);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   KEYBOARD (físico — desktop / tablet com teclado)
+═══════════════════════════════════════════════════════ */
+document.getElementById('ti').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){checkAnswer();}
+  else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(ST.hpos<ST.hist.length-1){ST.hpos++;this.value=ST.hist[ST.hpos];}
+  }
+  else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    if(ST.hpos>0){ST.hpos--;this.value=ST.hist[ST.hpos];}
+    else if(ST.hpos===0){ST.hpos=-1;this.value='';}
+  }
+  else if(e.key==='Tab'){
+    e.preventDefault();
+    var d=getVar();
+    if(d&&this.value.length>0){
+      var a=d.v.answers[0];
+      if(a.toLowerCase().startsWith(this.value.toLowerCase()))this.value=a;
+    }
+  }
+  else if(e.key==='Escape'){hideFB();}
+});
+
+/* impede scroll do body quando o input ganha foco no iOS */
+document.getElementById('ti').addEventListener('focus',function(){
+  setTimeout(function(){
+    var ti=document.getElementById('ti');
+    if(ti)ti.scrollIntoView({block:'center',behavior:'smooth'});
+  },300);
+});
+
+/* fecha drawer com swipe (touch) */
+(function(){
+  var sx=0,sy=0,dx=0,dy=0;
+  var dr=document.getElementById('drawer');
+  dr.addEventListener('touchstart',function(e){
+    if(!dr.classList.contains('open'))return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;dy=0;
+  },{passive:true});
+  dr.addEventListener('touchmove',function(e){
+    if(!dr.classList.contains('open'))return;
+    dx=e.touches[0].clientX-sx;dy=e.touches[0].clientY-sy;
+  },{passive:true});
+  dr.addEventListener('touchend',function(){
+    if(dx<-60&&Math.abs(dx)>Math.abs(dy))closeDrawer();
+  });
+})();
+
+/* ═══════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════ */
+buildSidebar();
+updateMP();
+// Não selecionar comando automaticamente — empty state primeiro
+// O usuário toca no menu / no CTA para escolher
+
+</script>
+</body>
+</html>
