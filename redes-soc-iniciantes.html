@@ -1,0 +1,2564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Redes para SOC — Red Team Leaders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c0f;
+  --bg2: #0d1318;
+  --bg3: #111820;
+  --bg4: #161e28;
+  --card: #0f1820;
+  --border: #1c2a38;
+  --border2: #243345;
+  --red: #e8304a;
+  --red2: #ff4d68;
+  --red-dim: rgba(232,48,74,0.15);
+  --green: #00e5a0;
+  --green2: #00ffb3;
+  --green-dim: rgba(0,229,160,0.12);
+  --blue: #4d9fff;
+  --blue-dim: rgba(77,159,255,0.12);
+  --yellow: #ffd166;
+  --yellow-dim: rgba(255,209,102,0.12);
+  --orange: #ff8c42;
+  --text: #c8d8e8;
+  --text2: #7a98b2;
+  --text3: #4a6478;
+  --glow-red: 0 0 20px rgba(232,48,74,0.4);
+  --glow-green: 0 0 20px rgba(0,229,160,0.3);
+  --radius: 10px;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Syne', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCANLINE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,160,0.012) 2px, rgba(0,229,160,0.012) 4px);
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ── HEADER ── */
+.header {
+  position:sticky;
+  top:0;
+  z-index:100;
+  background: rgba(8,12,15,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: env(safe-area-inset-top) 0 0;
+}
+
+.header-inner {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 20px;
+  gap:12px;
+}
+
+.logo {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo-icon {
+  width:36px;
+  height:36px;
+  border:1.5px solid var(--red);
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: var(--glow-red);
+  flex-shrink:0;
+}
+
+.logo-icon svg { width:20px; height:20px; }
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:0.02em;
+  line-height:1.2;
+}
+
+.logo-text span { color:var(--red); }
+
+.badge-soc {
+  background: var(--red-dim);
+  border:1px solid var(--red);
+  color:var(--red2);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.1em;
+  padding:3px 8px;
+  border-radius:4px;
+  text-transform:uppercase;
+}
+
+/* ── HERO ── */
+.hero {
+  padding:40px 20px 30px;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero::before {
+  content:'';
+  position:absolute;
+  top:-60px; right:-40px;
+  width:300px; height:300px;
+  background: radial-gradient(circle, rgba(232,48,74,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.hero-label {
+  font-size:10px;
+  letter-spacing:0.2em;
+  color:var(--green);
+  text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.hero-label::before {
+  content:'';
+  display:block;
+  width:24px; height:1px;
+  background:var(--green);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size:clamp(26px,7vw,36px);
+  font-weight:800;
+  line-height:1.1;
+  margin-bottom:14px;
+  letter-spacing:-0.02em;
+}
+
+.hero h1 em { font-style:normal; color:var(--red2); }
+
+.hero p {
+  font-size:13px;
+  color:var(--text2);
+  line-height:1.7;
+  max-width:500px;
+  margin-bottom:24px;
+}
+
+.hero-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:0;
+}
+
+.stat-card {
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 12px;
+  text-align:center;
+}
+
+.stat-n {
+  font-family: var(--font-display);
+  font-size:22px;
+  font-weight:800;
+  color:var(--green);
+  line-height:1;
+  margin-bottom:4px;
+}
+
+.stat-l {
+  font-size:9px;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+}
+
+/* ── NAV TABS ── */
+.nav-wrap {
+  position:sticky;
+  top:65px;
+  z-index:90;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+
+.nav-tabs {
+  display:flex;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  padding:0 16px;
+  gap:4px;
+}
+
+.nav-tabs::-webkit-scrollbar { display:none; }
+
+.nav-tab {
+  flex-shrink:0;
+  padding:12px 14px;
+  font-family: var(--font-mono);
+  font-size:11px;
+  color:var(--text3);
+  background:transparent;
+  border:none;
+  border-bottom:2px solid transparent;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all 0.2s;
+  letter-spacing:0.04em;
+}
+
+.nav-tab.active {
+  color:var(--green);
+  border-bottom-color:var(--green);
+}
+
+.nav-tab:hover { color:var(--text); }
+
+/* ── CONTENT ── */
+.content {
+  padding:24px 16px 100px;
+  max-width:800px;
+  margin:0 auto;
+}
+
+.section { display:none; }
+.section.active { display:block; }
+
+/* ── MODULE HEADER ── */
+.mod-header {
+  margin-bottom:28px;
+}
+
+.mod-tag {
+  font-size:9px;
+  letter-spacing:0.2em;
+  color:var(--text3);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.mod-title {
+  font-family: var(--font-display);
+  font-size:clamp(22px,5vw,28px);
+  font-weight:800;
+  letter-spacing:-0.02em;
+  color:var(--text);
+}
+
+.mod-title span { color:var(--red2); }
+
+.mod-subtitle {
+  font-size:12px;
+  color:var(--text2);
+  margin-top:6px;
+  line-height:1.6;
+}
+
+/* ── CARDS ── */
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
+}
+
+.card::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:3px;
+  border-radius:3px 0 0 3px;
+}
+
+.card.accent-red::before { background:var(--red); }
+.card.accent-green::before { background:var(--green); }
+.card.accent-blue::before { background:var(--blue); }
+.card.accent-yellow::before { background:var(--yellow); }
+.card.accent-orange::before { background:var(--orange); }
+
+.card-title {
+  font-family: var(--font-display);
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.card-icon {
+  width:28px; height:28px;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  flex-shrink:0;
+}
+
+.card-icon.red { background:var(--red-dim); }
+.card-icon.green { background:var(--green-dim); }
+.card-icon.blue { background:var(--blue-dim); }
+.card-icon.yellow { background:var(--yellow-dim); }
+
+.card p { font-size:12.5px; color:var(--text2); line-height:1.7; margin-bottom:10px; }
+.card p:last-child { margin-bottom:0; }
+
+/* ── CODE BLOCKS ── */
+.code-block {
+  background:#050a0f;
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin:12px 0;
+  overflow:hidden;
+}
+
+.code-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 14px;
+  background:#080e14;
+  border-bottom:1px solid var(--border);
+}
+
+.code-lang {
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+.code-copy {
+  font-size:10px;
+  color:var(--text3);
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  font-family: var(--font-mono);
+  padding:2px 6px;
+  border-radius:4px;
+  transition:all 0.2s;
+}
+
+.code-copy:hover { color:var(--green); }
+.code-copy.copied { color:var(--green); }
+
+pre {
+  padding:14px 16px;
+  overflow-x:auto;
+  font-size:12px;
+  line-height:1.6;
+  color:#9ab;
+  scrollbar-width:thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+pre::-webkit-scrollbar { height:4px; }
+pre::-webkit-scrollbar-track { background:transparent; }
+pre::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+.kw { color:var(--red2); }
+.cm { color:var(--text3); font-style:italic; }
+.st { color:var(--green); }
+.nm { color:var(--blue); }
+.op { color:var(--yellow); }
+.fl { color:var(--orange); }
+
+/* ── OSI TABLE ── */
+.osi-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:11.5px;
+  margin:12px 0;
+}
+
+.osi-table th {
+  background:#080e14;
+  padding:10px 12px;
+  text-align:left;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  border-bottom:1px solid var(--border);
+}
+
+.osi-table td {
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+
+.osi-table tr:last-child td { border-bottom:none; }
+.osi-table tr:hover td { background:rgba(255,255,255,0.02); }
+
+.layer-num {
+  font-family: var(--font-display);
+  font-size:18px;
+  font-weight:800;
+  line-height:1;
+}
+
+.layer-name { font-weight:600; font-size:12px; }
+.layer-desc { color:var(--text2); font-size:11px; }
+.layer-proto { color:var(--blue); font-size:10px; margin-top:3px; }
+
+/* ── IP DIAGRAM ── */
+.ip-visual {
+  background:#050a0f;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 16px;
+  margin:12px 0;
+}
+
+.ip-bits {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.ip-octet {
+  background:var(--bg4);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:10px 6px;
+  text-align:center;
+}
+
+.ip-octet-val {
+  font-family: var(--font-display);
+  font-size:20px;
+  font-weight:800;
+  color:var(--green);
+  line-height:1;
+  margin-bottom:4px;
+}
+
+.ip-octet-bin {
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.02em;
+  word-break:break-all;
+}
+
+.ip-octet-dot {
+  display:none;
+}
+
+.ip-label {
+  font-size:11px;
+  color:var(--text2);
+  text-align:center;
+}
+
+/* ── CIDR TABLE ── */
+.cidr-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin:12px 0;
+}
+
+.cidr-item {
+  background:var(--bg4);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+}
+
+.cidr-mask {
+  font-family: var(--font-display);
+  font-size:17px;
+  font-weight:800;
+  color:var(--yellow);
+  margin-bottom:3px;
+}
+
+.cidr-hosts {
+  font-size:11px;
+  color:var(--text2);
+}
+
+.cidr-subnet {
+  font-size:10px;
+  color:var(--text3);
+  margin-top:2px;
+}
+
+/* ── PORT TABLE ── */
+.port-list { margin:8px 0; }
+
+.port-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+}
+
+.port-item:first-child { border-radius:8px 8px 0 0; background:rgba(255,255,255,0.02); }
+.port-item:last-child { border-bottom:none; border-radius:0 0 8px 8px; }
+.port-item:nth-child(odd) { background:#080e14; }
+.port-item:hover { background:rgba(255,255,255,0.03); }
+
+.port-num {
+  font-family: var(--font-display);
+  font-size:15px;
+  font-weight:800;
+  color:var(--red2);
+  min-width:50px;
+}
+
+.port-proto {
+  background:var(--blue-dim);
+  color:var(--blue);
+  font-size:9px;
+  padding:2px 6px;
+  border-radius:3px;
+  letter-spacing:0.06em;
+  min-width:32px;
+  text-align:center;
+}
+
+.port-proto.tcp { background:var(--blue-dim); color:var(--blue); }
+.port-proto.udp { background:var(--yellow-dim); color:var(--yellow); }
+
+.port-name { font-size:12px; font-weight:600; flex:1; }
+.port-desc { font-size:11px; color:var(--text2); }
+
+/* ── TOOL CARDS ── */
+.tools-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin:12px 0;
+}
+
+.tool-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;
+  cursor:pointer;
+  transition:all 0.25s;
+}
+
+.tool-card:hover {
+  border-color:var(--border2);
+  transform:translateY(-1px);
+}
+
+.tool-header {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.tool-icon {
+  width:40px; height:40px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  flex-shrink:0;
+}
+
+.tool-icon.g { background:var(--green-dim); border:1px solid rgba(0,229,160,0.2); }
+.tool-icon.r { background:var(--red-dim); border:1px solid rgba(232,48,74,0.2); }
+.tool-icon.b { background:var(--blue-dim); border:1px solid rgba(77,159,255,0.2); }
+.tool-icon.y { background:var(--yellow-dim); border:1px solid rgba(255,209,102,0.2); }
+
+.tool-name {
+  font-family: var(--font-display);
+  font-size:16px;
+  font-weight:700;
+}
+
+.tool-tagline {
+  font-size:11px;
+  color:var(--text3);
+  letter-spacing:0.05em;
+}
+
+.tool-desc {
+  font-size:12px;
+  color:var(--text2);
+  line-height:1.6;
+  margin-bottom:10px;
+}
+
+/* ── ALERT BOXES ── */
+.alert {
+  border-radius:8px;
+  padding:14px 16px;
+  margin:12px 0;
+  font-size:12px;
+  line-height:1.6;
+  border:1px solid;
+  display:flex;
+  gap:10px;
+}
+
+.alert-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+
+.alert.info { background:var(--blue-dim); border-color:rgba(77,159,255,0.25); color:#8db8f0; }
+.alert.warn { background:var(--yellow-dim); border-color:rgba(255,209,102,0.25); color:#f0c866; }
+.alert.danger { background:var(--red-dim); border-color:rgba(232,48,74,0.25); color:#f0687a; }
+.alert.success { background:var(--green-dim); border-color:rgba(0,229,160,0.25); color:#5ee8b8; }
+
+/* ── SECTION DIVIDER ── */
+.divider {
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin:28px 0;
+}
+
+/* ── QUIZ ── */
+.quiz-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:16px;
+}
+
+.quiz-q {
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:14px;
+  color:var(--text);
+  line-height:1.5;
+}
+
+.quiz-q .qn {
+  color:var(--green);
+  font-size:10px;
+  letter-spacing:0.1em;
+  display:block;
+  margin-bottom:6px;
+}
+
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+
+.quiz-opt {
+  background:var(--bg4);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:11px 14px;
+  cursor:pointer;
+  font-size:12px;
+  color:var(--text2);
+  transition:all 0.2s;
+  text-align:left;
+  font-family: var(--font-mono);
+}
+
+.quiz-opt:hover { border-color:var(--border2); color:var(--text); }
+.quiz-opt.correct { background:var(--green-dim); border-color:var(--green); color:var(--green); }
+.quiz-opt.wrong { background:var(--red-dim); border-color:var(--red); color:var(--red2); }
+.quiz-opt:disabled { cursor:default; }
+
+.quiz-feedback {
+  margin-top:10px;
+  font-size:12px;
+  line-height:1.5;
+  display:none;
+}
+
+.quiz-feedback.show { display:block; }
+
+/* ── PROGRESS ── */
+.progress-wrap {
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:24px;
+}
+
+.progress-label {
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--text3);
+  margin-bottom:8px;
+}
+
+.progress-bar {
+  height:4px;
+  background:var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg, var(--red), var(--green));
+  border-radius:2px;
+  transition:width 0.5s ease;
+}
+
+/* ── GLOSSARY ── */
+.gloss-item {
+  border-bottom:1px solid var(--border);
+  padding:14px 0;
+}
+
+.gloss-item:first-child { padding-top:0; }
+.gloss-item:last-child { border-bottom:none; }
+
+.gloss-term {
+  font-family: var(--font-display);
+  font-size:14px;
+  font-weight:700;
+  color:var(--green);
+  margin-bottom:4px;
+}
+
+.gloss-def {
+  font-size:12px;
+  color:var(--text2);
+  line-height:1.6;
+}
+
+/* ── CHECKLIST ── */
+.checklist { list-style:none; margin:12px 0; }
+
+.checklist li {
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:8px 0;
+  font-size:12.5px;
+  color:var(--text2);
+  border-bottom:1px solid var(--border);
+  line-height:1.5;
+}
+
+.checklist li:last-child { border-bottom:none; }
+
+.check-icon { color:var(--green); flex-shrink:0; margin-top:1px; }
+.check-icon.warn { color:var(--yellow); }
+.check-icon.red { color:var(--red2); }
+
+/* ── FLOW DIAGRAM ── */
+.flow {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  margin:12px 0;
+}
+
+.flow-node {
+  background:var(--bg4);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:10px 16px;
+  font-size:12px;
+  text-align:center;
+  width:100%;
+  max-width:280px;
+  position:relative;
+}
+
+.flow-node.highlight {
+  border-color:var(--red);
+  box-shadow:var(--glow-red);
+  color:var(--red2);
+}
+
+.flow-node.highlight-g {
+  border-color:var(--green);
+  color:var(--green);
+}
+
+.flow-arrow {
+  width:2px;
+  height:20px;
+  background:var(--border2);
+  position:relative;
+}
+
+.flow-arrow::after {
+  content:'▼';
+  position:absolute;
+  bottom:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:10px;
+  color:var(--text3);
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position:fixed;
+  bottom:0;
+  left:0; right:0;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(8,12,15,0.97);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  z-index:200;
+}
+
+.bottom-nav-inner {
+  display:flex;
+  justify-content:space-around;
+  padding:8px 0 4px;
+}
+
+.bnav-btn {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:4px 10px;
+  border-radius:8px;
+  transition:all 0.2s;
+}
+
+.bnav-btn svg { width:22px; height:22px; }
+
+.bnav-label {
+  font-family: var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.05em;
+  color:var(--text3);
+}
+
+.bnav-btn.active .bnav-label { color:var(--green); }
+.bnav-btn.active svg { filter:drop-shadow(0 0 6px var(--green)); }
+
+/* ── TAG PILLS ── */
+.tags { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+
+.tag {
+  font-size:10px;
+  padding:3px 8px;
+  border-radius:4px;
+  letter-spacing:0.05em;
+  font-weight:600;
+}
+
+.tag.red { background:var(--red-dim); color:var(--red2); border:1px solid rgba(232,48,74,0.3); }
+.tag.green { background:var(--green-dim); color:var(--green); border:1px solid rgba(0,229,160,0.3); }
+.tag.blue { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(77,159,255,0.3); }
+.tag.yellow { background:var(--yellow-dim); color:var(--yellow); border:1px solid rgba(255,209,102,0.3); }
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  font-size:10px;
+  color:var(--text3);
+  margin-bottom:20px;
+  letter-spacing:0.05em;
+}
+
+.breadcrumb span { color:var(--red2); }
+
+/* ── RESPONSIVE ── */
+@media(min-width:640px) {
+  .tools-grid { grid-template-columns:repeat(2,1fr); }
+  .cidr-grid { grid-template-columns:repeat(4,1fr); }
+  .hero { padding:60px 32px 40px; }
+  .content { padding:32px 24px 100px; }
+}
+
+@media(min-width:1024px) {
+  .nav-wrap { top:73px; }
+  .content { padding:40px 32px 80px; }
+  .bottom-nav { display:none; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideIn {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.section.active .card,
+.section.active .tool-card,
+.section.active .quiz-card {
+  animation: fadeSlideIn 0.35s ease both;
+}
+
+.section.active .card:nth-child(2) { animation-delay:0.06s; }
+.section.active .card:nth-child(3) { animation-delay:0.12s; }
+.section.active .card:nth-child(4) { animation-delay:0.18s; }
+.section.active .card:nth-child(5) { animation-delay:0.24s; }
+
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50% { opacity:0.4; }
+}
+
+.blink { animation:pulse 1.4s infinite; }
+
+/* ── TERMINAL PROMPT ── */
+.prompt-line {
+  font-size:12px;
+  color:var(--text);
+  line-height:1.8;
+}
+
+.prompt-ps1 { color:var(--green); }
+.prompt-path { color:var(--blue); }
+.prompt-cmd { color:var(--text); }
+.prompt-out { color:var(--text2); }
+.prompt-comment { color:var(--text3); font-style:italic; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#e8304a" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="#e8304a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="#00e5a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">Red Team<br><span>Leaders</span></div>
+    </div>
+    <div class="badge-soc">SOC Track</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-label">Módulo Fundamentos</div>
+  <h1>Redes para<br><em>Analistas SOC</em></h1>
+  <p>Tudo que você precisa saber sobre redes e Linux para atuar como analista de segurança — do modelo OSI ao tcpdump.</p>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-n">9</div>
+      <div class="stat-l">Módulos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-n">47</div>
+      <div class="stat-l">Comandos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-n">SOC</div>
+      <div class="stat-l">Nível N1/N2</div>
+    </div>
+  </div>
+</section>
+
+<!-- NAV TABS -->
+<nav class="nav-wrap">
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" onclick="showSection('fundamentos',this)">01 · Fundamentos</button>
+    <button class="nav-tab" onclick="showSection('osi',this)">02 · Modelo OSI</button>
+    <button class="nav-tab" onclick="showSection('ip',this)">03 · TCP/IP & IPs</button>
+    <button class="nav-tab" onclick="showSection('protocolos',this)">04 · Protocolos</button>
+    <button class="nav-tab" onclick="showSection('linux',this)">05 · Linux</button>
+    <button class="nav-tab" onclick="showSection('ferramentas',this)">06 · Ferramentas</button>
+    <button class="nav-tab" onclick="showSection('soc',this)">07 · SOC</button>
+    <button class="nav-tab" onclick="showSection('logs',this)">08 · Logs</button>
+    <button class="nav-tab" onclick="showSection('quiz',this)">09 · Quiz</button>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<main class="content">
+
+<!-- ══════════════════════════════════ -->
+<!-- 01 · FUNDAMENTOS -->
+<!-- ══════════════════════════════════ -->
+<div class="section active" id="sec-fundamentos">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 01</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 01</div>
+    <div class="mod-title">Fundamentos de <span>Redes</span></div>
+    <div class="mod-subtitle">O que são redes, como funciona a comunicação e os conceitos-base que todo analista SOC precisa dominar.</div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🌐</div>
+      O que é uma Rede?
+    </div>
+    <p>Uma <strong style="color:var(--text)">rede de computadores</strong> é um conjunto de dispositivos (hosts) interconectados que trocam dados entre si. Essa comunicação segue regras chamadas <strong style="color:var(--text)">protocolos</strong>.</p>
+    <p>Para o analista SOC, entender redes é entender onde os ataques acontecem — 90% das intrusões passam pela rede.</p>
+    <div class="tags">
+      <span class="tag green">Host</span>
+      <span class="tag blue">Protocolo</span>
+      <span class="tag yellow">Pacote</span>
+      <span class="tag red">Tráfego</span>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🖥️</div>
+      Tipos de Rede
+    </div>
+    <ul class="checklist">
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">LAN (Local Area Network)</strong> — Rede local, dentro de um escritório ou data center. Velocidade alta, baixa latência.</div></li>
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">WAN (Wide Area Network)</strong> — Rede de longa distância. A Internet é a maior WAN do mundo.</div></li>
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">MAN (Metropolitan)</strong> — Cobre uma cidade ou campus universitário.</div></li>
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">VLAN (Virtual LAN)</strong> — Segmentação lógica dentro de uma LAN física. Crítico para segurança!</div></li>
+      <li><span class="check-icon warn">◈</span><div><strong style="color:var(--text)">DMZ (Demilitarized Zone)</strong> — Zona isolada para serviços públicos (web, email). Separa Internet da LAN interna.</div></li>
+    </ul>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🧩</div>
+      Componentes de Rede
+    </div>
+    <ul class="checklist">
+      <li><span class="check-icon">▶</span><div><strong style="color:var(--text)">Switch</strong> — Opera na camada 2 (MAC). Interliga dispositivos dentro da mesma LAN.</div></li>
+      <li><span class="check-icon">▶</span><div><strong style="color:var(--text)">Roteador (Router)</strong> — Camada 3 (IP). Encaminha pacotes entre redes diferentes.</div></li>
+      <li><span class="check-icon">▶</span><div><strong style="color:var(--text)">Firewall</strong> — Filtra tráfego com base em regras. Ponto de controle crítico para SOC.</div></li>
+      <li><span class="check-icon">▶</span><div><strong style="color:var(--text)">IDS/IPS</strong> — Detecta/Previne intrusões. Gera alertas que chegam ao SOC.</div></li>
+      <li><span class="check-icon">▶</span><div><strong style="color:var(--text)">Proxy</strong> — Intermediário de tráfego. Usado para filtrar, logar e anonimizar.</div></li>
+      <li><span class="check-icon warn">▶</span><div><strong style="color:var(--text)">WAF</strong> — Web Application Firewall. Protege especificamente aplicações web.</div></li>
+    </ul>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">📦</div>
+      Como os Dados São Enviados?
+    </div>
+    <p>Dados são divididos em <strong style="color:var(--text)">pacotes</strong>, cada um contendo:</p>
+    <ul class="checklist">
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">Header</strong> — Endereços de origem/destino, número de sequência, flags de controle.</div></li>
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">Payload</strong> — Os dados reais sendo transportados (conteúdo da mensagem).</div></li>
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">Trailer</strong> — Verificação de integridade (CRC). Detecta erros na transmissão.</div></li>
+    </ul>
+    <div class="alert info">
+      <span class="alert-icon">ℹ</span>
+      <span>No SOC, analisar o <strong>header dos pacotes</strong> revela tentativas de spoofing, scanning de portas e exfiltração de dados.</span>
+    </div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🔄</div>
+      Modos de Comunicação
+    </div>
+    <ul class="checklist">
+      <li><span class="check-icon">◉</span><div><strong style="color:var(--text)">Unicast</strong> — Um para um. Ex: navegação web comum.</div></li>
+      <li><span class="check-icon">◉</span><div><strong style="color:var(--text)">Broadcast</strong> — Um para todos na rede. Ex: ARP Request. Pode ser explorado em ataques de amplificação.</div></li>
+      <li><span class="check-icon warn">◉</span><div><strong style="color:var(--text)">Multicast</strong> — Um para grupo específico. Ex: streaming IPTV.</div></li>
+      <li><span class="check-icon red">◉</span><div><strong style="color:var(--text)">Anycast</strong> — Um para o mais próximo do grupo. Usado em DNS, CDN e DDoS mitigation.</div></li>
+    </ul>
+  </div>
+
+  <div class="alert warn">
+    <span class="alert-icon">⚠</span>
+    <span><strong>SOC Alert:</strong> Tráfego de broadcast excessivo pode indicar um worm se propagando ou um ataque de ARP Poisoning ativo na rede.</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 02 · MODELO OSI -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-osi">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 02</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 02</div>
+    <div class="mod-title">Modelo <span>OSI & TCP/IP</span></div>
+    <div class="mod-subtitle">Os dois modelos de referência que explicam como toda comunicação de rede funciona em camadas.</div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">📐</div>
+      Modelo OSI — 7 Camadas
+    </div>
+    <p>O modelo OSI (Open Systems Interconnection) divide a comunicação de rede em <strong style="color:var(--text)">7 camadas independentes</strong>. Cada camada tem responsabilidade específica e só se comunica com as camadas adjacentes.</p>
+    <table class="osi-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Camada</th>
+          <th>Função & Protocolos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="layer-num" style="color:var(--red2)">7</span></td>
+          <td>
+            <div class="layer-name">Aplicação</div>
+          </td>
+          <td>
+            <div class="layer-desc">Interface com o usuário final</div>
+            <div class="layer-proto">HTTP, HTTPS, DNS, FTP, SMTP, SSH</div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="layer-num" style="color:var(--orange)">6</span></td>
+          <td><div class="layer-name">Apresentação</div></td>
+          <td>
+            <div class="layer-desc">Codificação, compressão, criptografia</div>
+            <div class="layer-proto">SSL/TLS, JPEG, MPEG, ASCII</div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="layer-num" style="color:var(--yellow)">5</span></td>
+          <td><div class="layer-name">Sessão</div></td>
+          <td>
+            <div class="layer-desc">Gerencia sessões de comunicação</div>
+            <div class="layer-proto">NetBIOS, RPC, SMB (parcial)</div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="layer-num" style="color:var(--green)">4</span></td>
+          <td><div class="layer-name">Transporte</div></td>
+          <td>
+            <div class="layer-desc">Entrega fim-a-fim, controle de fluxo</div>
+            <div class="layer-proto">TCP (confiável), UDP (veloz)</div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="layer-num" style="color:var(--blue)">3</span></td>
+          <td><div class="layer-name">Rede</div></td>
+          <td>
+            <div class="layer-desc">Roteamento e endereçamento lógico</div>
+            <div class="layer-proto">IP, ICMP, OSPF, BGP</div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="layer-num" style="color:#a78bfa">2</span></td>
+          <td><div class="layer-name">Enlace</div></td>
+          <td>
+            <div class="layer-desc">Endereçamento físico (MAC), acesso ao meio</div>
+            <div class="layer-proto">Ethernet, ARP, Wi-Fi (802.11)</div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="layer-num" style="color:var(--text2)">1</span></td>
+          <td><div class="layer-name">Física</div></td>
+          <td>
+            <div class="layer-desc">Bits em sinais elétricos/ópticos</div>
+            <div class="layer-proto">Cabos, fibra, ondas de rádio</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🔗</div>
+      Modelo TCP/IP — 4 Camadas (Prático)
+    </div>
+    <p>O TCP/IP é o modelo real usado na Internet. Colapsa as 7 camadas OSI em <strong style="color:var(--text)">4 camadas práticas</strong>:</p>
+    <table class="osi-table">
+      <thead>
+        <tr><th>Camada TCP/IP</th><th>Equivalente OSI</th><th>Exemplos</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="layer-name" style="color:var(--red2)">Aplicação</div></td>
+          <td><div class="layer-desc">5, 6, 7</div></td>
+          <td><div class="layer-proto">HTTP, DNS, SSH, SMTP</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name" style="color:var(--green)">Transporte</div></td>
+          <td><div class="layer-desc">4</div></td>
+          <td><div class="layer-proto">TCP, UDP, SCTP</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name" style="color:var(--blue)">Internet</div></td>
+          <td><div class="layer-desc">3</div></td>
+          <td><div class="layer-proto">IP, ICMP, ARP</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name" style="color:var(--text2)">Acesso à Rede</div></td>
+          <td><div class="layer-desc">1, 2</div></td>
+          <td><div class="layer-proto">Ethernet, Wi-Fi</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🤝</div>
+      TCP Three-Way Handshake
+    </div>
+    <p>Toda conexão TCP começa com um <strong style="color:var(--text)">handshake de 3 vias</strong>. Entender isso é fundamental para identificar port scans e sessões suspeitas.</p>
+    <div class="flow">
+      <div class="flow-node highlight"><strong>Cliente</strong> envia SYN<br><span style="font-size:10px;color:var(--text3)">SYN=1, SEQ=x</span></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node" style="border-color:var(--blue);color:var(--blue)"><strong>Servidor</strong> responde SYN-ACK<br><span style="font-size:10px;color:var(--text3)">SYN=1, ACK=1, SEQ=y, ACK=x+1</span></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node highlight-g"><strong>Cliente</strong> confirma ACK<br><span style="font-size:10px;color:var(--text3)">ACK=1, ACK=y+1</span></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node" style="background:var(--green-dim);border-color:var(--green)"><strong>Conexão Estabelecida ✓</strong></div>
+    </div>
+    <div class="alert danger">
+      <span class="alert-icon">🚨</span>
+      <span><strong>SYN Flood Attack:</strong> Atacante envia milhares de SYN sem completar o handshake. O servidor esgota recursos esperando ACKs que nunca chegam → DDoS.</span>
+    </div>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">🎛️</div>
+      Flags TCP — O que Significam
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">FLAGS TCP</span></div>
+      <pre><span class="cm"># Flags TCP e sua relevância no SOC</span>
+
+<span class="kw">SYN</span>  → Inicia conexão            <span class="cm"># SYN scan = nmap -sS</span>
+<span class="kw">ACK</span>  → Confirmação               <span class="cm"># Sem SYN = ACK scan furtivo</span>
+<span class="kw">FIN</span>  → Encerra conexão           <span class="cm"># FIN scan bypassa alguns firewalls</span>
+<span class="kw">RST</span>  → Reset forçado             <span class="cm"># Porta fechada ou firewall bloqueando</span>
+<span class="kw">PSH</span>  → Envio imediato de dados   <span class="cm"># Push de payload</span>
+<span class="kw">URG</span>  → Dados urgentes            <span class="cm"># Raro, suspeito se frequente</span>
+<span class="kw">ECE</span>  → Congestionamento         <span class="cm"># Controle de tráfego</span>
+<span class="kw">CWR</span>  → Congestion Window Reset</pre>
+    </div>
+    <div class="alert warn">
+      <span class="alert-icon">⚠</span>
+      <span><strong>Xmas Scan:</strong> Pacote com SYN+FIN+URG+PSH simultâneos. Absurdo no TCP real — indica varredura maliciosa.</span>
+    </div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">📦</div>
+      Encapsulamento e PDUs
+    </div>
+    <p>Cada camada adiciona seu próprio cabeçalho ao dado — isso se chama <strong style="color:var(--text)">encapsulamento</strong>. Cada camada tem sua unidade de dados (PDU):</p>
+    <ul class="checklist">
+      <li><span class="check-icon">7</span><div><strong style="color:var(--text)">Dados</strong> — Camadas 5-7 (Aplicação)</div></li>
+      <li><span class="check-icon">4</span><div><strong style="color:var(--text)">Segmento</strong> — Camada 4 (TCP) ou Datagrama (UDP)</div></li>
+      <li><span class="check-icon">3</span><div><strong style="color:var(--text)">Pacote</strong> — Camada 3 (IP)</div></li>
+      <li><span class="check-icon">2</span><div><strong style="color:var(--text)">Frame/Quadro</strong> — Camada 2 (Ethernet)</div></li>
+      <li><span class="check-icon">1</span><div><strong style="color:var(--text)">Bits</strong> — Camada 1 (Física)</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 03 · TCP/IP & IPs -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-ip">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 03</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 03</div>
+    <div class="mod-title">Endereçamento <span>IP & Sub-redes</span></div>
+    <div class="mod-subtitle">IPv4, IPv6, CIDR, sub-redes e tudo sobre endereçamento que um analista SOC precisa conhecer.</div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🔢</div>
+      Anatomia do IPv4
+    </div>
+    <p>Um endereço IPv4 tem <strong style="color:var(--text)">32 bits</strong>, divididos em 4 octetos de 8 bits cada. Total: ~4,3 bilhões de endereços.</p>
+    <div class="ip-visual">
+      <div class="ip-bits">
+        <div class="ip-octet">
+          <div class="ip-octet-val">192</div>
+          <div class="ip-octet-bin">11000000</div>
+        </div>
+        <div class="ip-octet">
+          <div class="ip-octet-val">168</div>
+          <div class="ip-octet-bin">10101000</div>
+        </div>
+        <div class="ip-octet">
+          <div class="ip-octet-val">1</div>
+          <div class="ip-octet-bin">00000001</div>
+        </div>
+        <div class="ip-octet">
+          <div class="ip-octet-val">100</div>
+          <div class="ip-octet-bin">01100100</div>
+        </div>
+      </div>
+      <div class="ip-label">192.168.1.100 — IP privado de exemplo</div>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🏷️</div>
+      Classes IPv4
+    </div>
+    <table class="osi-table">
+      <thead><tr><th>Classe</th><th>Faixa</th><th>Uso</th><th>Hosts</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--green)">A</strong></td>
+          <td style="font-size:11px">0.0.0.0 – 127.255.255.255</td>
+          <td style="font-size:11px;color:var(--text2)">Grandes redes</td>
+          <td style="font-size:11px;color:var(--blue)">16M</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--yellow)">B</strong></td>
+          <td style="font-size:11px">128.0.0.0 – 191.255.255.255</td>
+          <td style="font-size:11px;color:var(--text2)">Médias redes</td>
+          <td style="font-size:11px;color:var(--blue)">65K</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--orange)">C</strong></td>
+          <td style="font-size:11px">192.0.0.0 – 223.255.255.255</td>
+          <td style="font-size:11px;color:var(--text2)">Redes pequenas</td>
+          <td style="font-size:11px;color:var(--blue)">254</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--red2)">D</strong></td>
+          <td style="font-size:11px">224.0.0.0 – 239.255.255.255</td>
+          <td style="font-size:11px;color:var(--text2)">Multicast</td>
+          <td style="font-size:11px;color:var(--text3)">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🔒</div>
+      IPs Privados (RFC 1918)
+    </div>
+    <p>Endereços reservados para uso interno. <strong style="color:var(--text)">Nunca roteáveis na Internet pública</strong>.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">RFC 1918 — Ranges Privados</span></div>
+      <pre><span class="st">10.0.0.0/8</span>        <span class="cm"># Classe A → 16.777.214 hosts</span>
+<span class="st">172.16.0.0/12</span>     <span class="cm"># Classe B → 1.048.574 hosts</span>
+<span class="st">192.168.0.0/16</span>    <span class="cm"># Classe C → 65.534 hosts</span>
+
+<span class="cm"># IPs especiais</span>
+<span class="nm">127.0.0.1</span>         <span class="cm"># Loopback (localhost)</span>
+<span class="nm">169.254.0.0/16</span>    <span class="cm"># APIPA (sem DHCP) → suspeito!</span>
+<span class="nm">0.0.0.0</span>           <span class="cm"># Qualquer interface</span>
+<span class="nm">255.255.255.255</span>   <span class="cm"># Broadcast limitado</span></pre>
+    </div>
+    <div class="alert warn">
+      <span class="alert-icon">⚠</span>
+      <span>Encontrar tráfego de <strong>169.254.x.x</strong> em logs indica falha de DHCP. Dispositivos com APIPA podem ser pontos cegos de monitoramento.</span>
+    </div>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">✂️</div>
+      CIDR — Notação por Prefixo
+    </div>
+    <p>CIDR (Classless Inter-Domain Routing) substitui as classes fixas. O <strong style="color:var(--text)">/N</strong> indica quantos bits são da <em>rede</em>.</p>
+    <div class="cidr-grid">
+      <div class="cidr-item">
+        <div class="cidr-mask">/8</div>
+        <div class="cidr-hosts">16.777.214 hosts</div>
+        <div class="cidr-subnet">255.0.0.0</div>
+      </div>
+      <div class="cidr-item">
+        <div class="cidr-mask">/16</div>
+        <div class="cidr-hosts">65.534 hosts</div>
+        <div class="cidr-subnet">255.255.0.0</div>
+      </div>
+      <div class="cidr-item">
+        <div class="cidr-mask">/24</div>
+        <div class="cidr-hosts">254 hosts</div>
+        <div class="cidr-subnet">255.255.255.0</div>
+      </div>
+      <div class="cidr-item">
+        <div class="cidr-mask">/30</div>
+        <div class="cidr-hosts">2 hosts</div>
+        <div class="cidr-subnet">255.255.255.252</div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Exemplos CIDR</span></div>
+      <pre><span class="st">192.168.1.0/24</span>  <span class="cm"># Rede: 192.168.1.0</span>
+                  <span class="cm"># Hosts: .1 – .254</span>
+                  <span class="cm"># Broadcast: 192.168.1.255</span>
+
+<span class="st">10.0.0.0/8</span>      <span class="cm"># Rede inteira classe A</span>
+<span class="st">172.16.0.0/12</span>   <span class="cm"># 172.16.x.x – 172.31.x.x</span></pre>
+    </div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🌍</div>
+      IPv6 — O Futuro (e o Presente)
+    </div>
+    <p>IPv6 tem <strong style="color:var(--text)">128 bits</strong> — espaço para 340 undecilhões de endereços. Formato hexadecimal com 8 grupos de 16 bits.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">IPv6 — Formatos</span></div>
+      <pre><span class="cm"># Endereço completo</span>
+<span class="nm">2001:0db8:85a3:0000:0000:8a2e:0370:7334</span>
+
+<span class="cm"># Simplificado (omite zeros)</span>
+<span class="nm">2001:db8:85a3::8a2e:370:7334</span>
+
+<span class="cm"># Loopback IPv6</span>
+<span class="st">::1</span>
+
+<span class="cm"># Link-Local (equiv. 169.254.x.x)</span>
+<span class="st">fe80::/10</span>
+
+<span class="cm"># IPs privados (ULA)</span>
+<span class="st">fc00::/7</span></pre>
+    </div>
+    <div class="alert info">
+      <span class="alert-icon">ℹ</span>
+      <span>Muitas organizações ainda não monitoram tráfego IPv6 adequadamente. Atacantes usam isso para <strong>tunelamento IPv6-sobre-IPv4</strong> para bypassar controles.</span>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🔀</div>
+      NAT — Network Address Translation
+    </div>
+    <p>NAT permite que múltiplos dispositivos com IPs privados compartilhem um único IP público. Fundamental para entender logs de firewall.</p>
+    <ul class="checklist">
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">SNAT</strong> — Traduz IP de origem. Saída à Internet (common).</div></li>
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">DNAT</strong> — Traduz IP de destino. Port forwarding para servidores internos.</div></li>
+      <li><span class="check-icon warn">→</span><div><strong style="color:var(--text)">PAT/Masquerade</strong> — NAT com porta. Um IP público, muitos hosts internos.</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 04 · PROTOCOLOS -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-protocolos">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 04</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 04</div>
+    <div class="mod-title">Protocolos <span>Essenciais</span></div>
+    <div class="mod-subtitle">Portas, protocolos e como cada serviço funciona — com foco nos ataques mais comuns em cada um.</div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🚪</div>
+      Portas Críticas para o SOC
+    </div>
+    <div class="port-list">
+      <div class="port-item">
+        <div class="port-num">21</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">FTP</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">Transferência de arquivos — plaintext!</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">22</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">SSH</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">Shell remoto seguro</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">23</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">Telnet</div>
+        <div class="port-desc" style="font-size:10px;color:var(--red2)">⚠ Sem criptografia!</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">25</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">SMTP</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">Envio de email</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">53</div>
+        <div class="port-proto udp">UDP</div>
+        <div class="port-name">DNS</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">Resolução de nomes</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">80</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">HTTP</div>
+        <div class="port-desc" style="font-size:10px;color:var(--red2)">⚠ Sem criptografia!</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">443</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">HTTPS</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">HTTP + TLS</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">445</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">SMB</div>
+        <div class="port-desc" style="font-size:10px;color:var(--red2)">⚠ EternalBlue/WannaCry!</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">3389</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">RDP</div>
+        <div class="port-desc" style="font-size:10px;color:var(--red2)">⚠ BlueKeep, força bruta</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">1433</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">MSSQL</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">Banco SQL Server</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">3306</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">MySQL</div>
+        <div class="port-desc" style="font-size:10px;color:var(--text3)">Banco MySQL/MariaDB</div>
+      </div>
+      <div class="port-item">
+        <div class="port-num">6379</div>
+        <div class="port-proto tcp">TCP</div>
+        <div class="port-name">Redis</div>
+        <div class="port-desc" style="font-size:10px;color:var(--red2)">⚠ Frequentemente exposto sem auth</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🔍</div>
+      DNS — Domain Name System
+    </div>
+    <p>DNS traduz nomes (google.com) em IPs. É um protocolo <strong style="color:var(--text)">crítico para detecção de ameaças</strong> — malwares usam DNS para C2.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Tipos de Registro DNS</span></div>
+      <pre><span class="kw">A</span>      → hostname para IPv4
+<span class="kw">AAAA</span>   → hostname para IPv6
+<span class="kw">MX</span>     → servidor de email
+<span class="kw">CNAME</span>  → alias (apelido)
+<span class="kw">NS</span>     → nameserver autoritativo
+<span class="kw">PTR</span>    → reverse DNS (IP → nome)
+<span class="kw">TXT</span>    → texto livre (SPF, DKIM)
+<span class="kw">SOA</span>    → info de zona DNS</pre>
+    </div>
+    <div class="alert danger">
+      <span class="alert-icon">🚨</span>
+      <span><strong>DNS Tunneling:</strong> Atacantes exfiltram dados codificando-os em consultas DNS (subdomínios longos/randômicos). Ferramenta: iodine, dnscat2. Detecte via volume anômalo de queries DNS.</span>
+    </div>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">🔄</div>
+      ARP — Address Resolution Protocol
+    </div>
+    <p>ARP mapeia IPs (camada 3) para MACs (camada 2). Opera apenas na LAN. <strong style="color:var(--text)">Protocolo sem autenticação</strong> — altamente suscetível a spoofing.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">ARP no Linux</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="prompt-ps1">$</span> <span class="prompt-cmd">arp -n</span>
+<span class="prompt-out">Address         HWtype  HWaddress          Iface</span>
+<span class="prompt-out">192.168.1.1     ether   aa:bb:cc:dd:ee:ff  eth0</span>
+<span class="prompt-out">192.168.1.50    ether   11:22:33:44:55:66  eth0</span>
+
+<span class="prompt-ps1">$</span> <span class="prompt-cmd">ip neigh show</span>  <span class="cm"># Alternativa moderna</span></pre>
+    </div>
+    <div class="alert danger">
+      <span class="alert-icon">🚨</span>
+      <span><strong>ARP Poisoning/Spoofing:</strong> Atacante envia ARP Replies falsos, associando seu MAC ao IP do gateway. Resultado: Man-in-the-Middle completo na LAN. Detecte com ARPwatch.</span>
+    </div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">📧</div>
+      ICMP — Internet Control Message Protocol
+    </div>
+    <p>ICMP não transporta dados de usuário — transmite <strong style="color:var(--text)">mensagens de controle e erro</strong>. Base do ping e traceroute.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Tipos ICMP Importantes</span></div>
+      <pre><span class="kw">Type 0</span>  Echo Reply        <span class="cm"># Resposta ao ping</span>
+<span class="kw">Type 3</span>  Dest Unreachable  <span class="cm"># Host/porta inacessível</span>
+<span class="kw">Type 5</span>  Redirect          <span class="cm"># ⚠ Pode ser exploit</span>
+<span class="kw">Type 8</span>  Echo Request      <span class="cm"># O ping</span>
+<span class="kw">Type 11</span> TTL Exceeded      <span class="cm"># Base do traceroute</span>
+
+<span class="cm"># Detectar ICMP Flood (ping of death / smurf)</span>
+<span class="prompt-ps1">$</span> tcpdump icmp</pre>
+    </div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🔐</div>
+      TLS/SSL — Criptografia de Transporte
+    </div>
+    <p>TLS criptografa comunicações de rede. Todo analista SOC deve entender seu funcionamento para detectar <strong style="color:var(--text)">TLS mal configurado</strong>, certificados inválidos e C2 over HTTPS.</p>
+    <ul class="checklist">
+      <li><span class="check-icon">🔑</span><div><strong style="color:var(--text)">Handshake TLS</strong> — Negocia algoritmos, troca certificados, estabelece chave de sessão.</div></li>
+      <li><span class="check-icon">🔑</span><div><strong style="color:var(--text)">SNI (Server Name Indication)</strong> — Informa o hostname no ClientHello. Visível mesmo em tráfego criptografado!</div></li>
+      <li><span class="check-icon warn">🔑</span><div><strong style="color:var(--text)">Certificate Pinning</strong> — App aceita só cert específico. Dificulta MitM e inspeção de proxy.</div></li>
+      <li><span class="check-icon red">🔑</span><div><strong style="color:var(--text)">Self-signed certs</strong> — Comum em malware C2. Gera alerta no SOC.</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 05 · LINUX -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-linux">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 05</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 05</div>
+    <div class="mod-title">Linux para <span>Redes</span></div>
+    <div class="mod-subtitle">Comandos fundamentais de rede no Linux. Do diagnóstico ao monitoramento — tudo que um analista SOC usa no dia a dia.</div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">💻</div>
+      Interfaces de Rede
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Ver todas as interfaces e endereços IPs</span>
+<span class="prompt-ps1">$</span> ip addr show
+<span class="prompt-ps1">$</span> ip a             <span class="cm"># Atalho</span>
+
+<span class="cm"># Ver apenas interface específica</span>
+<span class="prompt-ps1">$</span> ip a show eth0
+
+<span class="cm"># Legado (ainda encontrado em ambientes)</span>
+<span class="prompt-ps1">$</span> ifconfig
+<span class="prompt-ps1">$</span> ifconfig eth0
+
+<span class="cm"># Ver estado das interfaces (up/down)</span>
+<span class="prompt-ps1">$</span> ip link show
+
+<span class="cm"># Habilitar/desabilitar interface</span>
+<span class="prompt-ps1">$</span> ip link set eth0 up
+<span class="prompt-ps1">$</span> ip link set eth0 down</pre>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🗺️</div>
+      Rotas e Gateway
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Ver tabela de rotas</span>
+<span class="prompt-ps1">$</span> ip route show
+<span class="prompt-ps1">$</span> ip r
+
+<span class="cm"># Saída típica:</span>
+<span class="prompt-out">default via 192.168.1.1 dev eth0     </span><span class="cm"># Gateway padrão</span>
+<span class="prompt-out">192.168.1.0/24 dev eth0 proto kernel </span><span class="cm"># Rede local</span>
+
+<span class="cm"># Legado</span>
+<span class="prompt-ps1">$</span> route -n
+<span class="prompt-ps1">$</span> netstat -r
+
+<span class="cm"># Adicionar rota estática</span>
+<span class="prompt-ps1">$</span> ip route add 10.0.0.0/8 via 192.168.1.1
+
+<span class="cm"># Remover rota</span>
+<span class="prompt-ps1">$</span> ip route del 10.0.0.0/8</pre>
+    </div>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">📡</div>
+      Diagnóstico de Conectividade
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Ping básico</span>
+<span class="prompt-ps1">$</span> ping google.com
+<span class="prompt-ps1">$</span> ping -c 4 8.8.8.8       <span class="cm"># 4 pacotes</span>
+<span class="prompt-ps1">$</span> ping -i 0.5 192.168.1.1  <span class="cm"># Intervalo 0.5s</span>
+
+<span class="cm"># Traçar rota (traceroute)</span>
+<span class="prompt-ps1">$</span> traceroute google.com
+<span class="prompt-ps1">$</span> traceroute -n google.com  <span class="cm"># Sem resolver DNS</span>
+<span class="prompt-ps1">$</span> mtr google.com            <span class="cm"># Combinação ping+traceroute</span>
+
+<span class="cm"># Checar DNS</span>
+<span class="prompt-ps1">$</span> nslookup google.com
+<span class="prompt-ps1">$</span> dig google.com
+<span class="prompt-ps1">$</span> dig google.com A          <span class="cm"># Só registros A</span>
+<span class="prompt-ps1">$</span> dig @8.8.8.8 google.com  <span class="cm"># Usar DNS específico</span>
+<span class="prompt-ps1">$</span> host google.com           <span class="cm"># Simples</span></pre>
+    </div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🔌</div>
+      Portas e Conexões Ativas
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># ss — substituto moderno do netstat</span>
+<span class="prompt-ps1">$</span> ss -tulpn         <span class="cm"># TCP+UDP+listening+pid+numerico</span>
+<span class="prompt-ps1">$</span> ss -tnp           <span class="cm"># Só TCP com processos</span>
+<span class="prompt-ps1">$</span> ss -s             <span class="cm"># Estatísticas resumidas</span>
+<span class="prompt-ps1">$</span> ss -4 state established  <span class="cm"># Conexões TCP estabelecidas</span>
+
+<span class="cm"># netstat (legado, ainda muito usado)</span>
+<span class="prompt-ps1">$</span> netstat -tulpn    <span class="cm"># TCP+UDP ouvindo</span>
+<span class="prompt-ps1">$</span> netstat -an       <span class="cm"># Todas as conexões</span>
+<span class="prompt-ps1">$</span> netstat -antp     <span class="cm"># Com PID/processo</span>
+
+<span class="cm"># Ver quem usa uma porta específica</span>
+<span class="prompt-ps1">$</span> ss -tulpn | grep :443
+<span class="prompt-ps1">$</span> lsof -i :8080
+
+<span class="cm"># Ver conexões de um processo</span>
+<span class="prompt-ps1">$</span> lsof -p <span class="nm">1234</span> -i</pre>
+    </div>
+    <div class="alert danger">
+      <span class="alert-icon">🚨</span>
+      <span>No SOC: use <code style="color:var(--green)">ss -tnp</code> para identificar processos com conexões suspeitas (portas altas, IPs externos inesperados = possível malware ou backdoor ativo).</span>
+    </div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🌐</div>
+      Configuração de Rede (NetworkManager / ip)
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Adicionar IP à interface</span>
+<span class="prompt-ps1">$</span> ip addr add 192.168.1.50/24 dev eth0
+
+<span class="cm"># Ver ARP table</span>
+<span class="prompt-ps1">$</span> ip neigh show
+<span class="prompt-ps1">$</span> arp -n
+
+<span class="cm"># Flush ARP cache</span>
+<span class="prompt-ps1">$</span> ip neigh flush all
+
+<span class="cm"># DNS em /etc/resolv.conf</span>
+<span class="prompt-ps1">$</span> cat /etc/resolv.conf
+<span class="prompt-out">nameserver 8.8.8.8</span>
+<span class="prompt-out">nameserver 1.1.1.1</span>
+
+<span class="cm"># Hosts locais</span>
+<span class="prompt-ps1">$</span> cat /etc/hosts
+
+<span class="cm"># NetworkManager status</span>
+<span class="prompt-ps1">$</span> nmcli device status
+<span class="prompt-ps1">$</span> nmcli connection show</pre>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🔥</div>
+      Firewall com iptables e nftables
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH — iptables</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Ver regras atuais</span>
+<span class="prompt-ps1">$</span> iptables -L -n -v
+<span class="prompt-ps1">$</span> iptables -L -n --line-numbers
+
+<span class="cm"># Bloquear IP específico</span>
+<span class="prompt-ps1">$</span> iptables -I INPUT -s <span class="nm">1.2.3.4</span> -j DROP
+
+<span class="cm"># Permitir porta 22 (SSH)</span>
+<span class="prompt-ps1">$</span> iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+<span class="cm"># Bloquear porta de saída</span>
+<span class="prompt-ps1">$</span> iptables -A OUTPUT -p tcp --dport 4444 -j DROP
+
+<span class="cm"># Salvar regras (Debian/Ubuntu)</span>
+<span class="prompt-ps1">$</span> iptables-save > /etc/iptables/rules.v4
+
+<span class="cm"># UFW (frontend simplificado)</span>
+<span class="prompt-ps1">$</span> ufw status verbose
+<span class="prompt-ps1">$</span> ufw allow 22/tcp
+<span class="prompt-ps1">$</span> ufw deny from 1.2.3.4</pre>
+    </div>
+  </div>
+
+  <div class="card accent-orange" style="border-left:3px solid var(--orange);">
+    <div class="card-title">
+      <div class="card-icon" style="background:rgba(255,140,66,0.15);">⚡</div>
+      Comandos Rápidos de Referência
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">CHEATSHEET — Linux Network</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Velocidade de tráfego em tempo real</span>
+<span class="prompt-ps1">$</span> iftop -i eth0
+<span class="prompt-ps1">$</span> nload eth0
+<span class="prompt-ps1">$</span> bmon
+
+<span class="cm"># Estatísticas de interface</span>
+<span class="prompt-ps1">$</span> ip -s link show eth0
+<span class="prompt-ps1">$</span> cat /proc/net/dev
+
+<span class="cm"># Testar conectividade TCP sem telnet</span>
+<span class="prompt-ps1">$</span> nc -zv 192.168.1.1 443
+<span class="prompt-ps1">$</span> timeout 3 bash -c 'cat < /dev/tcp/8.8.8.8/53'
+
+<span class="cm"># Capturar pacotes básico (sem wireshark)</span>
+<span class="prompt-ps1">$</span> tcpdump -i eth0 -n
+<span class="prompt-ps1">$</span> tcpdump -i any host 1.2.3.4 -w captura.pcap
+
+<span class="cm"># Verificar processo por PID com conexão</span>
+<span class="prompt-ps1">$</span> ss -tp | grep pid=<span class="nm">1234</span>
+<span class="prompt-ps1">$</span> ls -la /proc/<span class="nm">1234</span>/exe</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 06 · FERRAMENTAS -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-ferramentas">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 06</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 06</div>
+    <div class="mod-title">Ferramentas de <span>Análise</span></div>
+    <div class="mod-subtitle">As ferramentas mais usadas em um SOC para análise de tráfego, descoberta de hosts e investigação de rede.</div>
+  </div>
+
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon g">🦈</div>
+        <div>
+          <div class="tool-name">Wireshark</div>
+          <div class="tool-tagline">GUI · Análise de PCAP</div>
+        </div>
+      </div>
+      <div class="tool-desc">Analisador de protocolos gráfico. Captura e analisa pacotes em tempo real. Padrão da indústria para investigações de rede.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Filtros Wireshark</span></div>
+        <pre style="font-size:11px"><span class="st">ip.addr == 192.168.1.1</span>
+<span class="st">tcp.port == 443</span>
+<span class="st">http.request.method == "POST"</span>
+<span class="st">dns.qry.name contains "evil"</span>
+<span class="st">tcp.flags.syn == 1</span>
+<span class="st">!(arp or icmp or dns)</span></pre>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon r">🎯</div>
+        <div>
+          <div class="tool-name">tcpdump</div>
+          <div class="tool-tagline">CLI · Captura em servidor</div>
+        </div>
+      </div>
+      <div class="tool-desc">Captura de pacotes via linha de comando. Essencial em servidores sem GUI. Salva em formato PCAP para análise posterior.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+        <pre style="font-size:11px"><span class="cm"># Capturar toda interface</span>
+<span class="kw">tcpdump</span> -i eth0
+
+<span class="cm"># Filtrar por host e porta</span>
+<span class="kw">tcpdump</span> -i any host 1.2.3.4 and port 443
+
+<span class="cm"># Salvar em arquivo</span>
+<span class="kw">tcpdump</span> -i eth0 -w captura.pcap
+
+<span class="cm"># Ler arquivo salvo</span>
+<span class="kw">tcpdump</span> -r captura.pcap -n
+
+<span class="cm"># Mostrar conteúdo ASCII</span>
+<span class="kw">tcpdump</span> -i eth0 -A port 80</pre>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon b">🗺️</div>
+        <div>
+          <div class="tool-name">Nmap</div>
+          <div class="tool-tagline">CLI · Scanner de rede</div>
+        </div>
+      </div>
+      <div class="tool-desc">Scanner de portas e serviços. Fundamental para inventário de rede e identificação de ativos. No SOC, é base para Threat Hunting.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+        <pre style="font-size:11px"><span class="cm"># Scan básico</span>
+<span class="kw">nmap</span> 192.168.1.0/24
+
+<span class="cm"># Detectar versão e OS</span>
+<span class="kw">nmap</span> -sV -O 192.168.1.1
+
+<span class="cm"># Scan furtivo (SYN)</span>
+<span class="kw">nmap</span> -sS -T2 192.168.1.1
+
+<span class="cm"># Portas específicas</span>
+<span class="kw">nmap</span> -p 22,80,443,3389 192.168.1.0/24
+
+<span class="cm"># Saída em XML p/ SIEM</span>
+<span class="kw">nmap</span> -oX scan.xml 192.168.1.0/24</pre>
+      </div>
+      <div class="alert warn" style="margin-top:8px">
+        <span class="alert-icon">⚠</span>
+        <span style="font-size:11px">Use apenas em redes autorizadas. Nmap gera alertas em qualquer IDS/SIEM decente.</span>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon y">⚡</div>
+        <div>
+          <div class="tool-name">netcat (nc)</div>
+          <div class="tool-tagline">CLI · Canivete suíço TCP/UDP</div>
+        </div>
+      </div>
+      <div class="tool-desc">Utilitário versátil para leitura/escrita em conexões TCP/UDP. Usado para testes de conectividade, transferência de arquivos e debugging.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">BASH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+        <pre style="font-size:11px"><span class="cm"># Testar conectividade porta</span>
+<span class="kw">nc</span> -zv 192.168.1.1 443
+
+<span class="cm"># Banner grabbing</span>
+<span class="kw">nc</span> 192.168.1.1 22
+
+<span class="cm"># Escutar em porta</span>
+<span class="kw">nc</span> -lvp 4444
+
+<span class="cm"># Transferir arquivo</span>
+<span class="cm"># Receptor:</span>
+<span class="kw">nc</span> -lvp 9999 > arquivo.txt
+<span class="cm"># Sender:</span>
+<span class="kw">nc</span> 192.168.1.10 9999 &lt; arquivo.txt</pre>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon g">🔬</div>
+        <div>
+          <div class="tool-name">Zeek (Bro)</div>
+          <div class="tool-tagline">NSM · Network Security Monitor</div>
+        </div>
+      </div>
+      <div class="tool-desc">Framework de análise de tráfego orientado a logs estruturados. Gera logs por protocolo (http.log, dns.log, conn.log) — integra com SIEM.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Logs Zeek</span></div>
+        <pre style="font-size:11px"><span class="cm"># conn.log   → todas as conexões</span>
+<span class="cm"># dns.log    → queries DNS</span>
+<span class="cm"># http.log   → tráfego HTTP</span>
+<span class="cm"># ssl.log    → handshakes TLS</span>
+<span class="cm"># files.log  → arquivos transferidos</span>
+<span class="cm"># notice.log → alertas Zeek</span>
+
+<span class="cm"># Rodar Zeek em PCAP</span>
+<span class="kw">zeek</span> -r captura.pcap</pre>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon r">🔍</div>
+        <div>
+          <div class="tool-name">Suricata</div>
+          <div class="tool-tagline">IDS/IPS · Detecção de ameaças</div>
+        </div>
+      </div>
+      <div class="tool-desc">Motor de IDS/IPS de alta performance. Analisa tráfego contra regras (Emerging Threats, ET Open) e gera alertas em formato EVE-JSON.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">BASH</span></div>
+        <pre style="font-size:11px"><span class="cm"># Testar PCAP com regras</span>
+<span class="kw">suricata</span> -r captura.pcap -l /tmp/
+
+<span class="cm"># Modo IDS em interface</span>
+<span class="kw">suricata</span> -i eth0
+
+<span class="cm"># Ver alertas EVE-JSON</span>
+<span class="kw">cat</span> /var/log/suricata/eve.json | \
+  jq 'select(.event_type=="alert")'</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 07 · SOC -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-soc">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 07</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 07</div>
+    <div class="mod-title">Operações de <span>SOC</span></div>
+    <div class="mod-subtitle">O que faz um analista SOC, como redes se conectam ao trabalho diário e os alertas mais importantes para monitorar.</div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🏢</div>
+      O que é um SOC?
+    </div>
+    <p>O <strong style="color:var(--text)">Security Operations Center (SOC)</strong> é o time responsável por monitorar, detectar, analisar e responder a incidentes de segurança 24x7. Trabalha com:</p>
+    <ul class="checklist">
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">SIEM</strong> (Splunk, Elastic, QRadar) — Correlação centralizada de logs</div></li>
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">EDR/XDR</strong> (CrowdStrike, SentinelOne) — Proteção de endpoints</div></li>
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">SOAR</strong> — Automação de resposta a incidentes</div></li>
+      <li><span class="check-icon">◈</span><div><strong style="color:var(--text)">Threat Intelligence</strong> — IoCs, TTPs, feeds de ameaças</div></li>
+      <li><span class="check-icon warn">◈</span><div><strong style="color:var(--text)">Análise de Rede</strong> — PCAP, NetFlow, firewall logs</div></li>
+    </ul>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🚨</div>
+      Alertas de Rede no SOC
+    </div>
+    <p>Os alertas mais críticos que chegam ao SOC via monitoramento de rede:</p>
+    <ul class="checklist">
+      <li><span class="check-icon red">🔴</span><div><strong style="color:var(--text)">Port Scanning</strong> — Múltiplas portas varridas em curto intervalo. Indica reconhecimento.</div></li>
+      <li><span class="check-icon red">🔴</span><div><strong style="color:var(--text)">Beaconing C2</strong> — Conexão periódica e regular a IP externo suspeito (ex: a cada 60s).</div></li>
+      <li><span class="check-icon red">🔴</span><div><strong style="color:var(--text)">Exfiltração</strong> — Grande volume de dados saindo para destino incomum.</div></li>
+      <li><span class="check-icon warn">🟡</span><div><strong style="color:var(--text)">Brute Force SSH/RDP</strong> — Múltiplas tentativas de autenticação falhas.</div></li>
+      <li><span class="check-icon warn">🟡</span><div><strong style="color:var(--text)">DNS Tunneling</strong> — Consultas DNS anômalas, subdomínios longos ou randômicos.</div></li>
+      <li><span class="check-icon warn">🟡</span><div><strong style="color:var(--text)">Lateral Movement</strong> — Conexões SMB/RDP entre hosts internos incomuns.</div></li>
+      <li><span class="check-icon">🟢</span><div><strong style="color:var(--text)">Tráfego em porta não-padrão</strong> — HTTP em porta 8888, SSH em porta 2222, etc.</div></li>
+    </ul>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🔍</div>
+      MITRE ATT&CK — Táticas de Rede
+    </div>
+    <p>O framework MITRE ATT&CK documenta TTPs de adversários reais. As principais táticas relacionadas a rede:</p>
+    <table class="osi-table">
+      <thead><tr><th>Tática</th><th>ID</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="layer-name">Reconhecimento</div></td>
+          <td><div class="layer-proto">TA0043</div></td>
+          <td><div class="layer-desc">Nmap scan, shodan, OSINT</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name">Initial Access</div></td>
+          <td><div class="layer-proto">TA0001</div></td>
+          <td><div class="layer-desc">Phishing, exploits RDP/VPN</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name">Lateral Movement</div></td>
+          <td><div class="layer-proto">TA0008</div></td>
+          <td><div class="layer-desc">PsExec, SMB, RDP, WMI</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name">C2 (Command & Control)</div></td>
+          <td><div class="layer-proto">TA0011</div></td>
+          <td><div class="layer-desc">Cobalt Strike, DNS C2</div></td>
+        </tr>
+        <tr>
+          <td><div class="layer-name">Exfiltration</div></td>
+          <td><div class="layer-proto">TA0010</div></td>
+          <td><div class="layer-desc">C2, FTP, HTTPS, DNS</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">📊</div>
+      NetFlow — Análise de Fluxo
+    </div>
+    <p>NetFlow/IPFIX captura metadados de fluxos de rede (sem payload). Essencial para detecção de anomalias em grande escala.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Campos NetFlow</span></div>
+      <pre><span class="kw">src_ip</span>      → IP de origem
+<span class="kw">dst_ip</span>      → IP de destino
+<span class="kw">src_port</span>    → Porta de origem
+<span class="kw">dst_port</span>    → Porta de destino
+<span class="kw">protocol</span>    → TCP/UDP/ICMP
+<span class="kw">bytes</span>       → Volume de dados
+<span class="kw">packets</span>     → Número de pacotes
+<span class="kw">start_time</span>  → Início do fluxo
+<span class="kw">end_time</span>    → Fim do fluxo
+<span class="kw">tcp_flags</span>   → Flags TCP usadas</pre>
+    </div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🎯</div>
+      IoCs de Rede — O que Buscar
+    </div>
+    <p><strong style="color:var(--text)">Indicators of Compromise (IoCs)</strong> são artefatos que indicam comprometimento:</p>
+    <ul class="checklist">
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">IPs maliciosos</strong> — Checar em VirusTotal, AbuseIPDB, Shodan</div></li>
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">Domínios DGA</strong> — Domain Generation Algorithm (ex: xk3h9abc.com)</div></li>
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">User-Agents suspeitos</strong> — curl, python-requests em prod = suspeito</div></li>
+      <li><span class="check-icon">→</span><div><strong style="color:var(--text)">JA3/JA3S hash</strong> — Fingerprint TLS de cliente/servidor. Detecta Cobalt Strike!</div></li>
+      <li><span class="check-icon warn">→</span><div><strong style="color:var(--text)">Portas incomuns</strong> — HTTPS em porta 4444, 8443, 8080</div></li>
+      <li><span class="check-icon red">→</span><div><strong style="color:var(--text)">Long connections</strong> — Sessão TCP aberta por horas = possível C2 keep-alive</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 08 · LOGS -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-logs">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 08</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 08</div>
+    <div class="mod-title">Análise de <span>Logs</span></div>
+    <div class="mod-subtitle">Como ler, filtrar e correlacionar logs de rede no Linux. Do syslog ao journald, e como enriquecer com contexto de rede.</div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">📋</div>
+      Logs Essenciais no Linux
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Localização de Logs</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Logs de sistema</span>
+<span class="st">/var/log/syslog</span>        <span class="cm"># Ubuntu/Debian</span>
+<span class="st">/var/log/messages</span>      <span class="cm"># CentOS/RHEL</span>
+
+<span class="cm"># Autenticação (SSH, sudo, login)</span>
+<span class="st">/var/log/auth.log</span>      <span class="cm"># Debian/Ubuntu</span>
+<span class="st">/var/log/secure</span>        <span class="cm"># CentOS/RHEL</span>
+
+<span class="cm"># Kernel e hardware</span>
+<span class="st">/var/log/kern.log</span>
+<span class="prompt-ps1">$</span> dmesg | grep -i network
+
+<span class="cm"># Firewall (iptables com log)</span>
+<span class="st">/var/log/ufw.log</span>
+<span class="prompt-ps1">$</span> grep "UFW BLOCK" /var/log/ufw.log
+
+<span class="cm"># journald — sistema moderno</span>
+<span class="prompt-ps1">$</span> journalctl -u sshd --since "1 hour ago"
+<span class="prompt-ps1">$</span> journalctl -f            <span class="cm"># Tail em tempo real</span></pre>
+    </div>
+  </div>
+
+  <div class="card accent-blue">
+    <div class="card-title">
+      <div class="card-icon blue">🔎</div>
+      Análise de Auth.log — Detectar Brute Force
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH — Investigação SSH</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Ver falhas de autenticação SSH</span>
+<span class="prompt-ps1">$</span> grep "Failed password" /var/log/auth.log
+
+<span class="cm"># Contar tentativas por IP</span>
+<span class="prompt-ps1">$</span> grep "Failed password" /var/log/auth.log | \
+  awk '{print $11}' | sort | uniq -c | sort -rn | head
+
+<span class="cm"># Logins bem-sucedidos</span>
+<span class="prompt-ps1">$</span> grep "Accepted password\|Accepted publickey" \
+  /var/log/auth.log
+
+<span class="cm"># Sessões SSH ativas agora</span>
+<span class="prompt-ps1">$</span> w
+<span class="prompt-ps1">$</span> who
+<span class="prompt-ps1">$</span> last | head -20
+
+<span class="cm"># Usuários criados recentemente</span>
+<span class="prompt-ps1">$</span> grep "useradd\|groupadd" /var/log/auth.log</pre>
+    </div>
+    <div class="alert danger">
+      <span class="alert-icon">🚨</span>
+      <span>Mais de 10 "Failed password" do mesmo IP em menos de 1 minuto = <strong>Brute Force ativo</strong>. Acione o bloqueio via fail2ban ou regra de firewall imediata.</span>
+    </div>
+  </div>
+
+  <div class="card accent-yellow">
+    <div class="card-title">
+      <div class="card-icon yellow">⚙️</div>
+      grep, awk, sed para Análise de Logs
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH — Parsing de Logs</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Filtrar por IP específico em qualquer log</span>
+<span class="prompt-ps1">$</span> grep "1.2.3.4" /var/log/nginx/access.log
+
+<span class="cm"># Logs da última hora</span>
+<span class="prompt-ps1">$</span> journalctl --since "1 hour ago"
+
+<span class="cm"># Top 10 IPs em nginx access.log</span>
+<span class="prompt-ps1">$</span> awk '{print $1}' /var/log/nginx/access.log | \
+  sort | uniq -c | sort -rn | head -10
+
+<span class="cm"># Top User-Agents</span>
+<span class="prompt-ps1">$</span> awk -F'"' '{print $6}' /var/log/nginx/access.log | \
+  sort | uniq -c | sort -rn | head
+
+<span class="cm"># Erros 4xx e 5xx</span>
+<span class="prompt-ps1">$</span> awk '$9 ~ /^[45]/' /var/log/nginx/access.log
+
+<span class="cm"># Monitorar log em tempo real</span>
+<span class="prompt-ps1">$</span> tail -f /var/log/syslog | grep -i ssh
+
+<span class="cm"># Buscar em logs comprimidos</span>
+<span class="prompt-ps1">$</span> zgrep "Failed" /var/log/auth.log.*.gz</pre>
+    </div>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-title">
+      <div class="card-icon red">🌐</div>
+      Formato de Log Apache/Nginx
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">access.log — Combined Format</span></div>
+      <pre><span class="prompt-out">1.2.3.4 - user [24/May/2026:10:15:30 +0000] \
+  "GET /admin/login HTTP/1.1" 200 1234 \
+  "-" "Mozilla/5.0 ..." 0.042</span>
+
+<span class="cm"># Campos:
+# $1  → IP de origem
+# $4  → Data/hora
+# $7  → URI requisitado
+# $9  → Status HTTP
+# $10 → Bytes enviados
+# $11 → Referrer
+# $12 → User-Agent</span>
+
+<span class="cm"># IOC: brute force em /admin</span>
+<span class="prompt-ps1">$</span> grep '"POST /admin' access.log | \
+  awk '$9==401' | awk '{print $1}' | \
+  sort | uniq -c | sort -rn</pre>
+    </div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-title">
+      <div class="card-icon green">🔗</div>
+      fail2ban — Bloqueio Automático
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">BASH — fail2ban</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+      <pre><span class="cm"># Status geral</span>
+<span class="prompt-ps1">$</span> fail2ban-client status
+
+<span class="cm"># Status da jail SSH</span>
+<span class="prompt-ps1">$</span> fail2ban-client status sshd
+
+<span class="cm"># IPs banidos atualmente</span>
+<span class="prompt-ps1">$</span> fail2ban-client status sshd | grep "Banned IP"
+
+<span class="cm"># Banir IP manualmente</span>
+<span class="prompt-ps1">$</span> fail2ban-client set sshd banip 1.2.3.4
+
+<span class="cm"># Desbanir IP</span>
+<span class="prompt-ps1">$</span> fail2ban-client set sshd unbanip 1.2.3.4
+
+<span class="cm"># Log do fail2ban</span>
+<span class="prompt-ps1">$</span> tail -f /var/log/fail2ban.log</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- 09 · QUIZ -->
+<!-- ══════════════════════════════════ -->
+<div class="section" id="sec-quiz">
+  <div class="breadcrumb">RED TEAM LEADERS · <span>REDES & SOC</span> · MÓDULO 09</div>
+  <div class="mod-header">
+    <div class="mod-tag">Módulo 09</div>
+    <div class="mod-title">Quiz de <span>Fixação</span></div>
+    <div class="mod-subtitle">Teste seus conhecimentos. Responda todas as questões para verificar sua preparação para atuar no SOC.</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Progresso</span>
+      <span id="quizProgress">0 / 8 respondidas</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="quiz-card" id="q1">
+    <div class="quiz-q"><span class="qn">QUESTÃO 01</span>Em qual camada do modelo OSI o protocolo IP opera?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q1',false)">A) Camada 2 — Enlace</button>
+      <button class="quiz-opt" onclick="answer(this,'q1',true)">B) Camada 3 — Rede</button>
+      <button class="quiz-opt" onclick="answer(this,'q1',false)">C) Camada 4 — Transporte</button>
+      <button class="quiz-opt" onclick="answer(this,'q1',false)">D) Camada 7 — Aplicação</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q1"><span style="color:var(--green)">✓ Correto!</span> O IP opera na Camada 3 (Rede), responsável pelo roteamento e endereçamento lógico entre redes diferentes.</div>
+  </div>
+
+  <div class="quiz-card" id="q2">
+    <div class="quiz-q"><span class="qn">QUESTÃO 02</span>Qual é o range de IPs privados definido pela RFC 1918 para redes de Classe A?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q2',false)">A) 172.16.0.0/12</button>
+      <button class="quiz-opt" onclick="answer(this,'q2',false)">B) 192.168.0.0/16</button>
+      <button class="quiz-opt" onclick="answer(this,'q2',true)">C) 10.0.0.0/8</button>
+      <button class="quiz-opt" onclick="answer(this,'q2',false)">D) 169.254.0.0/16</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q2"><span style="color:var(--green)">✓ Correto!</span> O range 10.0.0.0/8 é a faixa Classe A privada. O 169.254.0.0/16 é APIPA (sem DHCP) — sempre suspeito em ambiente corporativo.</div>
+  </div>
+
+  <div class="quiz-card" id="q3">
+    <div class="quiz-q"><span class="qn">QUESTÃO 03</span>Um analista SOC observa múltiplas conexões TCP com SYN sem ACK de resposta. O que isso provavelmente indica?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q3',false)">A) Tráfego UDP normal</button>
+      <button class="quiz-opt" onclick="answer(this,'q3',true)">B) SYN Flood (DDoS) ou Port Scan</button>
+      <button class="quiz-opt" onclick="answer(this,'q3',false)">C) Sessão TLS em andamento</button>
+      <button class="quiz-opt" onclick="answer(this,'q3',false)">D) DNS lookup em progresso</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q3"><span style="color:var(--green)">✓ Correto!</span> SYNs sem ACK de resposta indicam SYN Flood (DDoS) ou scan de porta -sS do Nmap. Ambos são eventos que devem gerar alertas no SIEM.</div>
+  </div>
+
+  <div class="quiz-card" id="q4">
+    <div class="quiz-q"><span class="qn">QUESTÃO 04</span>Qual comando Linux mostra todas as portas em estado de escuta (listening) com o PID do processo responsável?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q4',false)">A) ping -a localhost</button>
+      <button class="quiz-opt" onclick="answer(this,'q4',false)">B) ip route show</button>
+      <button class="quiz-opt" onclick="answer(this,'q4',true)">C) ss -tulpn</button>
+      <button class="quiz-opt" onclick="answer(this,'q4',false)">D) traceroute 8.8.8.8</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q4"><span style="color:var(--green)">✓ Correto!</span> <code style="color:var(--green)">ss -tulpn</code>: -t (TCP), -u (UDP), -l (listening), -p (processes/PID), -n (numérico). Essencial para identificar backdoors em servidores.</div>
+  </div>
+
+  <div class="quiz-card" id="q5">
+    <div class="quiz-q"><span class="qn">QUESTÃO 05</span>Qual protocolo pode ser usado para exfiltração de dados através de um firewall que bloqueia todo tráfego exceto DNS?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q5',false)">A) SMB (porta 445)</button>
+      <button class="quiz-opt" onclick="answer(this,'q5',false)">B) FTP (porta 21)</button>
+      <button class="quiz-opt" onclick="answer(this,'q5',true)">C) DNS Tunneling (porta 53)</button>
+      <button class="quiz-opt" onclick="answer(this,'q5',false)">D) RDP (porta 3389)</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q5"><span style="color:var(--green)">✓ Correto!</span> DNS Tunneling usa consultas DNS (geralmente permitidas) para encapsular dados. Ferramentas: iodine, dnscat2. Detecte pelo volume anômalo e tamanho de queries DNS.</div>
+  </div>
+
+  <div class="quiz-card" id="q6">
+    <div class="quiz-q"><span class="qn">QUESTÃO 06</span>Em qual arquivo do Linux você encontra os registros de tentativas de autenticação SSH no Ubuntu?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q6',false)">A) /var/log/syslog</button>
+      <button class="quiz-opt" onclick="answer(this,'q6',true)">B) /var/log/auth.log</button>
+      <button class="quiz-opt" onclick="answer(this,'q6',false)">C) /var/log/kern.log</button>
+      <button class="quiz-opt" onclick="answer(this,'q6',false)">D) /etc/ssh/sshd_config</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q6"><span style="color:var(--green)">✓ Correto!</span> O <code style="color:var(--green)">/var/log/auth.log</code> no Debian/Ubuntu registra toda autenticação. Use <code style="color:var(--green)">grep "Failed password"</code> para detectar brute force.</div>
+  </div>
+
+  <div class="quiz-card" id="q7">
+    <div class="quiz-q"><span class="qn">QUESTÃO 07</span>O que é ARP Poisoning e qual o principal risco para a segurança?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q7',false)">A) Ataque que satura o DNS com requests falsos</button>
+      <button class="quiz-opt" onclick="answer(this,'q7',false)">B) Envio de pacotes ICMP oversized para travar host</button>
+      <button class="quiz-opt" onclick="answer(this,'q7',true)">C) Falsificação de respostas ARP para interceptar tráfego (MitM)</button>
+      <button class="quiz-opt" onclick="answer(this,'q7',false)">D) Flood de conexões TCP para esgotar o handshake</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q7"><span style="color:var(--green)">✓ Correto!</span> ARP Poisoning associa o MAC do atacante ao IP do gateway, fazendo todo tráfego LAN passar por ele — Man-in-the-Middle completo. Detecte com ARPwatch ou XDR.</div>
+  </div>
+
+  <div class="quiz-card" id="q8">
+    <div class="quiz-q"><span class="qn">QUESTÃO 08</span>Qual porta TCP está associada ao protocolo SMB e foi explorada pelo ransomware WannaCry via EternalBlue?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'q8',false)">A) Porta 3389</button>
+      <button class="quiz-opt" onclick="answer(this,'q8',false)">B) Porta 8080</button>
+      <button class="quiz-opt" onclick="answer(this,'q8',true)">C) Porta 445</button>
+      <button class="quiz-opt" onclick="answer(this,'q8',false)">D) Porta 1433</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q8"><span style="color:var(--green)">✓ Correto!</span> A porta 445 (SMB) foi o vetor do WannaCry (2017) via exploit EternalBlue (MS17-010). No SOC, qualquer tráfego SMB externo deve ser imediatamente investigado.</div>
+  </div>
+
+  <div id="quizResult" style="display:none;" class="card accent-green" style="margin-top:20px">
+    <div class="card-title">
+      <div class="card-icon green">🏆</div>
+      Resultado Final
+    </div>
+    <div id="resultText" style="font-size:14px;line-height:1.7;"></div>
+  </div>
+</div>
+
+</main>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" id="bnav-0" onclick="bottomNav(0,'fundamentos',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bnav-label" style="color:var(--green)">Início</span>
+    </button>
+    <button class="bnav-btn" id="bnav-1" onclick="bottomNav(1,'osi',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bnav-label">OSI</span>
+    </button>
+    <button class="bnav-btn" id="bnav-2" onclick="bottomNav(2,'linux',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bnav-label">Linux</span>
+    </button>
+    <button class="bnav-btn" id="bnav-3" onclick="bottomNav(3,'soc',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bnav-label">SOC</span>
+    </button>
+    <button class="bnav-btn" id="bnav-4" onclick="bottomNav(4,'quiz',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="bnav-label">Quiz</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+// ── NAV ──
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function bottomNav(idx, id, btn) {
+  document.querySelectorAll('.bnav-btn').forEach(b => {
+    b.classList.remove('active');
+    b.querySelector('.bnav-label').style.color = '';
+  });
+  btn.classList.add('active');
+  btn.querySelector('.bnav-label').style.color = 'var(--green)';
+  
+  // sync top nav
+  const tabs = document.querySelectorAll('.nav-tab');
+  const sectionMap = {0:'fundamentos',1:'osi',2:'linux',3:'soc',4:'quiz'};
+  const sId = sectionMap[idx];
+  tabs.forEach(t => {
+    t.classList.remove('active');
+    if (t.getAttribute('onclick')?.includes("'"+sId+"'")) t.classList.add('active');
+  });
+  showSection(id, null);
+}
+
+// ── COPY CODE ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ copiado';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── QUIZ ──
+let answered = {};
+let correct = 0;
+
+function answer(btn, qId, isCorrect) {
+  if (answered[qId]) return;
+  answered[qId] = true;
+
+  const card = document.getElementById(qId);
+  const opts = card.querySelectorAll('.quiz-opt');
+  const fb = document.getElementById('fb-' + qId);
+
+  opts.forEach(o => {
+    o.disabled = true;
+    if (o === btn) {
+      o.classList.add(isCorrect ? 'correct' : 'wrong');
+    }
+    if (isCorrect && o === btn) return;
+    // highlight correct if wrong was chosen
+    if (!isCorrect && o.getAttribute('onclick').includes('true')) {
+      o.classList.add('correct');
+    }
+  });
+
+  if (isCorrect) correct++;
+
+  fb.classList.add('show');
+  if (!isCorrect) {
+    fb.innerHTML = '<span style="color:var(--red2)">✗ Incorreto.</span> ' + fb.textContent;
+  }
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = 8;
+  const done = Object.keys(answered).length;
+  document.getElementById('quizProgress').textContent = done + ' / ' + total + ' respondidas';
+  document.getElementById('progressFill').style.width = (done / total * 100) + '%';
+
+  if (done === total) {
+    const result = document.getElementById('quizResult');
+    const text = document.getElementById('resultText');
+    result.style.display = 'block';
+    const pct = Math.round(correct / total * 100);
+    let msg, color;
+    if (pct >= 87) { msg = '🏆 Excelente! Você está pronto para o SOC N1.'; color = 'var(--green)'; }
+    else if (pct >= 62) { msg = '📚 Bom progresso! Revise os módulos com mais atenção.'; color = 'var(--yellow)'; }
+    else { msg = '🔄 Continue estudando! Revise todos os módulos antes de seguir.'; color = 'var(--red2)'; }
+    text.innerHTML = `<span style="font-family:var(--font-display);font-size:32px;font-weight:800;color:${color}">${pct}%</span><br><span style="color:var(--text2)">${correct} de ${total} questões corretas</span><br><br><span style="font-size:13px;color:var(--text)">${msg}</span>`;
+    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  // Nav tab sync on load
+  document.querySelectorAll('.nav-tab')[0]?.classList.add('active');
+});
+</script>
+</body>
+</html>

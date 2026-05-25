@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Simulado SOC N1 — Red Team Leaders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090d;--bg2:#0b1018;--bg3:#0f1620;--bg4:#141e2a;
+  --card:#0d1722;--border:#192433;--border2:#223044;
+  --red:#e8304a;--red2:#ff4d68;--rd:rgba(232,48,74,.13);
+  --green:#00e5a0;--gn2:#00ffb3;--gd:rgba(0,229,160,.11);
+  --blue:#4d9fff;--bd:rgba(77,159,255,.11);
+  --yellow:#ffd166;--yd:rgba(255,209,102,.11);
+  --orange:#ff8c42;--od:rgba(255,140,66,.11);
+  --purple:#a78bfa;--pd:rgba(167,139,250,.11);
+  --text:#c3d6e8;--text2:#6a8ea8;--text3:#3a5470;
+  --glow-r:0 0 22px rgba(232,48,74,.4);
+  --glow-g:0 0 22px rgba(0,229,160,.35);
+  --glow-b:0 0 22px rgba(77,159,255,.3);
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Syne',sans-serif;--r:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,160,.007) 2px,rgba(0,229,160,.007) 4px);pointer-events:none;z-index:9999}
+
+/* ─── SCREENS ─── */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.show{display:flex}
+
+/* ════════ INTRO ════════ */
+#sIntro{align-items:center;justify-content:center;padding:40px 20px calc(40px + env(safe-area-inset-bottom));position:relative;overflow:hidden}
+.i-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(232,48,74,.07) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 85% 85%,rgba(0,229,160,.05) 0%,transparent 60%);pointer-events:none}
+.i-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.3;pointer-events:none}
+.i-inner{position:relative;z-index:1;width:100%;max-width:460px;text-align:center}
+.i-badge{display:inline-flex;align-items:center;gap:8px;background:var(--rd);border:1px solid rgba(232,48,74,.35);color:var(--red2);font-size:10px;letter-spacing:.14em;padding:5px 14px;border-radius:20px;margin-bottom:26px;text-transform:uppercase}
+.i-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--red2);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.i-logo{font-family:var(--disp);font-size:clamp(26px,8vw,38px);font-weight:800;line-height:1.05;letter-spacing:-.02em;margin-bottom:6px}
+.i-logo em{font-style:normal;color:var(--red2)}
+.i-tagline{font-size:11px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:30px}
+.i-desc{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:28px}
+.i-desc strong{color:var(--text)}
+.feat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px}
+.feat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center}
+.feat-ic{font-size:20px;margin-bottom:5px}
+.feat-lb{font-size:9px;color:var(--text2);letter-spacing:.05em;line-height:1.4;text-transform:uppercase}
+.inp-lbl{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;display:block;text-align:left}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--text);outline:none;transition:all .25s;margin-bottom:16px}
+.inp:focus{border-color:var(--green);box-shadow:var(--glow-g)}
+.inp::placeholder{color:var(--text3)}
+.btn-go{width:100%;padding:16px;background:linear-gradient(135deg,var(--red),#b81828);border:none;border-radius:10px;font-family:var(--disp);font-size:15px;font-weight:800;color:#fff;cursor:pointer;letter-spacing:.04em;transition:all .25s;box-shadow:var(--glow-r)}
+.btn-go:hover{transform:translateY(-1px)}
+.btn-go:active{transform:scale(.98)}
+.i-note{font-size:10px;color:var(--text3);margin-top:14px;line-height:1.6}
+
+/* ════════ EXAM ════════ */
+#sExam{flex-direction:column}
+.ex-hdr{position:sticky;top:0;z-index:100;background:rgba(7,9,13,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:calc(env(safe-area-inset-top) + 12px) 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ex-logo{font-family:var(--disp);font-size:13px;font-weight:700;color:var(--text2)}
+.ex-logo span{color:var(--red2)}
+.ex-chips{display:flex;gap:8px;align-items:center}
+.chip{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid;white-space:nowrap}
+.chip-q{background:var(--bg3);border-color:var(--border);color:var(--text2)}
+.chip-q b{color:var(--green)}
+.chip-s{background:var(--gd);border-color:rgba(0,229,160,.25);color:var(--green);font-family:var(--disp);font-weight:800}
+.ex-prog{height:3px;background:var(--border)}
+.ex-prog-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));transition:width .6s cubic-bezier(.4,0,.2,1)}
+.ex-body{flex:1;padding:22px 18px 110px;max-width:620px;margin:0 auto;width:100%}
+
+/* difficulty pill */
+.diff-pill{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:12px;border:1px solid;margin-bottom:14px}
+.diff-pill.easy{background:var(--gd);border-color:rgba(0,229,160,.3);color:var(--green)}
+.diff-pill.med{background:var(--yd);border-color:rgba(255,209,102,.3);color:var(--yellow)}
+.diff-pill.hard{background:var(--rd);border-color:rgba(232,48,74,.3);color:var(--red2)}
+
+/* audio card */
+.aud-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:16px 18px;margin-bottom:16px;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:14px;user-select:none}
+.aud-card:hover{border-color:var(--blue)}
+.aud-card.playing{border-color:var(--green);box-shadow:var(--glow-g)}
+.aud-btn{width:42px;height:42px;border-radius:50%;background:var(--bd);border:1px solid rgba(77,159,255,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
+.aud-card.playing .aud-btn{background:var(--gd);border-color:rgba(0,229,160,.4);animation:pring 1.6s infinite}
+@keyframes pring{0%{box-shadow:0 0 0 0 rgba(0,229,160,.45)}70%{box-shadow:0 0 0 14px rgba(0,229,160,0)}100%{box-shadow:0 0 0 0 rgba(0,229,160,0)}}
+.aud-icon{color:var(--blue);flex-shrink:0}
+.aud-card.playing .aud-icon{color:var(--green)}
+.aud-info{flex:1;min-width:0}
+.aud-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.aud-sub{font-size:10px;color:var(--text3)}
+.waveform{display:flex;align-items:center;gap:2px;height:24px;flex-shrink:0}
+.wb{width:3px;border-radius:2px;background:var(--border2);transition:all .15s}
+.aud-card.playing .wb{background:var(--green);animation:wva 1s ease-in-out infinite}
+.wb:nth-child(1){height:5px;animation-delay:0s}.wb:nth-child(2){height:14px;animation-delay:.08s}.wb:nth-child(3){height:22px;animation-delay:.16s}.wb:nth-child(4){height:18px;animation-delay:.24s}.wb:nth-child(5){height:10px;animation-delay:.32s}.wb:nth-child(6){height:20px;animation-delay:.4s}.wb:nth-child(7){height:16px;animation-delay:.48s}.wb:nth-child(8){height:8px;animation-delay:.56s}
+@keyframes wva{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.9)}}
+
+/* question */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.q-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--red)}
+.q-meta{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.q-meta-num{background:var(--rd);border:1px solid rgba(232,48,74,.3);color:var(--red2);padding:2px 8px;border-radius:4px;font-family:var(--disp);font-weight:800}
+.q-text{font-family:var(--disp);font-size:clamp(15px,4vw,18px);font-weight:600;line-height:1.45;color:var(--text)}
+
+/* hint */
+.hint{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11.5px;color:var(--text2);line-height:1.6;display:flex;gap:8px}
+.hint-ic{color:var(--yellow);flex-shrink:0}
+
+/* keywords preview */
+.kw-preview{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:var(--text3);line-height:1.6}
+.kw-preview strong{color:var(--text2);display:block;margin-bottom:5px;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.kw-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.kw-tag-prev{font-size:10px;padding:2px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3)}
+
+/* textarea */
+.ans-lbl{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.char-ct{color:var(--text3);font-size:10px}
+.ans-ta{width:100%;min-height:110px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:13px 15px;font-family:var(--mono);font-size:13px;color:var(--text);outline:none;resize:vertical;transition:all .25s;line-height:1.7;margin-bottom:14px}
+.ans-ta:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,229,160,.07)}
+.ans-ta::placeholder{color:var(--text3)}
+
+/* voice */
+.vc-row{display:flex;gap:8px;margin-bottom:8px}
+.btn-mic{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:10px;font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .25s;letter-spacing:.03em}
+.btn-mic.idle{background:var(--rd);border-color:rgba(232,48,74,.35);color:var(--red2)}
+.btn-mic.live{background:var(--red);color:#fff;border-color:var(--red);box-shadow:var(--glow-r);animation:mpulse .9s infinite alternate}
+@keyframes mpulse{from{box-shadow:var(--glow-r)}to{box-shadow:0 0 40px rgba(232,48,74,.7)}}
+.btn-clr{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:10px;padding:12px 14px;cursor:pointer;font-family:var(--mono);font-size:12px;transition:all .2s}
+.btn-clr:hover{border-color:var(--border);color:var(--text)}
+.rec-st{text-align:center;font-size:11px;color:var(--text3);margin-bottom:12px;min-height:16px}
+.rec-st.live{color:var(--red2)}
+
+/* submit */
+.btn-sub{width:100%;padding:16px;background:linear-gradient(135deg,var(--green),#00c086);border:none;border-radius:10px;font-family:var(--disp);font-size:15px;font-weight:800;color:#07090d;cursor:pointer;letter-spacing:.03em;transition:all .25s;box-shadow:var(--glow-g);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-sub:hover{transform:translateY(-1px);box-shadow:0 6px 30px rgba(0,229,160,.5)}
+.btn-sub:active{transform:scale(.98)}
+.btn-sub:disabled{background:var(--bg4);color:var(--text3);box-shadow:none;cursor:not-allowed;transform:none}
+
+/* ════════ FEEDBACK ════════ */
+#sFeedback{flex-direction:column}
+.fb-hdr{position:sticky;top:0;z-index:100;background:rgba(7,9,13,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:calc(env(safe-area-inset-top) + 12px) 18px 12px}
+.fb-hdr-row{display:flex;align-items:center;justify-content:space-between}
+.fb-hdr-lbl{font-size:12px;color:var(--text2)}
+.fb-body{flex:1;padding:22px 18px 100px;max-width:620px;margin:0 auto;width:100%}
+
+/* score reveal */
+.sc-reveal{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:24px;margin-bottom:18px;text-align:center;position:relative;overflow:hidden}
+.sc-reveal::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(0,229,160,.06),transparent);pointer-events:none}
+.sc-lbl{font-size:9px;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.sc-num{font-family:var(--disp);font-size:64px;font-weight:800;line-height:1;margin-bottom:4px}
+.sc-den{font-size:13px;color:var(--text3);margin-bottom:14px}
+.sc-bar-bg{background:var(--border);border-radius:4px;height:6px;overflow:hidden}
+.sc-bar-fg{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.verdict-pill{display:inline-block;margin-top:12px;font-size:12px;font-weight:700;padding:5px 18px;border-radius:20px;border:1px solid}
+.v-ex{background:var(--gd);border-color:rgba(0,229,160,.3);color:var(--green)}
+.v-gd{background:var(--bd);border-color:rgba(77,159,255,.3);color:var(--blue)}
+.v-ok{background:var(--yd);border-color:rgba(255,209,102,.3);color:var(--yellow)}
+.v-lw{background:var(--rd);border-color:rgba(232,48,74,.3);color:var(--red2)}
+
+/* keyword results */
+.kw-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.kw-sec-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text3)}
+.kw-sec-icon{font-size:14px}
+.kw-grid{display:flex;flex-wrap:wrap;gap:6px}
+.kw-hit{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid;display:flex;align-items:center;gap:5px;font-weight:500}
+.kw-hit.found{background:var(--gd);border-color:rgba(0,229,160,.3);color:var(--green)}
+.kw-hit.miss{background:var(--rd);border-color:rgba(232,48,74,.25);color:var(--red2)}
+.kw-hit.bonus{background:var(--bd);border-color:rgba(77,159,255,.3);color:var(--blue)}
+
+/* model answer */
+.model-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+.model-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.mc-blue::before{background:var(--blue)}
+.mc-green::before{background:var(--green)}
+.mc-yellow::before{background:var(--yellow)}
+.mc-orange::before{background:var(--orange)}
+.mc-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.mc-text{font-size:13px;color:var(--text2);line-height:1.75}
+.mc-text strong{color:var(--text)}
+.btn-speak{display:inline-flex;align-items:center;gap:6px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--text2);cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-speak:hover{border-color:var(--green);color:var(--green)}
+
+/* next btn */
+.btn-next{width:100%;padding:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;font-family:var(--disp);font-size:14px;font-weight:700;color:var(--text);cursor:pointer;letter-spacing:.03em;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.btn-next:hover{border-color:var(--green);color:var(--green);box-shadow:var(--glow-g)}
+
+/* ════════ REPORT ════════ */
+#sReport{flex-direction:column;overflow-y:auto}
+.rp-hdr{border-bottom:1px solid var(--border);padding:calc(env(safe-area-inset-top) + 24px) 20px 24px;text-align:center;background:var(--bg2);position:relative;overflow:hidden}
+.rp-hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 50% 0%,rgba(0,229,160,.07),transparent);pointer-events:none}
+.rp-seal{width:80px;height:80px;border-radius:50%;border:2px solid var(--green);background:var(--gd);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;position:relative;z-index:1;box-shadow:var(--glow-g)}
+.rp-title{font-family:var(--disp);font-size:clamp(20px,5vw,26px);font-weight:800;letter-spacing:-.02em;margin-bottom:4px;position:relative;z-index:1}
+.rp-sub{font-size:12px;color:var(--text2);position:relative;z-index:1}
+.rp-body{flex:1;padding:22px 18px 80px;max-width:620px;margin:0 auto;width:100%}
+
+/* stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.stat-c{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center}
+.stat-v{font-family:var(--disp);font-size:26px;font-weight:800;line-height:1;margin-bottom:3px}
+.stat-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+
+/* question list */
+.q-list{margin-bottom:22px}
+.ql-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ql-item:last-child{border-bottom:none}
+.ql-num{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:12px;font-weight:800;flex-shrink:0}
+.ql-num.hi{background:var(--gd);color:var(--green)}
+.ql-num.md{background:var(--yd);color:var(--yellow)}
+.ql-num.lo{background:var(--rd);color:var(--red2)}
+.ql-info{flex:1;min-width:0}
+.ql-cat{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.ql-q{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ql-sc{font-family:var(--disp);font-size:14px;font-weight:800;flex-shrink:0}
+.ql-sc.hi{color:var(--green)}.ql-sc.md{color:var(--yellow)}.ql-sc.lo{color:var(--red2)}
+
+/* strengths/weaknesses */
+.sw-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.sw-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sw-list{list-style:none}
+.sw-list li{font-size:12.5px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;line-height:1.5}
+.sw-list li:last-child{border-bottom:none}
+.sw-ic{flex-shrink:0;margin-top:1px}
+
+.btn-restart{width:100%;padding:16px;background:linear-gradient(135deg,var(--red),#b81828);border:none;border-radius:10px;font-family:var(--disp);font-size:15px;font-weight:800;color:#fff;cursor:pointer;letter-spacing:.03em;transition:all .25s;box-shadow:var(--glow-r);margin-top:8px}
+.btn-restart:hover{transform:translateY(-1px)}
+
+/* animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .38s ease both}
+.fu1{animation-delay:.07s}.fu2{animation-delay:.14s}.fu3{animation-delay:.21s}.fu4{animation-delay:.28s}.fu5{animation-delay:.35s}
+
+@media(min-width:640px){.feat-row{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- ════════ INTRO ════════ -->
+<div class="screen show" id="sIntro">
+  <div class="i-bg"></div><div class="i-grid"></div>
+  <div class="i-inner">
+    <div class="i-badge"><span class="i-badge-dot"></span>Simulado de Entrevista SOC N1</div>
+    <div class="i-logo fu">Red Team<br><em>Leaders</em></div>
+    <div class="i-tagline fu fu1">30 Questões · Do básico ao avançado</div>
+    <p class="i-desc fu fu2">
+      Simule uma <strong>entrevista técnica de Analista SOC N1</strong>. Cada questão é avaliada por correspondência de conceitos-chave. Você vê exatamente o que acertou, o que faltou e a resposta modelo com narração em áudio.
+    </p>
+    <div class="feat-row fu fu3">
+      <div class="feat"><div class="feat-ic">🔊</div><div class="feat-lb">Narração<br>em voz</div></div>
+      <div class="feat"><div class="feat-ic">🎤</div><div class="feat-lb">Voz ou<br>texto</div></div>
+      <div class="feat"><div class="feat-ic">🔍</div><div class="feat-lb">Match de<br>conceitos</div></div>
+      <div class="feat"><div class="feat-ic">📊</div><div class="feat-lb">Relatório<br>final</div></div>
+    </div>
+    <label class="inp-lbl" for="sName">Seu nome</label>
+    <input class="inp fu fu4" type="text" id="sName" placeholder="Ex: João Silva" autocomplete="name" maxlength="50">
+    <button class="btn-go fu fu5" onclick="startExam()">Iniciar Simulado →</button>
+    <p class="i-note fu fu5">Funciona 100% offline · Sem API externa · 30 questões de entrevista SOC N1</p>
+  </div>
+</div>
+
+<!-- ════════ EXAM ════════ -->
+<div class="screen" id="sExam">
+  <header class="ex-hdr">
+    <div class="ex-logo">Red Team <span>Leaders</span></div>
+    <div class="ex-chips">
+      <div class="chip chip-q">Q<b id="qNum">1</b>/30</div>
+      <div class="chip chip-s" id="runScore">0.0 pts</div>
+    </div>
+  </header>
+  <div class="ex-prog"><div class="ex-prog-fill" id="exProg" style="width:0%"></div></div>
+  <div class="ex-body" id="exBody"></div>
+</div>
+
+<!-- ════════ FEEDBACK ════════ -->
+<div class="screen" id="sFeedback">
+  <header class="fb-hdr">
+    <div class="fb-hdr-row">
+      <div class="fb-hdr-lbl">Questão <span id="fbQN">1</span> de 30 — Feedback</div>
+      <div class="chip chip-s" id="fbScore">—</div>
+    </div>
+  </header>
+  <div class="fb-body" id="fbBody"></div>
+</div>
+
+<!-- ════════ REPORT ════════ -->
+<div class="screen" id="sReport">
+  <div class="rp-hdr">
+    <div class="rp-seal" id="rpSeal">🏆</div>
+    <div class="rp-title" id="rpTitle">Relatório Final</div>
+    <div class="rp-sub" id="rpSub">Simulado concluído</div>
+  </div>
+  <div class="rp-body" id="rpBody"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// QUESTION BANK — 30 SOC N1 Interview Questions
+// Each has: required[] = must cover X of Y, bonus[] = extra pts
+// ══════════════════════════════════════════════════════════════
+const Q = [
+  // ─── FÁCEIS ───
+  {
+    id:1, cat:"Redes Básicas", diff:"easy",
+    narration:"Primeira questão. Conceito básico e fundamental. Responda de forma clara.",
+    question:"O que é um Firewall e qual é sua função principal em uma rede corporativa?",
+    hint:"Pense em filtros de tráfego, regras, entrada e saída.",
+    required:[
+      {label:"filtrar tráfego / controle de tráfego",rx:/filtr|controla|bloqu|permit|tráfego|trafico/i},
+      {label:"regras / políticas",rx:/regr|polít|política|polic|rule/i},
+      {label:"entrada e saída / bidirecional",rx:/entrada|saída|saida|inbound|outbound|bidirec/i},
+      {label:"proteger a rede",rx:/protect|proteg|segment|isol/i},
+    ],
+    bonus:[
+      {label:"stateful / stateless",rx:/stateful|stateless/i},
+      {label:"camada 3 ou 4",rx:/camada [34]|layer [34]|rede|transporte/i},
+      {label:"Next-Gen / NGFW",rx:/ngfw|next.gen|prox.gen/i},
+    ],
+    model:"Um <strong>firewall</strong> é um dispositivo ou software que <strong>filtra o tráfego de rede</strong> com base em <strong>regras e políticas definidas</strong>, controlando o que entra e sai da rede. Seu objetivo é <strong>proteger a rede interna</strong> de acessos não autorizados. Firewalls modernos (NGFW) operam até a camada 7, inspecionando o conteúdo dos pacotes.",
+    soc:"No SOC, os logs do firewall são fonte primária de alertas. Conexões bloqueadas em alta frequência para o mesmo destino podem indicar C2 beaconing ou scan externo."
+  },
+  {
+    id:2, cat:"Protocolos", diff:"easy",
+    narration:"Segunda questão. Um protocolo que você vai usar todo dia como analista SOC.",
+    question:"O que é SSH (Secure Shell)? Para que serve e como ele é diferente do Telnet?",
+    hint:"Pense em acesso remoto, criptografia e autenticação.",
+    required:[
+      {label:"acesso remoto / shell remoto",rx:/acesso remoto|shell remoto|remote|administr/i},
+      {label:"criptografia / cifrado",rx:/criptograf|cifr|encript|encrypt|segur/i},
+      {label:"porta 22",rx:/porta 22|port 22|:22/i},
+      {label:"Telnet sem criptografia / plaintext",rx:/telnet.*sem|plaintext|texto claro|text.plain|não.cifr|nao.cifr/i},
+    ],
+    bonus:[
+      {label:"autenticação por chave",rx:/chave|key|RSA|ed25519|public.key/i},
+      {label:"túnel / port forwarding",rx:/tunel|túnel|tunnel|port.forward/i},
+    ],
+    model:"<strong>SSH (Secure Shell)</strong> é um protocolo de <strong>acesso remoto seguro</strong> que usa <strong>criptografia</strong> para proteger toda a comunicação. Opera na <strong>porta 22</strong>. Diferente do Telnet, que transmite dados em <strong>texto claro (plaintext)</strong>, o SSH criptografa toda sessão, incluindo credenciais. Suporta autenticação por senha ou <strong>chave pública/privada</strong>.",
+    soc:"No SOC, tentativas de brute force em SSH são dos alertas mais comuns. Múltiplos 'Failed password' no auth.log em curto intervalo = ataque em andamento. Monitore também logins SSH fora do horário comercial."
+  },
+  {
+    id:3, cat:"Redes Básicas", diff:"easy",
+    narration:"Terceira questão. Fundamental para entender qualquer análise de tráfego de rede.",
+    question:"Qual a diferença entre endereço IP e endereço MAC? Para que serve cada um?",
+    hint:"Pense em camadas diferentes do modelo OSI e seus escopos.",
+    required:[
+      {label:"IP = identificação lógica / camada 3",rx:/lógic|logic|camada 3|layer 3|roteament|roteavel|routable/i},
+      {label:"MAC = endereço físico / hardware",rx:/físic|fisic|hardware|placa|NIC|camada 2|layer 2/i},
+      {label:"IP pode mudar / dinâmico",rx:/muda|dinâm|dinami|DHCP|mutable/i},
+      {label:"MAC é único por fabricante / fixo",rx:/único|unico|fixo|fabricant|OUI|manufacturer|burned/i},
+    ],
+    bonus:[
+      {label:"48 bits (MAC) / 32 bits (IPv4)",rx:/48 bits|32 bits|6 bytes|4 bytes/i},
+      {label:"ARP faz a relação entre eles",rx:/ARP|Address Resolution/i},
+    ],
+    model:"O <strong>endereço IP</strong> é uma identificação <strong>lógica</strong> (camada 3), pode ser dinâmico (via DHCP) e é usado para roteamento entre redes. O <strong>endereço MAC</strong> é um identificador <strong>físico</strong> (camada 2), gravado na placa de rede, único por fabricante. O protocolo <strong>ARP</strong> faz a tradução entre IP e MAC dentro de uma mesma rede local.",
+    soc:"No SOC, o MAC é útil para rastrear dispositivos físicos na LAN. ARP Poisoning falsifica respostas ARP associando o MAC do atacante ao IP do gateway — um ataque clássico de Man-in-the-Middle."
+  },
+  {
+    id:4, cat:"Protocolos", diff:"easy",
+    narration:"Quarta questão. Dois protocolos de transporte que você vai ver em todo tipo de análise.",
+    question:"Qual a diferença entre TCP e UDP? Dê um exemplo de protocolo que usa cada um.",
+    hint:"Pense em confiabilidade, handshake, velocidade e casos de uso.",
+    required:[
+      {label:"TCP = confiável / orientado a conexão",rx:/confiáv|confiav|reliable|conexão|conex|connection.oriented|handshake/i},
+      {label:"UDP = sem conexão / mais rápido",rx:/sem conexão|sem conex|connectionless|mais rápid|mais rapid|veloz/i},
+      {label:"TCP = HTTP/HTTPS/SSH ou similar",rx:/HTTP|HTTPS|SSH|FTP|SMTP|TCP.*exemplo|exemplo.*TCP/i},
+      {label:"UDP = DNS/streaming/VoIP ou similar",rx:/DNS|VoIP|streaming|video|UDP.*exemplo|exemplo.*UDP|jogos|games/i},
+    ],
+    bonus:[
+      {label:"retransmissão de pacotes perdidos",rx:/retransm|lost packet|perda|reenvio/i},
+      {label:"Three-Way Handshake",rx:/three.way|handshake|SYN/i},
+    ],
+    model:"<strong>TCP</strong> é um protocolo <strong>orientado a conexão e confiável</strong>: usa o Three-Way Handshake (SYN, SYN-ACK, ACK) e retransmite pacotes perdidos. Exemplos: HTTP, HTTPS, SSH, SMTP. <strong>UDP</strong> é <strong>sem conexão</strong>, mais rápido, mas não garante entrega. Exemplos: DNS, streaming de vídeo, VoIP, jogos online.",
+    soc:"UDP é difícil de rastrear pois não mantém estado. Ataques de amplificação DDoS usam UDP (ex: DNS amplification). SYN Flood abusa do TCP deixando conexões half-open para esgotar recursos do servidor."
+  },
+  {
+    id:5, cat:"Protocolos", diff:"easy",
+    narration:"Quinta questão. Um dos protocolos mais monitorados em qualquer SOC moderno.",
+    question:"O que é DNS (Domain Name System)? Como ele funciona e por que é importante para a segurança?",
+    hint:"Pense na tradução de nomes para IPs e nos tipos de ataque relacionados.",
+    required:[
+      {label:"tradução de nome para IP",rx:/traduz|resolver|resolve|nome.*IP|IP.*nome|hostname|domain.*IP/i},
+      {label:"hierarquia / servidores",rx:/hierarqu|servidor|nameserver|recursiv|autoritativ|resolver/i},
+      {label:"porta 53",rx:/porta 53|port 53|:53/i},
+      {label:"importância para segurança",rx:/seguranç|security|attack|ataque|malware|C2|monitor/i},
+    ],
+    bonus:[
+      {label:"DNS Tunneling / exfiltração",rx:/tunnel|tunel|exfiltrac|exfiltração/i},
+      {label:"tipos de registro A, MX, CNAME",rx:/registro|record|tipo A|AAAA|MX|CNAME|PTR/i},
+    ],
+    model:"<strong>DNS</strong> traduz <strong>nomes de domínio em endereços IP</strong>. Funciona hierarquicamente: cliente pergunta ao resolver local, que consulta servidores raiz → TLD → servidor autoritativo. Opera na <strong>porta 53</strong> (UDP/TCP). Para segurança, é crítico pois <strong>malwares usam DNS para C2 (command & control)</strong> e para exfiltração via DNS Tunneling.",
+    soc:"DNS é dos logs mais valiosos no SOC. Queries para domínios com nomes randômicos longos (DGA), alto volume para um único domínio, ou respostas com TTL muito baixo são red flags de comprometimento."
+  },
+  {
+    id:6, cat:"Segurança", diff:"easy",
+    narration:"Sexta questão. Um dos vetores de ataque mais usados por cibercriminosos no mundo todo.",
+    question:"O que é phishing? Quais são os principais tipos e como um analista SOC identifica uma campanha de phishing?",
+    hint:"Pense em engenharia social, email malicioso e indicadores.",
+    required:[
+      {label:"engenharia social / manipulação",rx:/engenharia social|social engineering|manipul|engan/i},
+      {label:"email malicioso / link falso",rx:/email|e-mail|link|URL|falso|fraudulent/i},
+      {label:"spear phishing / whaling",rx:/spear|whaling|vishing|smishing|variante|tipo/i},
+      {label:"como identificar / indicadores",rx:/identific|detectar|indicador|IOC|domínio|domain|header/i},
+    ],
+    bonus:[
+      {label:"MX / SPF / DKIM / DMARC",rx:/SPF|DKIM|DMARC|MX record/i},
+      {label:"comprometimento de credenciais",rx:/credential|credencial|senha|password|harvest/i},
+    ],
+    model:"<strong>Phishing</strong> é um ataque de <strong>engenharia social</strong> onde o atacante se passa por entidade legítima via <strong>e-mail</strong>, SMS ou voz para roubar credenciais ou instalar malware. Tipos: <strong>Spear Phishing</strong> (alvo específico), <strong>Whaling</strong> (alvo executivos), <strong>Vishing</strong> (voz), <strong>Smishing</strong> (SMS). SOC identifica analisando headers de email, domínios similares (typosquatting), SPF/DKIM/DMARC inválidos e URLs redirecionadas.",
+    soc:"Campanhas de phishing geram alertas de gateway de email (ex: Microsoft 365 Defender, Proofpoint). No SIEM, correlacione: email suspeito recebido → acesso à URL do email → autenticação com novo IP → exfiltração. Essa sequência é um TTPs clássico de Initial Access."
+  },
+  {
+    id:7, cat:"Malware", diff:"easy",
+    narration:"Sétima questão. Conhecimento essencial sobre ameaças que chegam diariamente ao SOC.",
+    question:"O que é malware? Explique os principais tipos: vírus, trojan, ransomware e spyware.",
+    hint:"Pense nas características de cada tipo e no comportamento.",
+    required:[
+      {label:"software malicioso",rx:/software malicioso|malicious|código malicioso|programa malicioso/i},
+      {label:"vírus = se replica / infecta",rx:/vírus|virus|replica|infect|propag/i},
+      {label:"trojan = disfarçado de legítimo",rx:/trojan|cavalo de troia|disfarç|legitim|backdoor/i},
+      {label:"ransomware = criptografa / sequestra",rx:/ransomware|criptograf|sequestra|encrypt|resgate|ransom/i},
+    ],
+    bonus:[
+      {label:"spyware / keylogger",rx:/spyware|keylogger|espion|monitorar|dados/i},
+      {label:"worm = se propaga sozinho",rx:/worm|propaga.*sozinho|auto.propag|sem interação/i},
+    ],
+    model:"<strong>Malware</strong> é qualquer software malicioso. Principais tipos: <strong>Vírus</strong> — se replica anexando-se a arquivos legítimos; <strong>Trojan</strong> — disfarçado de software legítimo, abre backdoor; <strong>Ransomware</strong> — criptografa arquivos e exige resgate; <strong>Spyware</strong> — monitora silenciosamente (keylogger, screenshots); <strong>Worm</strong> — se propaga automaticamente pela rede sem interação humana.",
+    soc:"EDR (Endpoint Detection & Response) é a principal ferramenta do SOC para detectar malware em endpoints. Alertas de 'unknown process spawning cmd.exe', 'script execution policy bypass' ou 'mass file encryption' são sinais críticos de malware ativo."
+  },
+  {
+    id:8, cat:"Fundamentos SOC", diff:"easy",
+    narration:"Oitava questão. Você precisa saber explicar sua própria área de atuação.",
+    question:"O que é um SOC (Security Operations Center) e quais são as principais responsabilidades de um analista SOC N1?",
+    hint:"Pense no que o SOC faz no dia a dia: monitoramento, triagem, resposta.",
+    required:[
+      {label:"monitoramento 24x7",rx:/monitor|24.7|contínuo|continuo|24 horas/i},
+      {label:"detectar / alertas / incidentes",rx:/detect|alert|incidente|evento|event/i},
+      {label:"triagem / classificar alertas",rx:/triagem|triage|classific|prioriza|analisa/i},
+      {label:"resposta a incidentes / escalar",rx:/resposta|response|escalar|escalon|investigar/i},
+    ],
+    bonus:[
+      {label:"SIEM como ferramenta central",rx:/SIEM|Splunk|Elastic|QRadar/i},
+      {label:"N1 = first responder / linha de frente",rx:/N1|primeiro.*nível|first.line|front.line|tier 1/i},
+    ],
+    model:"O <strong>SOC</strong> é o time responsável por <strong>monitorar a segurança 24x7</strong>. Um analista <strong>N1</strong> é o first responder: recebe alertas do SIEM, faz a <strong>triagem e classificação</strong> (falso positivo ou incidente real?), documenta e <strong>escala</strong> para N2/N3 quando necessário. Também monitora endpoints via EDR e tráfego via IDS/IPS. O SIEM (Splunk, Elastic, QRadar) é a ferramenta central.",
+    soc:"A diferença entre N1 e N2: N1 faz triagem e resposta inicial. N2 investiga a fundo, correlaciona TTPs e caça ameaças (threat hunting). N3 responde a incidentes críticos e realiza forensics. A escalada correta é tão importante quanto a detecção."
+  },
+  {
+    id:9, cat:"Ferramentas SOC", diff:"easy",
+    narration:"Nona questão. Uma ferramenta que você vai usar todo dia no SOC.",
+    question:"O que é um SIEM (Security Information and Event Management)? Quais são suas principais funções?",
+    hint:"Pense em coleta de logs, correlação, alertas e compliance.",
+    required:[
+      {label:"coleta / centraliza logs",rx:/coleta|central|agrega|collect|log|evento/i},
+      {label:"correlação de eventos",rx:/correlac|correlat|cruzament|regra|rule/i},
+      {label:"geração de alertas",rx:/alert|alarme|notific|detecta/i},
+      {label:"exemplos: Splunk, Elastic, QRadar",rx:/Splunk|Elastic|QRadar|Sentinel|ArcSight|LogRhythm|exemplo/i},
+    ],
+    bonus:[
+      {label:"compliance / auditoria",rx:/compli|audit|LGPD|PCI|ISO|regulat/i},
+      {label:"retenção de logs / histórico",rx:/retenc|retenção|histórico|historico|armazen|storage/i},
+    ],
+    model:"<strong>SIEM</strong> é a plataforma central do SOC. Suas funções: <strong>coletar e centralizar logs</strong> de múltiplas fontes (firewalls, endpoints, servidores), fazer <strong>correlação de eventos</strong> com regras para gerar <strong>alertas</strong> de ameaças, e armazenar histórico para <strong>auditoria e compliance</strong>. Exemplos: <strong>Splunk, IBM QRadar, Elastic SIEM, Microsoft Sentinel, ArcSight</strong>.",
+    soc:"Saber escrever queries no SIEM é fundamental. No Splunk: 'index=windows EventCode=4625 | stats count by src_ip | sort -count' — lista IPs com mais falhas de autenticação. Aprenda SPL (Splunk), KQL (Microsoft) ou Lucene (Elastic) conforme o SIEM do cliente."
+  },
+  {
+    id:10, cat:"Segurança", diff:"easy",
+    narration:"Décima questão. Conceito básico mas que muita gente confunde em entrevistas.",
+    question:"Qual a diferença entre autenticação e autorização? Por que as duas são importantes para segurança?",
+    hint:"Pense em 'quem é você' versus 'o que você pode fazer'.",
+    required:[
+      {label:"autenticação = verificar identidade / quem é",rx:/identidade|identity|quem é|autenticar|credencial|verificar.*quem|quem.*você/i},
+      {label:"autorização = permissões / o que pode fazer",rx:/permissão|permissao|permission|autorizar|acesso.*recurso|privilégio|privilegio|o que pode/i},
+      {label:"diferença entre os dois",rx:/diferença|diferente|distinção|enquanto|já a|primeiro.*segundo/i},
+      {label:"importância / segurança",rx:/import|seguranç|security|controle de acesso|access control/i},
+    ],
+    bonus:[
+      {label:"MFA / 2FA",rx:/MFA|2FA|multifator|multi.factor|segundo fator/i},
+      {label:"Princípio do mínimo privilégio",rx:/mínimo privilégio|least privilege|menor privilégio/i},
+    ],
+    model:"<strong>Autenticação</strong> verifica <strong>quem você é</strong> (login + senha, MFA, biometria). <strong>Autorização</strong> define <strong>o que você pode fazer</strong> após autenticado (permissões, roles, ACLs). Exemplo: você se autentica no sistema (autenticação), mas só pode ver relatórios, não editar configurações (autorização). O <strong>princípio do mínimo privilégio</strong> aplica autorização mínima necessária para cada usuário.",
+    soc:"Alertas de autorização são críticos: um usuário autenticado acessando recursos fora do seu perfil habitual (ex: analista de RH acessando servidor de banco de dados) é sinal de comprometimento ou ameaça interna (insider threat)."
+  },
+
+  // ─── MÉDIAS ───
+  {
+    id:11, cat:"Ferramentas SOC", diff:"med",
+    narration:"Décima primeira questão. Nível médio. Uma ferramenta que protege os endpoints e gera muitos dos alertas que chegam ao SOC.",
+    question:"O que é EDR (Endpoint Detection and Response)? Como ele difere de um antivírus tradicional?",
+    hint:"Pense em detecção comportamental, telemetria e resposta ativa.",
+    required:[
+      {label:"monitoramento de endpoint em tempo real",rx:/endpoint|monit.*real|real.time|contínuo/i},
+      {label:"detecção comportamental / heurística",rx:/comportament|behavior|heurística|heuristica|anômalo|anomal/i},
+      {label:"antivírus usa assinaturas / EDR usa comportamento",rx:/assinatura|signature|difere|diferença|antivírus.*EDR|EDR.*antivírus/i},
+      {label:"resposta / isolamento / remediação",rx:/resposta|response|isola|remedia|quarenten|containment/i},
+    ],
+    bonus:[
+      {label:"telemetria / visibilidade",rx:/telemetria|telemetry|visibilidade|visibility|forensic/i},
+      {label:"exemplos: CrowdStrike, SentinelOne",rx:/CrowdStrike|SentinelOne|Defender|Carbon.Black|Cortex|exemplo/i},
+    ],
+    model:"<strong>EDR</strong> monitora endpoints continuamente, coletando <strong>telemetria</strong> sobre processos, conexões e arquivos. Diferente do antivírus tradicional (baseado em <strong>assinaturas</strong> de arquivos maliciosos conhecidos), o EDR usa <strong>detecção comportamental</strong>: identifica ações suspeitas mesmo de malwares desconhecidos. Oferece <strong>resposta ativa</strong>: isolar endpoint, matar processo, coletar evidências. Exemplos: CrowdStrike Falcon, SentinelOne, Microsoft Defender for Endpoint.",
+    soc:"EDR é o 'olho' do SOC no endpoint. Alertas importantes: process injection, LSASS access (credential dumping), PowerShell obfuscado, living-off-the-land (uso de ferramentas legítimas para fins maliciosos como certutil, regsvr32, mshta)."
+  },
+  {
+    id:12, cat:"Redes", diff:"med",
+    narration:"Décima segunda questão. Segurança de redes avançada, conceito muito cobrado em entrevistas SOC.",
+    question:"O que é VPN (Virtual Private Network)? Como ela funciona e quais os riscos de segurança associados?",
+    hint:"Pense em túnel criptografado, autenticação e ameaças como credential stuffing.",
+    required:[
+      {label:"túnel criptografado",rx:/tunel|túnel|tunnel|criptograf|encrypt/i},
+      {label:"acesso remoto seguro",rx:/acesso remoto|remote access|seguro|privado|private/i},
+      {label:"protocolos: OpenVPN, IPSec, WireGuard",rx:/OpenVPN|IPSec|WireGuard|L2TP|SSL VPN|protocolo/i},
+      {label:"riscos: credential stuffing, brute force",rx:/risco|credential|brute.force|ataque|comprometimento|vulnerabilidade/i},
+    ],
+    bonus:[
+      {label:"split tunneling",rx:/split.tunneling|split tunnel/i},
+      {label:"MFA na VPN",rx:/MFA|2FA|multifator|segundo fator/i},
+    ],
+    model:"<strong>VPN</strong> cria um <strong>túnel criptografado</strong> entre cliente e servidor, permitindo <strong>acesso remoto seguro</strong> à rede corporativa. Protocolos comuns: <strong>OpenVPN, IPSec/IKEv2, WireGuard, SSL VPN</strong>. Riscos: VPNs são alvos frequentes de <strong>brute force e credential stuffing</strong>; credenciais vazadas permitem acesso total à rede interna. CVEs em VPNs (Pulse Secure, Fortinet, Cisco) são explorados ativamente.",
+    soc:"VPN logs são essenciais: monitore logins de IPs geograficamente impossíveis (ex: usuário em SP, login de VPN 2min depois em Rússia), horários incomuns e novos devices. Muitos ransomwares entram via VPN comprometida."
+  },
+  {
+    id:13, cat:"Ameaças", diff:"med",
+    narration:"Décima terceira questão. Um dos ataques mais comuns e devastadores do mundo corporativo.",
+    question:"O que é um ataque de ransomware? Descreva o ciclo de ataque (kill chain) e como o SOC deve responder.",
+    hint:"Pense nas fases: acesso inicial, persistência, movimento lateral, criptografia, resgate.",
+    required:[
+      {label:"criptografa arquivos / exige resgate",rx:/criptograf|encrypt|resgate|ransom|sequestra/i},
+      {label:"vetor de entrada: phishing ou VPN",rx:/phishing|VPN|RDP|acesso inicial|initial access|entrada/i},
+      {label:"movimento lateral antes da criptografia",rx:/lateral|movimento|spread|propaga|segmento/i},
+      {label:"resposta: isolar, preservar evidências",rx:/isolar|isolamento|containment|evidência|evidencia|backups|resposta/i},
+    ],
+    bonus:[
+      {label:"double extortion",rx:/double.extortion|dupla extorsão|exfiltração.*antes|vaza dados/i},
+      {label:"backups offline",rx:/backup|offline.backup|imutável|immutable/i},
+    ],
+    model:"<strong>Ransomware</strong> criptografa dados e exige resgate. Kill chain: <strong>1)</strong> Acesso inicial (phishing, VPN, RDP expostos) → <strong>2)</strong> Persistência (malware no sistema) → <strong>3)</strong> Reconhecimento interno → <strong>4)</strong> Movimento lateral para maximizar alcance → <strong>5)</strong> Exfiltração de dados (double extortion) → <strong>6)</strong> Criptografia em massa. Resposta SOC: <strong>isolar endpoints</strong> imediatamente, preservar evidências, ativar runbook de IR, validar backups offline.",
+    soc:"Indicadores precoces de ransomware: mass file rename/delete, acesso a shadow copies, criação de tarefas agendadas suspeitas, uso de tools legítimas (vssadmin, wbadmin, bcdedit). Detecte ANTES da criptografia — depois é tarde."
+  },
+  {
+    id:14, cat:"Redes", diff:"med",
+    narration:"Décima quarta questão. Entendimento de segmentação de rede, crucial para limitar impacto de ataques.",
+    question:"O que é uma VLAN (Virtual LAN)? Como ela contribui para a segurança de redes corporativas?",
+    hint:"Pense em segmentação lógica, isolamento de departamentos e controle de tráfego.",
+    required:[
+      {label:"segmentação lógica de rede",rx:/segment|lógic|logic|virtual|isolamento/i},
+      {label:"separa departamentos / tráfego",rx:/departament|separ|isolamento|tráfego|trafico/i},
+      {label:"reduz superfície de ataque / blast radius",rx:/superfície|superficie|blast.radius|contém|limita|reduz/i},
+      {label:"tráfego inter-VLAN precisa de roteador/firewall",rx:/inter.VLAN|roteador|firewall|camada 3|layer 3/i},
+    ],
+    bonus:[
+      {label:"VLAN de DMZ / servidores públicos",rx:/DMZ|servidor público|public.server/i},
+      {label:"VLAN hopping attack",rx:/VLAN hopping|trunk|802\.1q/i},
+    ],
+    model:"<strong>VLAN</strong> é uma <strong>segmentação lógica</strong> dentro da rede física: RH, TI, servidores, guests ficam em VLANs separadas mesmo usando o mesmo switch. Benefícios: <strong>isolamento de tráfego</strong> (RH não acessa servidor de banco), <strong>redução do blast radius</strong> (comprometimento de um segmento não compromete todos), e controle granular. Tráfego entre VLANs passa obrigatoriamente por roteador/firewall (onde há regras).",
+    soc:"Sem VLANs, um atacante comprometendo um PC de recepção pode fazer lateral movement para servidores críticos. Com VLANs bem configuradas, o firewall bloqueia e o SOC vê o alerta de tentativa de acesso inter-segmento."
+  },
+  {
+    id:15, cat:"Vulnerabilidades", diff:"med",
+    narration:"Décima quinta questão. Conhecimento sobre vulnerabilidades web, muito frequente em ambientes corporativos.",
+    question:"O que é SQL Injection? Como funciona o ataque e como o SOC pode detectar tentativas?",
+    hint:"Pense em input malicioso em campos de formulário, queries SQL e logs de WAF/aplicação.",
+    required:[
+      {label:"inserção de código SQL malicioso",rx:/SQL.*malicioso|inserção|inject|input.*SQL|código.*SQL/i},
+      {label:"manipula a query do banco de dados",rx:/manipul|query|banco.*dado|database|consulta/i},
+      {label:"pode vazar dados / autenticar sem senha",rx:/vazar|exfiltrar|bypass.*autent|sem senha|dump|dados/i},
+      {label:"detectar via WAF / logs de aplicação",rx:/WAF|log.*aplicação|detectar|anomal|assinatura|pattern/i},
+    ],
+    bonus:[
+      {label:"blind SQL injection",rx:/blind|cego|boolean|time.based/i},
+      {label:"prepared statements / parametrização",rx:/prepared.statement|parametriz|bind.param|mitigação/i},
+    ],
+    model:"<strong>SQL Injection</strong> insere <strong>código SQL malicioso</strong> em campos de input de aplicações vulneráveis. A aplicação executa o SQL manipulado no banco de dados, podendo <strong>vazar dados, deletar tabelas ou bypassar autenticação</strong> (ex: ' OR '1'='1). Detecção no SOC: alertas de <strong>WAF</strong> (regras OWASP), análise de logs de aplicação buscando caracteres suspeitos (', --, ;, UNION SELECT), e padrões de resposta anômalos.",
+    soc:"SQLi geralmente aparece em logs do WAF com código 403 ou em logs da aplicação. Correlacione: muitas requisições para um endpoint com parâmetros suspeitos em curto período = possível SQL Injection automatizado (sqlmap, etc.)."
+  },
+  {
+    id:16, cat:"Vulnerabilidades", diff:"med",
+    narration:"Décima sexta questão. Terminologia de vulnerabilidades que você vai usar todo dia.",
+    question:"O que é um CVE? O que é CVSS e como o analista SOC usa essas informações para priorizar riscos?",
+    hint:"Pense em identificação padronizada de vulnerabilidades e pontuação de criticidade.",
+    required:[
+      {label:"CVE = identificador único de vulnerabilidade",rx:/identificador|CVE-\d|Common Vulnerability|único.*vulnerabilidade/i},
+      {label:"CVSS = pontuação de criticidade / 0 a 10",rx:/CVSS|pontuação|score|0.*10|criticidade|severidade/i},
+      {label:"Critical/High/Medium/Low",rx:/critical|crítico|high|alto|medium|médio|low|baixo|severity/i},
+      {label:"priorização de patches / resposta",rx:/prioriza|patch|atualização|update|remediar|remediac|resposta/i},
+    ],
+    bonus:[
+      {label:"NVD / NIST como repositório",rx:/NVD|NIST|National Vulnerability|banco de dados/i},
+      {label:"CVSS v3 considera exploitability",rx:/exploitability|attackVector|scope|CVSS v3/i},
+    ],
+    model:"<strong>CVE</strong> (Common Vulnerabilities and Exposures) é um <strong>identificador único</strong> para vulnerabilidades (ex: CVE-2021-44228 = Log4Shell). <strong>CVSS</strong> é uma pontuação de <strong>0 a 10</strong> que mede criticidade (fatores: vetor de ataque, complexidade, impacto). Pontuação ≥9 = Critical. O SOC usa CVSS para <strong>priorizar quais vulnerabilidades patchear primeiro</strong> — um CVSS 9.8 explorado ativamente tem prioridade máxima.",
+    soc:"Combine CVSS com contexto: um CVSS 9.8 num servidor não exposto à internet pode ser menos urgente que um CVSS 7.5 em servidor público com exploit público disponível. Use EPSS (Exploit Prediction Scoring System) para saber a probabilidade de exploração ativa."
+  },
+  {
+    id:17, cat:"Segurança", diff:"med",
+    narration:"Décima sétima questão. Conceito essencial de criptografia que aparece em TLS, SSH, VPN e mais.",
+    question:"Qual a diferença entre criptografia simétrica e assimétrica? Dê exemplos de algoritmos e onde cada uma é usada.",
+    hint:"Pense em número de chaves, velocidade e casos de uso.",
+    required:[
+      {label:"simétrica = uma chave para cifrar e decifrar",rx:/uma chave|mesma chave|simétric|symmetric|compartilhada/i},
+      {label:"assimétrica = par de chaves pública/privada",rx:/par de chave|pública.*privada|privada.*pública|asymmetr|assimétric/i},
+      {label:"simétrica é mais rápida",rx:/rápida|rapida|faster|performatic|eficiente/i},
+      {label:"exemplos: AES (simétrico), RSA (assimétrico)",rx:/AES|DES|3DES|RSA|ECC|ed25519|ChaCha|exemplo/i},
+    ],
+    bonus:[
+      {label:"TLS usa os dois (híbrido)",rx:/TLS|SSL|híbrido|hybrid|HTTPS/i},
+      {label:"distribuição de chave como problema da simétrica",rx:/distribuição de chave|key distribution|problema.*chave/i},
+    ],
+    model:"<strong>Simétrica</strong>: usa <strong>uma chave</strong> para cifrar e decifrar. Mais rápida. Exemplos: <strong>AES-256, ChaCha20</strong>. Problema: como compartilhar a chave com segurança? <strong>Assimétrica</strong>: usa <strong>par de chaves pública/privada</strong>. Mais lenta mas resolve o problema de distribuição. Exemplos: <strong>RSA, ECC, Ed25519</strong>. Na prática, <strong>TLS usa os dois</strong>: assimétrica para trocar uma chave de sessão simétrica (hybrid encryption).",
+    soc:"Entender criptografia ajuda a analisar TLS no SOC. Tráfego HTTPS mal configurado (TLS 1.0, ciphers fracos), certificados auto-assinados ou CN que não bate com o domínio são IOCs de C2 over HTTPS."
+  },
+  {
+    id:18, cat:"Ameaças", diff:"med",
+    narration:"Décima oitava questão. Um ataque que afeta disponibilidade e pode ser usado como distração.",
+    question:"O que é um ataque DDoS (Distributed Denial of Service)? Quais são os principais tipos e como mitigar?",
+    hint:"Pense em volumetria, protocolo e camada de aplicação.",
+    required:[
+      {label:"múltiplas origens / botnet",rx:/múltiplas.*origens|botnet|distribuído|distributed|múltiplos.*hosts/i},
+      {label:"esgota recursos / nega serviço",rx:/esgot|recurso|serviço.*indisponível|nega.*serviço|disponibilidade/i},
+      {label:"tipos: volumétrico, protocolo, aplicação",rx:/volumétr|volumetric|protocolo|camada.*aplicação|layer 7|SYN.flood|amplificação/i},
+      {label:"mitigação: CDN, scrubbing, rate limiting",rx:/CDN|scrubbing|rate.limit|mitig|Cloudflare|filtro|blackhole/i},
+    ],
+    bonus:[
+      {label:"amplificação DNS/NTP",rx:/amplificação|amplification|DNS.*DDoS|NTP.*DDoS|reflection/i},
+      {label:"DDoS como distração",rx:/distração|distraction|smoke.*screen|enquanto/i},
+    ],
+    model:"<strong>DDoS</strong> usa <strong>múltiplas origens (botnet)</strong> para sobrecarregar um alvo e negar serviço. Tipos: <strong>Volumétrico</strong> (UDP flood, DNS amplification — esgota banda), <strong>Protocolo</strong> (SYN Flood — esgota conexões TCP), <strong>Camada 7</strong> (HTTP flood — esgota recursos da aplicação). Mitigação: <strong>CDN/WAF com scrubbing, rate limiting, BGP blackhole, Anycast</strong>. Provedores: Cloudflare, Akamai, AWS Shield.",
+    soc:"DDoS frequentemente é usado como <strong>distração</strong> enquanto um ataque real (exfiltração, ransomware) ocorre em paralelo. Não foque só no DDoS — monitore outros vetores simultaneamente."
+  },
+  {
+    id:19, cat:"Segurança", diff:"med",
+    narration:"Décima nona questão. Uma camada de proteção de identidade que todo SOC deve monitorar.",
+    question:"O que é MFA (Multi-Factor Authentication)? Quais os tipos de fatores e por que é importante para o SOC monitorar eventos de MFA?",
+    hint:"Pense nos três fatores: algo que você sabe, tem e é.",
+    required:[
+      {label:"múltiplos fatores de autenticação",rx:/múltiplos fatores|multifator|multi.factor|dois fatores|2FA/i},
+      {label:"algo que sabe: senha",rx:/sabe|senha|password|PIN|conhece/i},
+      {label:"algo que tem: token, app, SMS",rx:/tem|token|TOTP|SMS|app authenticat|hardware|dispositivo/i},
+      {label:"reduz risco de credenciais comprometidas",rx:/reduz|credential.*compromet|senha.*vazad|roubo.*senha|mitiga/i},
+    ],
+    bonus:[
+      {label:"MFA bombing / push fatigue attack",rx:/MFA bombing|push fatigue|MFA.*ataque|Uber.*hack/i},
+      {label:"algo que é: biometria",rx:/biometria|digital|face|íris|iris|algo que é/i},
+    ],
+    model:"<strong>MFA</strong> exige dois ou mais fatores para autenticar: <strong>algo que você sabe</strong> (senha), <strong>algo que tem</strong> (token TOTP, SMS, hardware key) e <strong>algo que você é</strong> (biometria). Reduz drasticamente o risco de comprometimento por credenciais vazadas. No SOC, monitore: falhas repetidas de MFA (possível brute force), aprovações de MFA em horários suspeitos e <strong>MFA Push Bombing</strong> (atacante envia dezenas de aprovações até usuário aceitar por engano).",
+    soc:"MFA Push Bombing comprometeu a Uber em 2022. O atacante ligou para o funcionário se passando por suporte de TI e pediu para aprovar a notificação MFA. Treine usuários e configure 'number matching' no MFA para mitigar."
+  },
+  {
+    id:20, cat:"Redes", diff:"med",
+    narration:"Vigésima questão. Um protocolo que regula como endereços IP são distribuídos na rede.",
+    question:"O que é DHCP e quais são os riscos de segurança associados? O que é DHCP Starvation?",
+    hint:"Pense em alocação dinâmica de IPs e ataques de disponibilidade.",
+    required:[
+      {label:"aloca IPs dinamicamente",rx:/aloca|dinamic|dynamic|distribui.*IP|atribui.*IP/i},
+      {label:"DISCOVER, OFFER, REQUEST, ACK",rx:/DISCOVER|OFFER|REQUEST|ACK|DORA|handshake/i},
+      {label:"DHCP Starvation = esgota pool de IPs",rx:/Starvation|esgot.*pool|esgotar.*IP|exaur/i},
+      {label:"DHCP Spoofing / rogue server",rx:/Spoofing|rogue|falso.*servidor|servidor.*falso|servidor.*malicioso/i},
+    ],
+    bonus:[
+      {label:"DHCP Snooping como mitigação",rx:/snooping|mitigação|proteção.*DHCP/i},
+      {label:"lease time",rx:/lease|tempo.*concessão|expiração/i},
+    ],
+    model:"<strong>DHCP</strong> aloca IPs dinamicamente via processo DORA: <strong>Discover, Offer, Request, Acknowledge</strong>. Riscos: <strong>DHCP Starvation</strong> — atacante envia múltiplos DISCOVER com MACs falsos, esgota o pool de IPs, negando serviço; <strong>DHCP Spoofing</strong> — atacante levanta servidor DHCP rogue para distribuir gateway e DNS maliciosos (Man-in-the-Middle). Mitigação: <strong>DHCP Snooping</strong> nos switches (só portas confiáveis respondem DHCP).",
+    soc:"Dispositivos com IP 169.254.x.x (APIPA) no log indicam falha no DHCP — pode ser Starvation ativo. DHCP Snooping gera logs que aparecem no SIEM quando alguém tenta montar um rogue DHCP server."
+  },
+
+  // ─── DIFÍCEIS ───
+  {
+    id:21, cat:"MITRE ATT&CK", diff:"hard",
+    narration:"Vigésima primeira questão. Nível avançado. Framework que todo analista SOC sênior domina.",
+    question:"O que é o framework MITRE ATT&CK? Como um analista SOC N1 usa esse framework no dia a dia?",
+    hint:"Pense em táticas, técnicas, TTPs e mapeamento de comportamentos de atacantes.",
+    required:[
+      {label:"base de conhecimento de TTPs de atacantes",rx:/TTP|base.*conhecimento|conhecimento.*atacante|adversário|adversary/i},
+      {label:"táticas e técnicas",rx:/tática|tatica|técnica|technique|ID.*T\d|TA\d/i},
+      {label:"mapear comportamento de ameaças",rx:/mapear|mapping|comportamento.*ameaça|threat.*map/i},
+      {label:"ajuda na detecção e resposta",rx:/detecção|detect|resposta|response|investigação|hunt/i},
+    ],
+    bonus:[
+      {label:"14 táticas (Reconnaissance a Impact)",rx:/14 tátic|Reconnaissance|Impact|Initial Access|Exfiltration/i},
+      {label:"Navigator como ferramenta",rx:/Navigator|cobertura.*detecção|detection.*coverage/i},
+    ],
+    model:"<strong>MITRE ATT&CK</strong> é uma base de conhecimento de <strong>TTPs</strong> (Táticas, Técnicas e Procedimentos) usados por atacantes reais. Organizado em <strong>14 táticas</strong> (Reconnaissance, Initial Access, Execution, Persistence, Privilege Escalation, Defense Evasion, Credential Access, Discovery, Lateral Movement, Collection, C2, Exfiltration, Impact). O SOC usa para: <strong>mapear alertas a técnicas</strong> (ex: alerta de LSASS access = T1003 Credential Dumping), priorizar detecções e entender a intenção do atacante.",
+    soc:"Na triagem: quando você identifica uma técnica ATT&CK, consulte as técnicas adjacentes para antecipar o próximo passo do atacante. Se detectou Lateral Movement via SMB (T1021), o próximo passo provável é Collection (T1005) ou Exfiltration (T1041). Seja proativo."
+  },
+  {
+    id:22, cat:"Resposta a Incidentes", diff:"hard",
+    narration:"Vigésima segunda questão. Processo estruturado de resposta — fundamental para qualquer analista.",
+    question:"Descreva o processo de resposta a incidentes (Incident Response). Quais são as principais fases e o que o analista SOC faz em cada uma?",
+    hint:"Pense nas 6 fases do NIST SP 800-61: Preparação, Identificação, Contenção, Erradicação, Recuperação e Lições aprendidas.",
+    required:[
+      {label:"preparação / planejamento",rx:/prepara|preparação|planej|plan|runbook|playbook/i},
+      {label:"identificação / detecção",rx:/identific|detectar|alerta|triagem|triage|análise/i},
+      {label:"contenção / isolamento",rx:/conten|isolamento|isolar|containment|limit|bloquear/i},
+      {label:"erradicação / remediação",rx:/erradica|remedia|remoção|limpar|clean|mitigat/i},
+    ],
+    bonus:[
+      {label:"recuperação / restaurar serviços",rx:/recupera|recovery|restaurar|restore|volta/i},
+      {label:"lições aprendidas / post-mortem",rx:/lições|postmortem|post.mortem|melhoria|lesson|after.*action/i},
+    ],
+    model:"Fases do <strong>Incident Response (NIST SP 800-61)</strong>: <strong>1. Preparação</strong> — runbooks, ferramentas, contatos; <strong>2. Identificação</strong> — detectar e classificar o incidente; <strong>3. Contenção</strong> — isolar endpoints/sistemas afetados para evitar propagação; <strong>4. Erradicação</strong> — remover malware, fechar acesso do atacante; <strong>5. Recuperação</strong> — restaurar serviços, monitorar para reinfecção; <strong>6. Lições Aprendidas</strong> — post-mortem, melhorias no processo.",
+    soc:"SOC N1 atua principalmente nas fases 2 (triagem) e 3 (contenção inicial). A contenção errada pode destruir evidências — antes de formatar um endpoint, colete: memory dump, logs de evento, prefetch, histórico de processos. Chain of custody é essencial para investigação forense."
+  },
+  {
+    id:23, cat:"Ameaças Avançadas", diff:"hard",
+    narration:"Vigésima terceira questão. Um conceito avançado que distingue um bom analista SOC.",
+    question:"O que é Lateral Movement? Quais técnicas os atacantes usam e como o SOC pode detectar?",
+    hint:"Pense em movimentação dentro da rede após acesso inicial, usando SMB, RDP, PsExec, Pass-the-Hash.",
+    required:[
+      {label:"movimentação pela rede após acesso inicial",rx:/moviment|lateral|inside.*rede|rede.*interna|após.*acesso/i},
+      {label:"técnicas: SMB, RDP, PsExec",rx:/SMB|RDP|PsExec|WMI|Remote.*exec|DCOM/i},
+      {label:"Pass-the-Hash ou Kerberoasting",rx:/Pass.the.Hash|PTH|Kerberoast|credential|token|ticket/i},
+      {label:"detectar via logs / comportamento anômalo",rx:/detectar|log|comportamento|SIEM|anomal|incomum/i},
+    ],
+    bonus:[
+      {label:"living off the land / LOLBins",rx:/living.off.land|LOLBin|legítim.*ferramenta|built.in/i},
+      {label:"segmentação / zero trust como controle",rx:/segmentação|Zero Trust|controle|mitigação/i},
+    ],
+    model:"<strong>Lateral Movement</strong> é quando o atacante se move de máquina em máquina dentro da rede após o acesso inicial. Técnicas: <strong>SMB/RDP</strong> com credenciais roubadas, <strong>PsExec</strong>, <strong>WMI</strong>, <strong>Pass-the-Hash</strong> (reutilizar hash NTLM sem saber a senha), <strong>Kerberoasting</strong>. Muitas vezes usa ferramentas legítimas do Windows (LOLBins). Detecção: conexões SMB/RDP incomuns entre estações, evento 4648 (logon explícito), tráfego interno anômalo em horário fora do padrão.",
+    soc:"Alert prioritário: um servidor web abrindo conexão SMB para um servidor de banco de dados é absolutamente anômalo. Servidores web não deveriam se comunicar diretamente com DBs via SMB. Esse padrão no SIEM indica comprometimento e lateral movement ativo."
+  },
+  {
+    id:24, cat:"Ameaças Avançadas", diff:"hard",
+    narration:"Vigésima quarta questão. Técnica furtiva usada por grupos APT avançados.",
+    question:"O que é Privilege Escalation? Explique a diferença entre escalada horizontal e vertical, e cite técnicas comuns.",
+    hint:"Pense em ganhar mais permissões do que o usuário original possui.",
+    required:[
+      {label:"ganhar mais privilégios / permissões",rx:/privilégio|privilegio|privilege|permissão|permission|mais.*acesso/i},
+      {label:"vertical = usuário comum para admin/root",rx:/vertical|usuário.*admin|comum.*root|admin.*root|SYSTEM/i},
+      {label:"horizontal = acesso a outra conta do mesmo nível",rx:/horizontal|mesma.*conta|outro.*usuário|pivot.*conta/i},
+      {label:"técnicas: explorar vulnerabilidade, misconfiguration",rx:/explorar|vulnerabilidade|misconfig|configuração.*errada|sudo.*misconfigured|SUID/i},
+    ],
+    bonus:[
+      {label:"token impersonation / UAC bypass",rx:/token.*impersonation|UAC.bypass|SeImpersonatePrivilege|Potato/i},
+      {label:"monitorar eventos 4728, 4732",rx:/evento.*4728|evento.*4732|Group.*changed|domain.*admin/i},
+    ],
+    model:"<strong>Privilege Escalation</strong> é o atacante obtendo <strong>mais permissões</strong> do que possui. <strong>Vertical</strong>: usuário comum → administrador/root (ex: explorar kernel vuln, misconfiguration de sudo/SUID no Linux, UAC bypass no Windows). <strong>Horizontal</strong>: acessar conta de outro usuário do mesmo nível. Técnicas comuns: explorar CVEs locais, misconfigurations (sudo sem senha, WriteDACL), Token Impersonation, DLL hijacking.",
+    soc:"Eventos críticos no Windows: 4728 (adicionado a grupo privilegiado), 4732 (adicionado a Administrators local), 4756 (adicionado a grupo universal). Qualquer adição inesperada a Domain Admins é P1 imediato. No Linux, monitore mudanças em /etc/sudoers e criação de usuários com UID 0."
+  },
+  {
+    id:25, cat:"Threat Intelligence", diff:"hard",
+    narration:"Vigésima quinta questão. Conceito de inteligência de ameaças que eleva o nível do SOC.",
+    question:"O que é Threat Intelligence? Qual a diferença entre inteligência estratégica, operacional e tática? Como o SOC consome feeds de TI?",
+    hint:"Pense em informação acionável sobre ameaças e nos diferentes públicos que cada nível serve.",
+    required:[
+      {label:"informação sobre ameaças / adversários",rx:/informação.*ameaça|threat.*intel|conhecimento.*adversário|TI.*feeds/i},
+      {label:"estratégica = nível executivo / tendências",rx:/estratégic|executivo|tendência|trend|macro/i},
+      {label:"tática = IOCs / IPs, domínios, hashes",rx:/tática|tatic|IOC|IP.*malicioso|hash|domínio.*malicioso/i},
+      {label:"alimentar SIEM / bloquear IOCs",rx:/alimentar|SIEM|bloquear|enriquecer|enriquecimento|consumir/i},
+    ],
+    bonus:[
+      {label:"operacional = campanhas específicas / TTPs",rx:/operacional|campanha|TTP.*específic|específic.*attack/i},
+      {label:"STIX / TAXII / MISP",rx:/STIX|TAXII|MISP|OpenCTI|padrão/i},
+    ],
+    model:"<strong>Threat Intelligence</strong> é informação acionável sobre ameaças. Níveis: <strong>Estratégico</strong> — tendências para executivos (ex: aumento de ransomware no setor); <strong>Operacional</strong> — campanhas específicas e TTPs de grupos APT; <strong>Tático</strong> — IOCs concretos (IPs, domínios, hashes de malware) para bloquear imediatamente. O SOC consome feeds de TI para <strong>enriquecer alertas no SIEM</strong>, bloquear IOCs no firewall/proxy e priorizar patches. Formatos: STIX/TAXII, plataformas como MISP, OpenCTI.",
+    soc:"Enriquecimento automático de IOCs no SIEM muda o jogo: quando um alerta dispara para uma conexão a 1.2.3.4, ter automaticamente 'IP visto em 47 campanhas de Emotet nos últimos 30 dias' transforma triagem de 20min em 2min."
+  },
+  {
+    id:26, cat:"Cloud", diff:"hard",
+    narration:"Vigésima sexta questão. Segurança em nuvem é uma das maiores demandas do mercado SOC atual.",
+    question:"Quais são os principais desafios de segurança em ambientes de nuvem (Cloud)? O que é o modelo de responsabilidade compartilhada?",
+    hint:"Pense em quem protege o quê: o provedor cuida da infraestrutura, você cuida dos dados.",
+    required:[
+      {label:"responsabilidade compartilhada provedor x cliente",rx:/responsabilidade.*compartilhada|shared.*responsib|provedor.*cliente|cliente.*provedor/i},
+      {label:"provedor protege infraestrutura física",rx:/provedor.*infraestrutura|AWS.*responsável|Azure.*physical|datacenter/i},
+      {label:"cliente protege dados, configurações, acessos",rx:/cliente.*dado|configuração.*cliente|IAM|acesso.*client|bucket.*público/i},
+      {label:"desafios: misconfigurations, exposição",rx:/misconfigur|configuração incorreta|exposta|bucket.*público|dado.*exposto|shadow IT/i},
+    ],
+    bonus:[
+      {label:"CASB / CSPM como ferramentas",rx:/CASB|CSPM|Cloud.*Security.*Posture|Defender.*Cloud/i},
+      {label:"Zero Trust em cloud",rx:/Zero Trust|identidade.*cloud|ZTNA/i},
+    ],
+    model:"No modelo de <strong>responsabilidade compartilhada</strong>, o <strong>provedor</strong> (AWS, Azure, GCP) protege a infraestrutura física (hardware, datacenter, hipervisor). O <strong>cliente</strong> é responsável por dados, configurações de IAM, criptografia e controle de acesso. Principais desafios: <strong>misconfigurations</strong> (S3 bucket público, permissões IAM excessivas), visibilidade de tráfego, Shadow IT e identidades de serviço não gerenciadas. Ferramentas: CSPM (Cloud Security Posture Management), CASB.",
+    soc:"Leaks de dados mais comuns em cloud: S3 buckets públicos com dados sensíveis. No SOC cloud, use logs do CloudTrail (AWS) ou Activity Log (Azure) — equivalente ao auth.log mas para ações na nuvem. API calls em horários suspeitos ou regiões não usuais são red flags."
+  },
+  {
+    id:27, cat:"Ameaças Avançadas", diff:"hard",
+    narration:"Vigésima sétima questão. Técnica que agentes de ameaça usam para se manter invisíveis por meses.",
+    question:"O que é um APT (Advanced Persistent Threat)? Como difere de um ataque convencional e como o SOC detecta atividade de APT?",
+    hint:"Pense em longo prazo, furtividade, objetivos específicos e grupos patrocinados por estados.",
+    required:[
+      {label:"ameaça persistente e avançada / longo prazo",rx:/persistente|long.term|longo prazo|avançada|advanced/i},
+      {label:"objetivo específico / espionagem / sabotagem",rx:/objetivo.*específic|espionagem|sabotagem|roubo.*propriedade|intellectual/i},
+      {label:"furtividade / evasão de detecção",rx:/furtiv|stealth|evasão|evad|invisível|low.and.slow/i},
+      {label:"grupos / estados nacionais",rx:/grupos|grupo APT|estado.*nacion|patrocinado|Lazarus|APT28|Fancy Bear/i},
+    ],
+    bonus:[
+      {label:"indicadores: beacon periódico, living off the land",rx:/beacon|LOLBin|living.off.land|low.*slow|pequenos volumes/i},
+      {label:"threat hunting como resposta",rx:/threat hunting|caçar|hunt|proativo|anomalia/i},
+    ],
+    model:"<strong>APT</strong> (Advanced Persistent Threat) são atacantes altamente qualificados (geralmente <strong>patrocinados por estados</strong>) com objetivos específicos de <strong>espionagem ou sabotagem</strong>. Diferem de ataques convencionais pela <strong>persistência</strong> (meses ou anos na rede), <strong>furtividade</strong> (low-and-slow, LOLBins, beacon pequeno) e recursos. Exemplos: APT28 (Fancy Bear/Rússia), Lazarus Group (Coreia do Norte). Detecção: <strong>threat hunting proativo</strong>, buscar beaconing periódico, anomalias comportamentais sutis que alertas automáticos perdem.",
+    soc:"APTs são detectados por threat hunting, não por alertas reativos. Técnica: busque no SIEM por conexões externas com intervalos regulares exatos (ex: a cada 300 segundos = beacon automatizado). APTs configuraram seus beacons para parecer tráfego normal mas têm frequência matemática precisa."
+  },
+  {
+    id:28, cat:"Forense", diff:"hard",
+    narration:"Vigésima oitava questão. Preservação de evidências digitais — crítico para investigações.",
+    question:"O que é forense digital (Digital Forensics)? Quais são os artefatos mais importantes que um analista SOC deve preservar após um incidente?",
+    hint:"Pense em cadeia de custódia, volatilidade de evidências e ordem de coleta.",
+    required:[
+      {label:"coleta e análise de evidências digitais",rx:/evidência|evidence|coleta|análise.*digital|investigação/i},
+      {label:"cadeia de custódia",rx:/cadeia.*custódia|chain.of.custody|integridade.*evidência|hash.*evidência/i},
+      {label:"ordem de volatilidade: memória RAM primeiro",rx:/volatilidade|RAM.*primeiro|memória.*primeiro|volátil|ordem.*coleta/i},
+      {label:"artefatos: logs, memory dump, disco",rx:/log|memory dump|dump.*memória|disco|imagem.*disco|prefetch|artefato/i},
+    ],
+    bonus:[
+      {label:"ferramentas: Volatility, FTK, Autopsy",rx:/Volatility|FTK|Autopsy|Rekall|ferramenta/i},
+      {label:"hash para integridade: MD5/SHA256",rx:/MD5|SHA256|hash.*integr|integr.*hash/i},
+    ],
+    model:"<strong>Forense digital</strong> é a coleta, preservação e análise de <strong>evidências digitais</strong> mantendo a <strong>cadeia de custódia</strong>. Siga a ordem de <strong>volatilidade</strong>: colete primeiro o que desaparece mais rápido: <strong>1)</strong> Memória RAM (memory dump) <strong>2)</strong> Processos/conexões ativas <strong>3)</strong> Logs de sistema <strong>4)</strong> Imagem de disco. Valide integridade com <strong>hash SHA256</strong>. Ferramentas: Volatility (análise de RAM), Autopsy/FTK (disco), Velociraptor (coleta remota).",
+    soc:"Erro clássico: formatar o endpoint 'para ficar limpo' antes de coletar evidências. Isso destrói a investigação. Sempre: isolar da rede → coletar RAM → coletar logs → imagem de disco → só então remediar. A sequência importa."
+  },
+  {
+    id:29, cat:"Zero Trust", diff:"hard",
+    narration:"Vigésima nona questão. Um dos paradigmas de segurança mais modernos e demandados pelo mercado.",
+    question:"O que é o conceito de Zero Trust? Quais são seus princípios fundamentais e como o SOC opera dentro de um ambiente Zero Trust?",
+    hint:"Pense em 'nunca confie, sempre verifique', microsegmentação e identidade como novo perímetro.",
+    required:[
+      {label:"nunca confie, sempre verifique",rx:/nunca.*confie|never.*trust|always.*verify|não.*confiar|zero.trust/i},
+      {label:"verificar identidade continuamente",rx:/identidade|identity|verificação.*contínua|continuous.*verify|re-autenticat/i},
+      {label:"mínimo privilégio / least privilege",rx:/mínimo.*privilégio|least.*privilege|menor.*acesso|apenas.*necessário/i},
+      {label:"microsegmentação",rx:/microsegment|micro.segment|segmentação.*granular|east.west/i},
+    ],
+    bonus:[
+      {label:"perímetro baseado em identidade não em rede",rx:/perímetro.*identidade|identity.*perimeter|nova.*borda|network.*não é|além.*VPN/i},
+      {label:"ZTNA / SDP como implementação",rx:/ZTNA|SDP|BeyondCorp|Zscaler|implementação/i},
+    ],
+    model:"<strong>Zero Trust</strong> parte do princípio <strong>'Never Trust, Always Verify'</strong>: nenhuma entidade (usuário, dispositivo, serviço) é confiável por padrão, mesmo dentro da rede. Princípios: <strong>verificação contínua de identidade</strong>, <strong>mínimo privilégio</strong>, <strong>microsegmentação</strong> (comunicação E-W controlada), e <strong>identidade como novo perímetro</strong>. O SOC em ambiente Zero Trust tem visibilidade granular de cada acesso, facilitando detecção de comportamentos anômalos pois o baseline é bem definido.",
+    soc:"Zero Trust facilita o SOC: quando todo acesso é verificado e logado, anomalias se destacam mais. Um usuário acessando um recurso que nunca acessou antes gera alerta automático. Compare com o modelo tradicional onde 'dentro da rede = confiável' — um atacante lateral move-se sem alertas."
+  },
+  {
+    id:30, cat:"Threat Hunting", diff:"hard",
+    narration:"Trigésima e última questão. A habilidade que diferencia um analista médio de um analista excelente.",
+    question:"O que é Threat Hunting? Como difere do monitoramento reativo do SOC e quais as principais hipóteses e técnicas usadas?",
+    hint:"Pense em busca proativa por ameaças que ainda não geraram alertas, usando hipóteses baseadas em ATT&CK.",
+    required:[
+      {label:"busca proativa por ameaças",rx:/proativ|proactive|busca.*ameaça|hunt.*ameaça|não.*alerta|antes.*alerta/i},
+      {label:"difere do monitoramento reativo",rx:/difere|reativo|reactive|ao invés.*alerta|não.*espera/i},
+      {label:"hipóteses baseadas em TTPs / ATT&CK",rx:/hipótese|hypothesis|TTP|MITRE|ATT.CK|baseado.*inteligência/i},
+      {label:"técnicas: análise de logs, query SIEM, análise comportamental",rx:/análise.*log|query|SIEM|comportamental|baseline|anomalia|técnica/i},
+    ],
+    bonus:[
+      {label:"loophole / dwell time",rx:/dwell.time|tempo.*residência|invisible|não detectado|persistência.*longa/i},
+      {label:"iteração e melhoria de detecções",rx:/melhoria|nova.*regra|nova.*detecção|iterar|feedback/i},
+    ],
+    model:"<strong>Threat Hunting</strong> é a busca <strong>proativa</strong> por ameaças que ainda não geraram alertas — diferente do monitoramento reativo (esperar alertas do SIEM). O hunter parte de <strong>hipóteses</strong> baseadas em TTPs conhecidos (MITRE ATT&CK) ou inteligência de ameaças e busca evidências manualmente. Técnicas: análise de logs com queries customizadas no SIEM, análise comportamental, buscar LOLBins, beaconing, anomalias de baseline. Resultado: detectar APTs com meses de dwell time e <strong>criar novas regras de detecção</strong> para automatizar.",
+    soc:"Threat Hunting reduz o dwell time (tempo médio que atacante fica na rede sem ser detectado — historicamente 197 dias!). Uma hipótese prática: 'Estou buscando uso de certutil.exe para download de arquivos' (T1105). Query no Splunk: index=sysmon EventCode=1 Image='*certutil*' CommandLine='*urlcache*'. Se encontrar, é comprometimento confirmado."
+  }
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const ST = {
+  name:'', qIdx:0, results:[],
+  totalScore:0, synth:null, recog:null,
+  isRec:false, isPlay:false
+};
+
+// ═══════════════════════════════════════════
+// EVALUATE ANSWER
+// ═══════════════════════════════════════════
+function evaluate(q, answer) {
+  const a = answer.toLowerCase();
+  const reqHits = q.required.map(r=>({...r, hit: r.rx.test(a)}));
+  const bonHits = (q.bonus||[]).map(r=>({...r, hit: r.rx.test(a)}));
+  const reqScore = reqHits.filter(r=>r.hit).length / q.required.length;
+  const bonScore = bonHits.length > 0 ? bonHits.filter(r=>r.hit).length / bonHits.length : 0;
+  const raw = (reqScore * 8) + (bonScore * 2);
+  const score = Math.min(10, parseFloat(raw.toFixed(1)));
+  const verdict = score>=9?'Excelente':score>=7?'Bom':score>=5?'Regular':'Insuficiente';
+  return {score, verdict, reqHits, bonHits};
+}
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════
+// INTRO
+// ═══════════════════════════════════════════
+function startExam(){
+  const n=document.getElementById('sName').value.trim();
+  if(!n){
+    const el=document.getElementById('sName');
+    el.style.borderColor='var(--red)';
+    el.focus();
+    setTimeout(()=>el.style.borderColor='',1500);
+    return;
+  }
+  ST.name=n; ST.qIdx=0; ST.results=[]; ST.totalScore=0;
+  document.getElementById('runScore').textContent='0.0 pts';
+  goScreen('sExam');
+  renderQ();
+}
+
+// ═══════════════════════════════════════════
+// RENDER QUESTION
+// ═══════════════════════════════════════════
+function renderQ(){
+  const q=Q[ST.qIdx];
+  const num=ST.qIdx+1;
+  document.getElementById('qNum').textContent=num;
+  document.getElementById('exProg').style.width=((num-1)/30*100)+'%';
+
+  const kwHTML=q.required.map(r=>`<span class="kw-tag-prev">···</span>`).join('');
+  const diffLabel={easy:'Fácil',med:'Médio',hard:'Difícil'}[q.diff];
+
+  document.getElementById('exBody').innerHTML=`
+    <div class="diff-pill ${q.diff} fu">
+      <span>${{easy:'●',med:'◆',hard:'★'}[q.diff]}</span>
+      ${diffLabel} · ${q.cat}
+    </div>
+
+    <div class="aud-card fu fu1" id="audCard" onclick="toggleAudio()">
+      <div class="aud-btn">
+        <svg id="audIco" class="aud-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
+      <div class="aud-info">
+        <div class="aud-title">🔊 Ouvir questão narrada</div>
+        <div class="aud-sub">Toque para reproduzir em português</div>
+      </div>
+      <div class="waveform">
+        ${Array(8).fill('<div class="wb"></div>').join('')}
+      </div>
+    </div>
+
+    <div class="q-card fu fu2">
+      <div class="q-meta">
+        <span class="q-meta-num">Q${String(num).padStart(2,'0')}</span>
+        Questão dissertativa
+      </div>
+      <div class="q-text">${q.question}</div>
+    </div>
+
+    <div class="hint fu fu3"><span class="hint-ic">💡</span>${q.hint}</div>
+
+    <div class="kw-preview fu fu3">
+      <strong>Conceitos avaliados:</strong>
+      A IA local vai verificar se você cobriu os seguintes conceitos:
+      <div class="kw-tags">
+        ${q.required.map(_=>`<span class="kw-tag-prev">conceito ●</span>`).join('')}
+        ${(q.bonus||[]).map(_=>`<span class="kw-tag-prev" style="color:var(--blue)">bônus +</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="ans-lbl fu fu4"><span>Sua resposta</span><span class="char-ct" id="cc">0 chars</span></div>
+    <textarea class="ans-ta fu fu4" id="ansTA" placeholder="Explique com suas palavras..." oninput="document.getElementById('cc').textContent=this.value.length+' chars'"></textarea>
+
+    <div class="vc-row fu fu4">
+      <button class="btn-mic idle" id="btnMic" onclick="toggleRec()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.93V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.07A7 7 0 0 0 19 11z"/>
+        </svg>
+        Responder por Voz
+      </button>
+      <button class="btn-clr" onclick="document.getElementById('ansTA').value='';document.getElementById('cc').textContent='0 chars'">🗑</button>
+    </div>
+    <div class="rec-st" id="recSt">Microfone inativo</div>
+
+    <button class="btn-sub fu fu5" onclick="submitQ()">
+      ✓ Avaliar Resposta
+    </button>`;
+}
+
+// ═══════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════
+function toggleAudio(){
+  if(ST.isPlay){stopAudio();return;}
+  const q=Q[ST.qIdx];
+  speakText(q.narration+'. '+q.question, true);
+}
+
+function speakText(text, isQ){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='pt-BR'; u.rate=0.88; u.pitch=1;
+  const vs=window.speechSynthesis.getVoices();
+  const v=vs.find(v=>v.lang.startsWith('pt-BR'))||vs.find(v=>v.lang.startsWith('pt'))||null;
+  if(v) u.voice=v;
+  u.onstart=()=>{
+    ST.isPlay=true;
+    if(isQ){
+      document.getElementById('audCard')?.classList.add('playing');
+      document.getElementById('audIco').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    }
+  };
+  u.onend=u.onerror=()=>{
+    ST.isPlay=false;
+    if(isQ){
+      document.getElementById('audCard')?.classList.remove('playing');
+      const ic=document.getElementById('audIco');
+      if(ic) ic.innerHTML='<path d="M8 5v14l11-7z"/>';
+    }
+  };
+  window.speechSynthesis.speak(u);
+}
+
+function stopAudio(){
+  window.speechSynthesis?.cancel();
+  ST.isPlay=false;
+  document.getElementById('audCard')?.classList.remove('playing');
+  const ic=document.getElementById('audIco');
+  if(ic) ic.innerHTML='<path d="M8 5v14l11-7z"/>';
+}
+
+window.speechSynthesis?.getVoices();
+window.addEventListener('load',()=>window.speechSynthesis?.getVoices());
+
+// ═══════════════════════════════════════════
+// SPEECH RECOGNITION
+// ═══════════════════════════════════════════
+function toggleRec(){ST.isRec?stopRec():startRec();}
+
+function startRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('recSt').textContent='⚠ Não suportado neste navegador';return;}
+  const r=new SR();r.lang='pt-BR';r.continuous=true;r.interimResults=true;
+  r.onstart=()=>{
+    ST.isRec=true;
+    const b=document.getElementById('btnMic');
+    b.className='btn-mic live';
+    b.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Parar';
+    const s=document.getElementById('recSt');
+    if(s){s.textContent='🔴 Gravando...';s.className='rec-st live';}
+  };
+  r.onresult=(e)=>{
+    let f='',i='';
+    for(let x=0;x<e.results.length;x++){
+      if(e.results[x].isFinal) f+=e.results[x][0].transcript+' ';
+      else i+=e.results[x][0].transcript;
+    }
+    const ta=document.getElementById('ansTA');
+    if(ta){ta.value=f+i;document.getElementById('cc').textContent=ta.value.length+' chars';}
+  };
+  r.onerror=()=>stopRec();r.onend=()=>stopRec();
+  r.start();ST.recog=r;
+}
+
+function stopRec(){
+  ST.isRec=false;ST.recog?.stop();ST.recog=null;
+  const b=document.getElementById('btnMic');
+  if(b){
+    b.className='btn-mic idle';
+    b.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.93V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.07A7 7 0 0 0 19 11z"/></svg> Responder por Voz';
+  }
+  const s=document.getElementById('recSt');
+  if(s){s.textContent='Microfone inativo';s.className='rec-st';}
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════
+function submitQ(){
+  stopRec(); stopAudio();
+  const ans=(document.getElementById('ansTA')?.value||'').trim();
+  if(ans.length<8){
+    const ta=document.getElementById('ansTA');
+    if(ta){ta.style.borderColor='var(--red)';setTimeout(()=>ta.style.borderColor='',1200);}
+    return;
+  }
+  const q=Q[ST.qIdx];
+  const res=evaluate(q,ans);
+  ST.results.push({q,ans,...res});
+  ST.totalScore+=res.score;
+  const avg=ST.totalScore/ST.results.length;
+  document.getElementById('runScore').textContent=avg.toFixed(1)+' pts';
+  showFeedback(q,ans,res);
+}
+
+// ═══════════════════════════════════════════
+// FEEDBACK
+// ═══════════════════════════════════════════
+function showFeedback(q,ans,res){
+  const qNum=ST.qIdx+1;
+  document.getElementById('fbQN').textContent=qNum;
+  document.getElementById('fbScore').textContent=res.score.toFixed(1)+'/10';
+
+  const vc=res.score>=9?'v-ex':res.score>=7?'v-gd':res.score>=5?'v-ok':'v-lw';
+  const scColor=res.score>=7?'var(--green)':res.score>=5?'var(--yellow)':'var(--red2)';
+  const isLast=ST.qIdx>=29;
+
+  const reqHTML=res.reqHits.map(r=>
+    `<span class="kw-hit ${r.hit?'found':'miss'}">${r.hit?'✓':'✗'} ${r.label}</span>`
+  ).join('');
+  const bonHTML=res.bonHits.map(r=>
+    `<span class="kw-hit ${r.hit?'bonus':'miss'}">${r.hit?'★':'✗'} ${r.label}</span>`
+  ).join('');
+
+  const foundCount=res.reqHits.filter(r=>r.hit).length;
+  const missCount=res.reqHits.filter(r=>!r.hit).length;
+
+  document.getElementById('fbBody').innerHTML=`
+    <div class="sc-reveal fu">
+      <div class="sc-lbl">Pontuação — Questão ${qNum}</div>
+      <div class="sc-num" id="scN" style="color:${scColor}">0.0</div>
+      <div class="sc-den">de 10.0 pontos</div>
+      <div class="sc-bar-bg"><div class="sc-bar-fg" id="scBar" style="width:0%"></div></div>
+      <span class="verdict-pill ${vc}">${res.verdict}</span>
+    </div>
+
+    <div class="kw-section fu fu1">
+      <div class="kw-sec-title"><span class="kw-sec-icon">🔍</span>
+        Conceitos avaliados — <span style="color:var(--green)">${foundCount} encontrados</span> · <span style="color:var(--red2)">${missCount} ausentes</span>
+      </div>
+      <div class="kw-grid">${reqHTML}</div>
+      ${res.bonHits.length>0?`<div class="kw-sec-title" style="margin-top:10px"><span class="kw-sec-icon">★</span>Bônus (extra)</div><div class="kw-grid">${bonHTML}</div>`:''}
+    </div>
+
+    <div class="model-card mc-blue fu fu2">
+      <div class="mc-title">📘 Resposta Modelo</div>
+      <div class="mc-text">${q.model}</div>
+      <button class="btn-speak" onclick="speakText(${JSON.stringify(q.model.replace(/<[^>]*>/g,''))},false)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Ouvir resposta modelo
+      </button>
+    </div>
+
+    <div class="model-card mc-green fu fu3">
+      <div class="mc-title">🛡 Aplicação no SOC</div>
+      <div class="mc-text">${q.soc}</div>
+      <button class="btn-speak" onclick="speakText(${JSON.stringify(q.soc)},false)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Ouvir insight SOC
+      </button>
+    </div>
+
+    <button class="btn-next fu fu4" onclick="${isLast?'showReport()':'nextQ()'}">
+      ${isLast?'📊 Ver Relatório Final':'Próxima Questão →'}
+    </button>`;
+
+  goScreen('sFeedback');
+  setTimeout(()=>{
+    const el=document.getElementById('scN');
+    const bar=document.getElementById('scBar');
+    const tgt=res.score; let cur=0;
+    const intv=setInterval(()=>{
+      cur=Math.min(cur+tgt/40,tgt);
+      if(el) el.textContent=cur.toFixed(1);
+      if(bar) bar.style.width=(cur/10*100)+'%';
+      if(cur>=tgt) clearInterval(intv);
+    },28);
+  },200);
+}
+
+function nextQ(){
+  stopAudio();
+  ST.qIdx++;
+  goScreen('sExam');
+  renderQ();
+  document.getElementById('exProg').style.width=(ST.qIdx/30*100)+'%';
+}
+
+// ═══════════════════════════════════════════
+// REPORT
+// ═══════════════════════════════════════════
+function showReport(){
+  stopAudio();
+  const avg=ST.totalScore/ST.results.length;
+  const pct=Math.round(avg/10*100);
+  const seal=avg>=8?'🏆':avg>=6?'✅':avg>=4?'📚':'🔄';
+  const level=avg>=8?'Aprovado — SOC N1 Ready':avg>=6?'Bom — Continue praticando':avg>=4?'Regular — Revise os módulos':'Insuficiente — Estudo aprofundado necessário';
+
+  document.getElementById('rpSeal').textContent=seal;
+  document.getElementById('rpTitle').textContent=`Relatório de ${ST.name}`;
+  document.getElementById('rpSub').textContent=`${level} · Média ${avg.toFixed(1)}/10`;
+
+  // category analysis
+  const cats={};
+  ST.results.forEach(r=>{
+    const c=r.q.cat;
+    if(!cats[c]) cats[c]={sum:0,cnt:0};
+    cats[c].sum+=r.score; cats[c].cnt++;
+  });
+  const catList=Object.entries(cats).map(([cat,v])=>({cat,avg:v.sum/v.cnt})).sort((a,b)=>b.avg-a.avg);
+  const bestCats=catList.slice(0,3).filter(c=>c.avg>=6);
+  const worstCats=catList.slice(-3).filter(c=>c.avg<6).reverse();
+
+  // diff breakdown
+  const byDiff={easy:[],med:[],hard:[]};
+  ST.results.forEach(r=>byDiff[r.q.diff].push(r.score));
+  const avgD=d=>byDiff[d].length?byDiff[d].reduce((a,b)=>a+b,0)/byDiff[d].length:null;
+  const diffEasy=avgD('easy'), diffMed=avgD('med'), diffHard=avgD('hard');
+
+  // per-question list
+  const qlHTML=ST.results.map((r,i)=>{
+    const cls=r.score>=7?'hi':r.score>=5?'md':'lo';
+    return `<div class="ql-item">
+      <div class="ql-num ${cls}">${i+1}</div>
+      <div class="ql-info">
+        <div class="ql-cat">${r.q.cat} · ${{'easy':'Fácil','med':'Médio','hard':'Difícil'}[r.q.diff]}</div>
+        <div class="ql-q">${r.q.question.substring(0,55)}...</div>
+      </div>
+      <div class="ql-sc ${cls}">${r.score.toFixed(1)}</div>
+    </div>`;
+  }).join('');
+
+  const strongHTML=bestCats.length?bestCats.map(c=>`<li><span class="sw-ic">✅</span><span><strong style="color:var(--text)">${c.cat}</strong> — média ${c.avg.toFixed(1)}/10</span></li>`).join(''):'<li><span class="sw-ic">—</span><span>Continue praticando para consolidar pontos fortes</span></li>';
+  const weakHTML=worstCats.length?worstCats.map(c=>`<li><span class="sw-ic" style="color:var(--red2)">⚠</span><span><strong style="color:var(--text)">${c.cat}</strong> — média ${c.avg.toFixed(1)}/10</span></li>`).join(''):'<li><span class="sw-ic">✅</span><span>Nenhuma área crítica identificada — ótimo desempenho!</span></li>';
+
+  const recItems=[
+    worstCats.length?`Revise prioritariamente: <strong>${worstCats[0]?.cat}</strong> — material de estudo disponível nos módulos do Red Team Leaders`:'Continue avançando com labs práticos',
+    diffHard<6?'Aprofunde estudo em tópicos avançados: MITRE ATT&CK, Threat Hunting e Forense Digital':'Bom domínio de tópicos avançados — considere o módulo de Threat Intelligence',
+    avg<7?'Pratique com simulados adicionais antes de entrevistas reais de SOC N1':'Você está pronto para entrevistas SOC N1 — mire em certificações CompTIA Security+, CySA+ ou SC-200'
+  ];
+
+  document.getElementById('rpBody').innerHTML=`
+    <div class="stats-grid fu">
+      <div class="stat-c">
+        <div class="stat-v" style="color:${avg>=7?'var(--green)':avg>=5?'var(--yellow)':'var(--red2)'}">${avg.toFixed(1)}</div>
+        <div class="stat-l">Média Geral</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-v" style="color:var(--blue)">${pct}%</div>
+        <div class="stat-l">Aproveitamento</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-v" style="color:var(--yellow)">${ST.results.filter(r=>r.score>=7).length}/30</div>
+        <div class="stat-l">Questões ≥7</div>
+      </div>
+    </div>
+
+    ${diffEasy!==null||diffMed!==null||diffHard!==null?`
+    <div class="sw-card fu fu1">
+      <div class="sw-title"><span>📊</span> Desempenho por Dificuldade</div>
+      <ul class="sw-list">
+        ${diffEasy!==null?`<li><span class="sw-ic" style="color:var(--green)">●</span><span>Fácil — média <strong style="color:var(--text)">${diffEasy.toFixed(1)}/10</strong> (${byDiff.easy.length} questões)</span></li>`:''}
+        ${diffMed!==null?`<li><span class="sw-ic" style="color:var(--yellow)">◆</span><span>Médio — média <strong style="color:var(--text)">${diffMed.toFixed(1)}/10</strong> (${byDiff.med.length} questões)</span></li>`:''}
+        ${diffHard!==null?`<li><span class="sw-ic" style="color:var(--red2)">★</span><span>Difícil — média <strong style="color:var(--text)">${diffHard.toFixed(1)}/10</strong> (${byDiff.hard.length} questões)</span></li>`:''}
+      </ul>
+    </div>`:''}
+
+    <div class="sw-card fu fu1">
+      <div class="sw-title"><span>💪</span> Pontos Fortes</div>
+      <ul class="sw-list">${strongHTML}</ul>
+    </div>
+
+    <div class="sw-card fu fu2">
+      <div class="sw-title"><span>📚</span> Áreas para Desenvolver</div>
+      <ul class="sw-list">${weakHTML}</ul>
+    </div>
+
+    <div class="sw-card fu fu2">
+      <div class="sw-title"><span>🎯</span> Recomendações</div>
+      <ul class="sw-list">
+        ${recItems.map(r=>`<li><span class="sw-ic">→</span><span>${r}</span></li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="sw-card fu fu3">
+      <div class="sw-title"><span>📋</span> Questão por Questão</div>
+      <div class="q-list">${qlHTML}</div>
+    </div>
+
+    <button class="btn-restart fu fu4" onclick="restartExam()">🔄 Refazer Simulado</button>`;
+
+  goScreen('sReport');
+}
+
+function restartExam(){
+  stopAudio();
+  ST.qIdx=0; ST.results=[]; ST.totalScore=0;
+  document.getElementById('runScore').textContent='0.0 pts';
+  goScreen('sIntro');
+}
+</script>
+</body>
+</html>
