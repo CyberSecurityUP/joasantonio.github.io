@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dia 1 — Modelo OSI e TCP/IP · Flashcards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root{
+    --bg:#fef6e8; --card:#fffdf8; --accent:#c9852a; --accent2:#a86512;
+    --soft:#f6e4c2; --text:#5c3d12; --ink:#3a3a38;
+    --tech:#0e5a8a; --techbg:#e7f1fa; --techsoft:#c5dcf0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Nunito',system-ui,sans-serif; background:var(--bg); color:var(--ink);
+    min-height:100vh; padding:18px 14px 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  /* ---- header ---- */
+  header h1{font-family:'Fraunces',serif;font-weight:700;font-size:26px;color:var(--text);line-height:1.15}
+  header .sub{font-weight:700;color:var(--accent);font-size:14px;margin-top:3px}
+  header .meta{font-size:13px;color:#9a7b46;margin-top:6px}
+  .progresswrap{display:flex;gap:3px;margin:16px 0 6px;flex-wrap:wrap}
+  .pdot{height:6px;flex:1 1 14px;border-radius:4px;background:var(--soft);cursor:pointer;transition:background .3s,transform .15s}
+  .pdot.seen{background:var(--accent)}
+  .pdot.active{background:var(--text);transform:scaleY(1.6)}
+  .counter{font-size:13px;font-weight:800;color:var(--accent);text-align:right}
+
+  /* ---- card ---- */
+  .stage{margin-top:14px}
+  .card{
+    background:var(--card);border-radius:24px;padding:24px 22px 26px;
+    border:1.5px solid var(--soft);box-shadow:0 16px 38px -18px rgba(0,0,0,.28);
+    animation:floatIn .4s ease;
+  }
+  .tag{display:inline-block;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent);background:var(--soft);padding:4px 11px;border-radius:999px}
+  .tag.layer{background:#efe2c8}
+  .cardtitle{font-family:'Fraunces',serif;font-weight:700;font-size:24px;color:var(--text);line-height:1.18;margin:12px 0 4px}
+  .hook{font-weight:700;color:var(--accent2);font-size:15px;margin-bottom:14px}
+
+  /* two parallel columns */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  @media(max-width:600px){.cols{grid-template-columns:1fr}}
+  .col{border-radius:16px;padding:14px 14px 15px}
+  .col.simple{background:var(--bg);border:1.5px solid var(--soft)}
+  .col.tech{background:var(--techbg);border:1.5px solid var(--techsoft)}
+  .col h4{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px;
+    display:flex;align-items:center;gap:6px}
+  .col.simple h4{color:var(--accent)}
+  .col.tech h4{color:var(--tech)}
+  .col p{font-size:14.5px;line-height:1.6}
+  .col.tech p{color:#143b54}
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:#fff;border:1px solid var(--techsoft);
+    padding:1px 6px;border-radius:6px;color:var(--tech)}
+
+  .example{margin-top:14px;background:#fff;border:1.5px dashed var(--soft);border-radius:14px;padding:13px 15px}
+  .example .lab{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+  .example p{font-size:14.5px;line-height:1.6}
+
+  ul.keys{margin:12px 0 0 2px;list-style:none;display:flex;flex-direction:column;gap:8px}
+  ul.keys li{font-size:14.5px;line-height:1.5;padding-left:24px;position:relative}
+  ul.keys li:before{content:"▸";position:absolute;left:4px;color:var(--accent);font-weight:800}
+
+  /* ---- animation slots ---- */
+  .anim{margin-top:16px;background:#fff;border:1.5px solid var(--soft);border-radius:16px;padding:16px;overflow:hidden}
+  .anim .alab{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;text-align:center}
+
+  /* OSI stack */
+  .stack{display:flex;flex-direction:column;gap:5px}
+  .lyr{padding:9px 12px;border-radius:9px;font-weight:700;font-size:13px;color:#fff;
+    display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateX(-18px);
+    animation:slideIn .45s ease forwards}
+  .lyr small{font-weight:600;opacity:.85;font-size:11px}
+
+  /* encapsulation boxes */
+  .encap{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0}
+  .box{border:2px solid;border-radius:8px;padding:7px 9px;font-weight:800;font-size:12px;position:relative;
+    animation:pop .4s ease both}
+  .box .inner{margin:6px 0 0;border-radius:6px;padding:6px 8px;border:2px solid}
+
+  /* packet travel */
+  .travel{position:relative;height:60px;background:linear-gradient(#fff,#fff);border-radius:10px;overflow:hidden;border:1px solid var(--soft)}
+  .road{position:absolute;top:50%;left:0;right:0;height:3px;background:var(--soft);transform:translateY(-50%)}
+  .hostL,.hostR{position:absolute;top:50%;transform:translateY(-50%);font-size:24px}
+  .hostL{left:10px}.hostR{right:10px}
+  .pkt{position:absolute;top:50%;left:42px;transform:translateY(-50%);font-size:20px;animation:drive 3s linear infinite}
+
+  .btns{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px}
+  button.nav{padding:12px 20px;border:none;border-radius:14px;background:var(--accent);color:#fff;
+    font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;transition:transform .15s,opacity .2s}
+  button.nav:hover:not(:disabled){transform:scale(1.05)}
+  button.nav:disabled{opacity:.3;cursor:default}
+  .pos{font-weight:800;color:var(--text);font-size:14px}
+
+  /* quiz card */
+  .quiz .opt{display:block;width:100%;text-align:left;margin-top:9px;padding:12px 14px;border-radius:13px;
+    border:1.5px solid var(--soft);background:#fff;font-weight:700;font-size:14.5px;color:var(--text);
+    cursor:pointer;font-family:inherit;transition:transform .15s,background .2s}
+  .quiz .opt:hover:not(.locked){transform:translateX(4px)}
+  .quiz .opt.right{background:#e3f6ea;border-color:#46b870;color:#1c6b3a}
+  .quiz .opt.wrong{background:#fdeaea;border-color:#e57373;color:#a23232;animation:shake .4s}
+  .feedback{margin-top:12px;padding:12px 14px;border-radius:13px;font-weight:600;font-size:14.5px;
+    background:#fff5e6;color:var(--text);animation:bounceIn .45s ease}
+
+  @keyframes floatIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes slideIn{to{opacity:1;transform:translateX(0)}}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes drive{0%{left:42px}50%{left:calc(100% - 62px)}50.01%{transform:translateY(-50%) scaleX(-1)}100%{left:42px;transform:translateY(-50%) scaleX(-1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+  @keyframes bounceIn{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.07)}100%{transform:scale(1);opacity:1}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---------- MOBILE ---------- */
+  @media(max-width:560px){
+    body{padding:12px 10px 80px;-webkit-text-size-adjust:100%}
+    header h1{font-size:21px}
+    header .sub{font-size:13px}
+    header .meta{font-size:12px;line-height:1.45}
+    .progresswrap{gap:2px;margin:14px 0 6px}
+    .pdot{flex:1 1 8px;height:5px}
+    .pdot.active{transform:scaleY(1.5)}
+    .counter{font-size:12px}
+
+    .card{padding:18px 15px 20px;border-radius:20px}
+    .cardtitle{font-size:20px;margin:10px 0 4px}
+    .hook{font-size:14px;margin-bottom:12px}
+    .tag{font-size:10px;padding:4px 9px}
+
+    .cols{grid-template-columns:1fr;gap:10px}   /* empilha as duas versões */
+    .col{padding:13px 13px 14px}
+    .col h4{font-size:11px}
+    .col p{font-size:15px;line-height:1.62}
+    code{font-size:13px;word-break:break-word}
+
+    .example{padding:12px 13px}
+    .example p{font-size:15px}
+    ul.keys li{font-size:15px}
+
+    .anim{padding:13px 11px}
+    .lyr{font-size:12px;padding:8px 10px}
+    .lyr small{display:none}                    /* esconde subtítulo apertado */
+    .box{font-size:11px;padding:6px 7px}
+    .travel{height:54px}
+
+    /* navegação fixa no rodapé, fácil no polegar */
+    .btns{position:fixed;left:0;right:0;bottom:0;margin:0;padding:10px 12px;
+      background:rgba(255,253,248,.96);backdrop-filter:blur(6px);
+      border-top:1.5px solid var(--soft);z-index:20}
+    button.nav{flex:1;padding:14px 10px;font-size:15px}
+    .pos{flex:0 0 auto;min-width:70px;text-align:center;font-size:13px}
+
+    /* quiz toque */
+    .quiz .opt{padding:14px 14px;font-size:15px}
+    .quiz .opt:hover:not(.locked){transform:none}  /* hover não faz sentido no toque */
+    .feedback{font-size:15px}
+  }
+  @media(max-width:380px){
+    header h1{font-size:19px}
+    .cardtitle{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Dia 1 — Modelo OSI e TCP/IP</h1>
+    <div class="sub">Semana 1 · Fundamentos de rede · baralho de estudo</div>
+    <div class="meta">Cada cartão traz a versão <b>sem tecniquês</b> e a <b>técnica</b> lado a lado. Use as setas ou as teclas ← →.</div>
+    <div class="progresswrap" id="dots"></div>
+    <div class="counter" id="counter"></div>
+  </header>
+
+  <div class="stage"><div id="cardSlot"></div></div>
+
+  <div class="btns">
+    <button class="nav" id="prev">← Anterior</button>
+    <span class="pos" id="pos"></span>
+    <button class="nav" id="next">Próximo →</button>
+  </div>
+</div>
+
+<script>
+const LAYER_COLORS = {
+  7:"#7b3fa0",6:"#9b4dca",5:"#c0399a",4:"#0f8a6c",3:"#0e6fae",2:"#c9852a",1:"#9a5a1a"
+};
+
+// ---------- CONTEÚDO: ~28 cartões ----------
+const CARDS = [
+  {tag:"Abertura", title:"Por que existe um 'modelo' de rede?",
+   hook:"Ninguém constrói uma casa começando pelo telhado.",
+   simple:"Fazer dois computadores conversarem é complicado. Pra não virar bagunça, dividiram o problema em camadas: cada uma resolve só um pedaço. É como uma fábrica com estações — cada estação faz uma coisa e passa pra próxima.",
+   tech:"Um modelo de referência padroniza a comunicação em camadas independentes. Cada camada oferece serviços à camada de cima e usa serviços da de baixo, escondendo a complexidade interna (abstração).",
+   example:{lab:"No dia a dia", text:"Você manda uma mensagem no WhatsApp sem saber se ela foi por Wi-Fi, 4G ou cabo. As camadas de baixo resolvem isso e você nem percebe — só vê o 'enviado'."},
+   keys:["Dividir pra conquistar: cada camada, um problema.","Uma camada não precisa saber como a outra funciona por dentro.","Existem dois modelos famosos: OSI (7 camadas) e TCP/IP (4)."],
+   anim:"stack"},
+
+  {tag:"Visão geral", title:"As 7 camadas do OSI, de cima pra baixo",
+   hook:"Do que você vê na tela até o sinal no cabo.",
+   simple:"Lá em cima fica o que é mais perto de você (o app, a tela). Lá embaixo, o que é mais perto da máquina (o fio, o sinal). O dado nasce no topo e vai descendo até virar eletricidade ou luz.",
+   tech:"Topo→base: 7 Aplicação, 6 Apresentação, 5 Sessão, 4 Transporte, 3 Rede, 2 Enlace, 1 Física. As camadas 5-7 lidam com software/dados; 1-4 com transporte e meio físico.",
+   example:{lab:"Macete de memória", text:"Uma frase clássica (de cima pra baixo): 'Alguns Apresentadores Sempre Tomam Refrigerante No Frio' — Aplicação, Apresentação, Sessão, Transporte, Rede, Enlace, Física."},
+   keys:["7 camadas no total.","Quanto mais alto, mais perto do usuário; mais baixo, mais perto do hardware.","Você não precisa decorar tudo hoje — vamos uma por uma."],
+   anim:"stack"},
+
+  {tag:"Conceito-chave", title:"Encapsulamento: ir embrulhando o dado",
+   hook:"Presente dentro da caixa, dentro do pacote, dentro do caminhão.",
+   simple:"Cada camada que o dado desce, ganha mais um 'embrulho' com informações de entrega. É como pôr a carta no envelope, o envelope na sacola, a sacola no caminhão. No destino, abrem na ordem inversa.",
+   tech:"A cada camada que desce, adiciona-se um cabeçalho (header) — e às vezes um trailer. Esse processo é o encapsulamento; o inverso, no receptor, é o desencapsulamento.",
+   example:{lab:"Visual", text:"Veja abaixo: o dado (presente) recebe um header da camada de transporte, depois da rede, depois do enlace — cada caixa envolvendo a anterior."},
+   keys:["Cada camada adiciona seu próprio cabeçalho.","O receptor remove os cabeçalhos na ordem inversa.","O dado original viaja 'embrulhado' por dentro de tudo."],
+   anim:"encap"},
+
+  {tag:"Conceito-chave", title:"Cada camada fala com a sua 'igual' do outro lado",
+   hook:"O gerente de um lado conversa com o gerente do outro.",
+   simple:"Mesmo o dado descendo e subindo, cada camada se entende com a camada do mesmo nível no outro computador. É como dois tradutores: cada um só conversa com o tradutor equivalente do outro time.",
+   tech:"Comunicação peer-to-peer lógica: a camada N da origem se comunica logicamente com a camada N do destino, usando o protocolo daquela camada — mesmo que fisicamente o dado passe por todas as camadas inferiores.",
+   example:{lab:"Na prática", text:"A camada de Transporte do seu PC 'negocia' com a camada de Transporte do servidor (ex.: TCP combinando a conexão), ignorando os detalhes do cabo lá embaixo."},
+   keys:["Comunicação lógica é horizontal (camada N ↔ camada N).","O caminho físico é vertical (desce tudo, sobe tudo).","Cada camada tem seu próprio 'idioma' (protocolo)."],
+   anim:"travel"},
+
+  {tag:"Camada 1", title:"Camada Física — o mundo dos sinais",
+   hook:"Onde o bit vira eletricidade, luz ou onda.",
+   simple:"É a camada mais 'crua': cabos, conectores, sinal de rádio do Wi-Fi. Aqui o 0 e o 1 viram pulso elétrico no cobre, luz na fibra ou onda no ar. É o chão de tudo.",
+   tech:"Define características elétricas, ópticas e mecânicas do meio: voltagem, pinagem, modulação, taxa de bits. Trata de bits brutos, sem significado de endereço. Ex.: Ethernet (cabo), fibra, 802.11 (rádio).",
+   example:{lab:"Você já viu", text:"Aquele cabo azul de rede (RJ-45) e a luzinha piscando no roteador? Camada física pura — sinal indo e voltando."},
+   keys:["Unidade aqui: o bit.","Lida com o meio físico: cobre, fibra, rádio.","Não entende endereços nem pacotes — só sinal."],
+   anim:"none"},
+
+  {tag:"Camada 2", title:"Camada de Enlace — a entrega dentro do bairro",
+   hook:"Quem entrega de porta em porta na mesma rua.",
+   simple:"Cuida da entrega entre aparelhos vizinhos na MESMA rede local — tipo seu PC e o roteador. Usa um endereço gravado de fábrica em cada placa de rede (o endereço MAC), como o número fixo de cada casa na rua.",
+   tech:"Organiza bits em quadros (frames), faz controle de acesso ao meio e detecção de erro. Endereçamento por MAC (físico). Switches operam aqui. Subcamadas LLC e MAC.",
+   example:{lab:"Curiosidade real", text:"Todo aparelho tem um MAC único tipo <code>A4:5E:60:...</code>. É por isso que alguns Wi-Fis liberam acesso 'por aparelho' — eles olham o MAC."},
+   keys:["Unidade aqui: o quadro (frame).","Endereço MAC = identidade física da placa de rede.","Switch é o equipamento típico dessa camada."],
+   anim:"none"},
+
+  {tag:"Camada 3", title:"Camada de Rede — achar o caminho entre cidades",
+   hook:"O GPS que decide a rota até o destino distante.",
+   simple:"Quando o dado precisa sair da sua rua e atravessar a internet até outro país, é essa camada que escolhe o caminho. Usa o endereço IP, que é como o endereço completo (com cidade e país), não só o número da casa.",
+   tech:"Responsável por endereçamento lógico (IP) e roteamento entre redes distintas. Decide o melhor caminho salto a salto. Roteadores operam aqui. Protocolos: IP, ICMP, roteamento (OSPF, BGP).",
+   example:{lab:"Você usa todo dia", text:"Abrir um site nos EUA: a camada de rede leva seus pacotes pulando de roteador em roteador, cada um decidindo 'manda por aqui', até chegar lá."},
+   keys:["Unidade aqui: o pacote.","Endereço IP = endereço lógico, funciona entre redes.","Roteador é o equipamento dessa camada."],
+   anim:"none"},
+
+  {tag:"Camada 4", title:"Camada de Transporte — a confiança da entrega",
+   hook:"Carta registrada (TCP) ou panfleto (UDP)?",
+   simple:"Decide COMO o dado é entregue: com confirmação e reenvio (TCP, confiável e mais lento) ou rápido e sem garantia (UDP). Também cuida de qual programa recebe, usando as portas.",
+   tech:"Provê comunicação fim-a-fim entre processos. TCP: orientado a conexão, confiável, controle de fluxo e congestionamento. UDP: sem conexão, sem garantia, baixo overhead. Multiplexação por portas.",
+   example:{lab:"Sentindo a diferença", text:"Baixar um PDF usa TCP (não pode faltar pedaço). Uma chamada de vídeo usa UDP (melhor perder um frame do que travar)."},
+   keys:["Unidade aqui: segmento (TCP) ou datagrama (UDP).","TCP = confiável e confirmado. UDP = rápido e sem garantia.","Portas dizem qual aplicativo recebe o dado."],
+   anim:"none"},
+
+  {tag:"Camadas 5-6", title:"Sessão e Apresentação — o combinado e a tradução",
+   hook:"Quem mantém a conversa de pé e quem traduz.",
+   simple:"A camada de Sessão abre, mantém e fecha a 'conversa' entre dois lados (como manter a ligação ativa). A de Apresentação traduz e arruma o formato dos dados — converte, comprime e cuida da criptografia pra ambos se entenderem.",
+   tech:"Sessão (5): estabelece, gerencia e encerra sessões; sincronização e checkpoints. Apresentação (6): sintaxe e semântica dos dados — codificação, compressão, criptografia (ex.: TLS atua aqui conceitualmente).",
+   example:{lab:"Exemplo concreto", text:"Quando o cadeado HTTPS criptografa sua senha, isso é função de Apresentação. Manter você logado durante a navegação tem cara de Sessão."},
+   keys:["Sessão: começa, mantém e encerra a conversa.","Apresentação: formato, compressão e criptografia dos dados.","Na prática, muita coisa daqui aparece dentro de protocolos modernos."],
+   anim:"none"},
+
+  {tag:"Camada 7", title:"Camada de Aplicação — onde você mora",
+   hook:"O andar de cima: o que você realmente usa.",
+   simple:"É a camada mais perto de você: o navegador, o app de e-mail, o WhatsApp. É aqui que o pedido nasce ('me mostra esse site') antes de descer por todas as outras camadas.",
+   tech:"Interface entre aplicações e a rede. Protocolos de aplicação: HTTP/HTTPS, DNS, SMTP, FTP, SSH. Não é o app em si, mas os protocolos que o app usa pra falar na rede.",
+   example:{lab:"Acontece agora", text:"Esta página que você está lendo chegou via HTTP(S) — um protocolo da camada de aplicação. O pedido começou aqui no topo."},
+   keys:["Unidade aqui: a mensagem (dados).","Protocolos: HTTP, DNS, SMTP, SSH...","É o ponto de partida do pedido, no topo da pilha."],
+   anim:"none"},
+
+  {tag:"Comparação", title:"OSI x TCP/IP: teoria x vida real",
+   hook:"Um é o mapa didático; o outro é a estrada de verdade.",
+   simple:"O OSI tem 7 camadas e serve pra ENSINAR e organizar a cabeça. O TCP/IP tem 4 camadas e é o que REALMENTE roda na internet. Pense no OSI como o manual e no TCP/IP como o carro andando.",
+   tech:"TCP/IP (4): Aplicação, Transporte, Internet, Acesso à Rede. Mapeamento: Aplicação TCP/IP ≈ camadas 5-7 OSI; Transporte ≈ 4; Internet ≈ 3; Acesso à Rede ≈ 1-2.",
+   example:{lab:"Por que isso importa", text:"Em entrevistas e no trabalho, as duas aparecem. Saber que 'Internet' do TCP/IP é a 'Rede' do OSI evita confusão na hora de analisar tráfego."},
+   keys:["OSI = 7 camadas, modelo de ensino.","TCP/IP = 4 camadas, o que roda de fato.","As camadas de aplicação do TCP/IP juntam 3 camadas do OSI."],
+   anim:"compare"},
+
+  {tag:"Exemplo guiado", title:"O que acontece ao abrir um site (descida)",
+   hook:"Acompanhe o pedido descendo a pilha.",
+   simple:"Você digita o endereço (Aplicação). O dado é embrulhado pra entrega confiável (Transporte), ganha endereço de destino (Rede), endereço do vizinho de saída (Enlace) e vira sinal no cabo (Física). Pronto, saiu.",
+   tech:"HTTP GET (L7) → segmento TCP com porta 443 (L4) → pacote IP com IP destino (L3) → frame com MAC do gateway (L2) → bits no meio (L1). Cada nível adiciona seu header.",
+   example:{lab:"Repare", text:"O mesmo pedido 'me dá essa página' foi ganhando 4 embrulhos no caminho pra baixo. No servidor, vai desembrulhar tudo de novo."},
+   keys:["O pedido nasce no topo (Aplicação).","Desce ganhando um cabeçalho por camada.","Sai como sinal físico pelo meio."],
+   anim:"encap"},
+
+  {tag:"Exemplo guiado", title:"O que acontece ao abrir um site (subida)",
+   hook:"No servidor, o dado sobe e é desembrulhado.",
+   simple:"No outro lado, o sinal chega (Física), vira quadro e confere o vizinho (Enlace), confere o endereço IP (Rede), remonta na ordem certa (Transporte) e entrega o pedido pro programa do site (Aplicação). Ele responde e o ciclo se inverte.",
+   tech:"No receptor ocorre o desencapsulamento: L1 recebe bits → L2 valida frame/MAC → L3 confere IP → L4 reordena segmentos → L7 entrega à aplicação (servidor web). A resposta repete o processo em sentido contrário.",
+   example:{lab:"Visual", text:"É a pilha de camadas funcionando como elevador: desceu de um lado, sobe do outro."},
+   keys:["Subida = desencapsulamento (tira os embrulhos).","Cada camada confere o cabeçalho que é dela.","No topo, a aplicação finalmente lê o pedido."],
+   anim:"stack"},
+
+  {tag:"Unidades", title:"O nome do dado muda em cada camada (PDU)",
+   hook:"Mesmo conteúdo, nomes diferentes por andar.",
+   simple:"O mesmo dado tem 'apelidos' diferentes dependendo de onde está: lá em cima é mensagem, no transporte é segmento, na rede é pacote, no enlace é quadro e na física é bit. Saber o apelido ajuda a entender em que camada você está.",
+   tech:"PDU (Protocol Data Unit) por camada — L7: dados/mensagem; L4: segmento (TCP) / datagrama (UDP); L3: pacote; L2: quadro (frame); L1: bit.",
+   example:{lab:"Pra fixar", text:"Se alguém diz 'analisei os pacotes', está falando da camada de rede (L3). 'Olhei os frames' = enlace (L2). O vocabulário entrega a camada."},
+   keys:["Mensagem → Segmento → Pacote → Quadro → Bit.","O nome indica em qual camada o dado está.","Esse vocabulário aparece o tempo todo em ferramentas como o Wireshark."],
+   anim:"none"},
+
+  {tag:"Aplicação no SOC", title:"Por que isso importa pra quem defende?",
+   hook:"Cada problema mora numa camada diferente.",
+   simple:"Quando algo dá errado, saber as camadas ajuda a achar a origem rápido: site fora do ar pode ser aplicação; IP estranho é camada de rede; aparelho clonado é enlace. É como saber em qual gaveta procurar.",
+   tech:"Modelo em camadas guia troubleshooting e análise de ameaças: ataques se mapeiam por camada (ARP spoofing em L2, IP spoofing/DDoS em L3, SYN flood em L4, ataques web em L7). Acelera triagem no SOC.",
+   example:{lab:"No mundo SOC", text:"Um SYN flood (enxurrada de aperto de mão TCP) é problema de camada 4. Já um ataque a um site é camada 7. Saber disso direciona a investigação."},
+   keys:["Cada tipo de ataque tende a viver numa camada.","Saber a camada acelera achar a causa.","Vira base pra entender tráfego e alertas nas próximas semanas."],
+   anim:"none"},
+
+  {tag:"Mito x verdade", title:"Desfazendo confusões comuns",
+   hook:"Nem tudo que parece, é.",
+   simple:"Mito: 'o TCP/IP é melhor que o OSI'. Verdade: servem a propósitos diferentes — OSI ensina, TCP/IP roda. Mito: 'tenho que decorar as 7 camadas hoje'. Verdade: entender o papel de cada uma vale mais que decorar a ordem.",
+   tech:"OSI é um modelo de referência conceitual; TCP/IP é a suíte de protocolos implementada. Não competem — coexistem como mapa e território. A memorização da ordem é secundária frente à compreensão funcional.",
+   example:{lab:"Conselho prático", text:"Em vez de decorar, saiba responder: 'o que essa camada resolve?'. A ordem vem naturalmente depois com o uso."},
+   keys:["OSI e TCP/IP não competem.","Entender o papel > decorar a ordem.","Os dois modelos vão aparecer na sua carreira."],
+   anim:"none"},
+
+  // ---- QUIZZES ----
+  {tag:"Quiz 1", title:"Teste rápido: a ideia das camadas", quiz:{
+    q:"Por que a rede é dividida em camadas?",
+    options:["Pra deixar a internet mais bonita","Pra cada camada resolver um problema sem depender de como as outras funcionam","Pra gastar mais energia"],
+    correct:1, why:"Isso! Camadas separam responsabilidades. Um problema de endereço você resolve na camada de rede, sem mexer no resto."}},
+
+  {tag:"Quiz 2", title:"Teste rápido: encapsulamento", quiz:{
+    q:"O que acontece com o dado a cada camada que ele DESCE na origem?",
+    options:["Ele perde informação","Ele ganha um novo cabeçalho (vai sendo embrulhado)","Ele vira um site"],
+    correct:1, why:"Exato! Cada camada adiciona seu cabeçalho. No destino, esses embrulhos são removidos na ordem inversa."}},
+
+  {tag:"Quiz 3", title:"Teste rápido: endereços", quiz:{
+    q:"O endereço MAC pertence a qual camada?",
+    options:["Camada de Rede (3)","Camada de Enlace (2)","Camada de Aplicação (7)"],
+    correct:1, why:"Certo! MAC é o endereço físico da placa de rede, usado na camada de Enlace (2). O IP é que fica na camada 3."}},
+
+  {tag:"Quiz 4", title:"Teste rápido: roteamento", quiz:{
+    q:"Qual equipamento decide o caminho entre redes diferentes (camada 3)?",
+    options:["Switch","Roteador","Cabo de rede"],
+    correct:1, why:"Isso! O roteador opera na camada de Rede e escolhe a rota entre redes. O switch fica na camada 2 (rede local)."}},
+
+  {tag:"Quiz 5", title:"Teste rápido: transporte", quiz:{
+    q:"Uma transferência de arquivo que não pode perder nenhum pedaço usa...",
+    options:["UDP, porque é rápido","TCP, porque confirma e reenvia o que falta","Nenhum dos dois"],
+    correct:1, why:"Perfeito! TCP garante entrega completa e na ordem. UDP seria arriscado pra arquivo, pois não confirma nada."}},
+
+  {tag:"Quiz 6", title:"Teste rápido: vocabulário (PDU)", quiz:{
+    q:"Na camada de Rede (3), o dado é chamado de...",
+    options:["Quadro (frame)","Pacote","Bit"],
+    correct:1, why:"Certo! L3 = pacote. Frame é L2 (enlace), bit é L1 (física), segmento é L4 (transporte)."}},
+
+  {tag:"Quiz 7", title:"Teste rápido: OSI x TCP/IP", quiz:{
+    q:"A camada 'Internet' do TCP/IP corresponde a qual camada do OSI?",
+    options:["Aplicação (7)","Rede (3)","Física (1)"],
+    correct:1, why:"Isso! 'Internet' (TCP/IP) ≈ 'Rede' (OSI, camada 3). É onde mora o IP e o roteamento."}},
+
+  {tag:"Quiz 8", title:"Teste rápido: visão de defesa", quiz:{
+    q:"Um ataque contra um site (ex.: injeção numa página) vive em qual camada?",
+    options:["Aplicação (7)","Física (1)","Enlace (2)"],
+    correct:0, why:"Exato! Ataques web acontecem na camada de Aplicação (7), onde vivem HTTP e os sites."}},
+
+  {tag:"Quiz 9", title:"Teste rápido: sentido do tráfego", quiz:{
+    q:"No computador que RECEBE o dado, o que acontece com as camadas?",
+    options:["O dado desce e ganha embrulhos","O dado sobe e os embrulhos são removidos (desencapsulamento)","Nada muda"],
+    correct:1, why:"Certo! No receptor o dado sobe a pilha e cada camada remove seu cabeçalho até a aplicação ler o conteúdo."}},
+
+  {tag:"Quiz 10", title:"Teste rápido: a base de tudo", quiz:{
+    q:"Qual a camada mais próxima do usuário (onde o pedido nasce)?",
+    options:["Física (1)","Aplicação (7)","Transporte (4)"],
+    correct:1, why:"Isso! A camada de Aplicação (7) é o topo — o app/navegador onde o pedido começa antes de descer."}},
+
+  {tag:"Fechamento", title:"Você fechou o Dia 1!",
+   hook:"O alicerce de tudo que vem nas próximas semanas.",
+   simple:"Agora você entende que a rede é uma pilha de camadas, que o dado vai sendo embrulhado e desembrulhado, e que cada camada tem um papel. Tudo que vier (IP, portas, DNS, tráfego, detecção) encaixa nessa estrutura.",
+   tech:"Você consolidou: o conceito de camadas e abstração, encapsulamento/desencapsulamento, o papel de L1-L7, o vocabulário de PDUs e o mapeamento OSI↔TCP/IP. Base direta para endereçamento (Dia 2) e transporte (Dia 3).",
+   example:{lab:"Teste final pessoal", text:"Tente explicar pra alguém, em 1 minuto, o que acontece quando você abre um site — citando pelo menos 3 camadas. Se conseguir, o Dia 1 está dominado."},
+   keys:["Rede = pilha de camadas independentes.","Dado é embrulhado na descida, desembrulhado na subida.","Próximo passo: Dia 2 — Endereçamento IP e sub-redes."],
+   anim:"travel"}
+];
+
+// ---------- RENDER ----------
+const slot = document.getElementById('cardSlot');
+const dotsWrap = document.getElementById('dots');
+const counter = document.getElementById('counter');
+const posEl = document.getElementById('pos');
+let idx = 0;
+const seen = new Set();
+const quizDone = new Set();
+
+CARDS.forEach((c,i)=>{
+  const d = document.createElement('div');
+  d.className = 'pdot';
+  d.onclick = ()=>{idx=i;render();};
+  dotsWrap.appendChild(d);
+});
+
+function animStack(){
+  const names = [["7 Aplicação","o app / navegador"],["6 Apresentação","formato, criptografia"],["5 Sessão","mantém a conversa"],["4 Transporte","TCP / UDP, portas"],["3 Rede","IP, roteamento"],["2 Enlace","MAC, switch"],["1 Física","cabo, sinal"]];
+  let h='<div class="stack">';
+  names.forEach((n,i)=>{
+    const layer = 7-i;
+    h+=`<div class="lyr" style="background:${LAYER_COLORS[layer]};animation-delay:${i*0.09}s"><span>${n[0]}</span><small>${n[1]}</small></div>`;
+  });
+  h+='</div>';
+  return `<div class="anim"><div class="alab">A pilha de camadas (topo → base)</div>${h}</div>`;
+}
+function animEncap(){
+  return `<div class="anim"><div class="alab">Encapsulamento: cada camada embrulha a anterior</div>
+  <div class="encap">
+   <div class="box" style="border-color:#9a5a1a;color:#9a5a1a;animation-delay:.45s;background:#fff">L2 Enlace
+     <div class="inner" style="border-color:#0e6fae;color:#0e6fae;animation-delay:.3s">L3 Rede
+       <div class="inner" style="border-color:#0f8a6c;color:#0f8a6c;animation-delay:.15s">L4 Transp.
+         <div class="inner" style="border-color:#7b3fa0;color:#7b3fa0;animation-delay:0s">🎁 Dado</div>
+       </div>
+     </div>
+   </div>
+  </div></div>`;
+}
+function animTravel(){
+  return `<div class="anim"><div class="alab">O pacote indo e voltando entre dois computadores</div>
+  <div class="travel"><div class="road"></div><div class="hostL">💻</div><div class="hostR">🖥️</div><div class="pkt">📦</div></div></div>`;
+}
+function animCompare(){
+  const osi=[["7 Aplicação",7],["6 Apresentação",6],["5 Sessão",5],["4 Transporte",4],["3 Rede",3],["2 Enlace",2],["1 Física",1]];
+  const tcp=[["Aplicação","#7b3fa0",3],["Transporte","#0f8a6c",1],["Internet","#0e6fae",1],["Acesso à Rede","#9a5a1a",2]];
+  let l='<div style="flex:1"><div style="font-weight:800;font-size:12px;color:var(--accent);margin-bottom:6px;text-align:center">OSI (7)</div><div class="stack">';
+  osi.forEach((o,i)=>l+=`<div class="lyr" style="background:${LAYER_COLORS[o[1]]};animation-delay:${i*0.06}s;padding:6px 9px;font-size:12px">${o[0]}</div>`);
+  l+='</div></div>';
+  let r='<div style="flex:1"><div style="font-weight:800;font-size:12px;color:var(--tech);margin-bottom:6px;text-align:center">TCP/IP (4)</div><div class="stack">';
+  tcp.forEach((t,i)=>r+=`<div class="lyr" style="background:${t[1]};animation-delay:${i*0.1}s;padding:${t[2]*9}px 9px;font-size:12px">${t[0]}</div>`);
+  r+='</div></div>';
+  return `<div class="anim"><div class="alab">Lado a lado: cada bloco do TCP/IP cobre uma ou mais camadas do OSI</div><div style="display:flex;gap:14px;align-items:flex-start">${l}${r}</div></div>`;
+}
+
+function buildAnim(type){
+  if(type==='stack')return animStack();
+  if(type==='encap')return animEncap();
+  if(type==='travel')return animTravel();
+  if(type==='compare')return animCompare();
+  return '';
+}
+
+function render(){
+  const c = CARDS[idx];
+  seen.add(idx);
+  let html = `<div class="card"><span class="tag ${c.tag.startsWith('Camada')?'layer':''}">${c.tag}</span>`;
+  html += `<div class="cardtitle">${c.title}</div>`;
+  if(c.hook) html += `<div class="hook">“${c.hook}”</div>`;
+
+  if(c.quiz){
+    html += `<div class="quiz" id="quizbox"><p style="font-weight:700;font-size:16px;color:var(--text);margin-bottom:4px">${c.quiz.q}</p>`;
+    c.quiz.options.forEach((o,i)=>{ html+=`<button class="opt" data-i="${i}">${o}</button>`; });
+    html += `<div id="fb"></div></div>`;
+  } else {
+    html += `<div class="cols">
+      <div class="col simple"><h4>🧩 Sem tecniquês</h4><p>${c.simple}</p></div>
+      <div class="col tech"><h4>⚙️ Versão técnica</h4><p>${c.tech}</p></div>
+    </div>`;
+    if(c.example) html += `<div class="example"><div class="lab">${c.example.lab}</div><p>${c.example.text}</p></div>`;
+    if(c.keys){ html+='<ul class="keys">'; c.keys.forEach(k=>html+=`<li>${k}</li>`); html+='</ul>'; }
+    if(c.anim && c.anim!=='none') html += buildAnim(c.anim);
+  }
+  html += `</div>`;
+  slot.innerHTML = html;
+
+  if(c.quiz){
+    const box = document.getElementById('quizbox');
+    box.querySelectorAll('.opt').forEach(btn=>{
+      btn.onclick=()=>{
+        if(box.querySelector('.locked')) return;
+        const chosen = +btn.dataset.i;
+        box.querySelectorAll('.opt').forEach(b=>b.classList.add('locked'));
+        if(chosen===c.quiz.correct){ btn.classList.add('right'); quizDone.add(idx); }
+        else { btn.classList.add('wrong'); box.querySelectorAll('.opt')[c.quiz.correct].classList.add('right'); }
+        document.getElementById('fb').innerHTML =
+          `<div class="feedback">${chosen===c.quiz.correct?'':'Quase! '}${c.quiz.why}</div>`;
+        updateDots();
+      };
+    });
+  }
+  updateDots();
+  document.getElementById('prev').disabled = idx===0;
+  document.getElementById('next').disabled = idx===CARDS.length-1;
+  posEl.textContent = `${idx+1} de ${CARDS.length}`;
+}
+
+function updateDots(){
+  [...dotsWrap.children].forEach((d,i)=>{
+    d.className='pdot'+(seen.has(i)?' seen':'')+(i===idx?' active':'');
+  });
+  counter.textContent = `${seen.size}/${CARDS.length} cartões vistos · ${quizDone.size} quizzes certos`;
+}
+
+document.getElementById('prev').onclick=()=>{if(idx>0){idx--;render();}};
+document.getElementById('next').onclick=()=>{if(idx<CARDS.length-1){idx++;render();}};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'&&idx>0){idx--;render();}
+  if(e.key==='ArrowRight'&&idx<CARDS.length-1){idx++;render();}
+});
+render();
+</script>
+</body>
+</html>
